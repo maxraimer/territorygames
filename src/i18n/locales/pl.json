@@ -1,0 +1,302 @@
+{
+  "common": {
+    "appName": "Territory Games",
+    "back": "Wstecz",
+    "rules": "Zasady gry",
+    "close": "Zamknij",
+    "theme": "Motyw",
+    "themeLight": "Jasny motyw",
+    "themeDark": "Ciemny motyw",
+    "language": "Język",
+    "diceAriaLabel": "Kostka: {{value}}",
+    "shapeAriaLabel": "Figura: {{value}}",
+    "languages": {
+      "uk": "Українська",
+      "en": "English",
+      "ru": "Русский",
+      "es": "Español",
+      "fr": "Français",
+      "pl": "Polski",
+      "de": "Deutsch"
+    }
+  },
+  "home": {
+    "subtitle": "Wybierz grę",
+    "nickname": {
+      "label": "Twój nick",
+      "placeholder": "Wpisz nick",
+      "required": "Wpisz nick, aby kontynuować"
+    },
+    "games": {
+      "dice": {
+        "name": "Diceritory",
+        "tagline": "Dwie kostki, nieskończona taktyka: każdy rzut to nowa bitwa o każdy centymetr planszy."
+      },
+      "tetromino": {
+        "name": "Tetritory",
+        "tagline": "Ulubione klocki z Tetrisa wkraczają do walki o terytorium — układaj, okrążaj, wygrywaj."
+      },
+      "domino": {
+        "name": "Dominotory",
+        "tagline": "Liczby muszą się zgadzać, ambicje — nie: zamień każdą kostkę domina w przyczółek do podboju."
+      },
+      "hex": {
+        "name": "Hexoritory",
+        "tagline": "Sześciokątna plansza, sześć kierunków ataku — opanuj heksagony i weź przeciwników w okrążenie."
+      }
+    }
+  },
+  "setup": {
+    "subtitle": "Skonfiguruj {{game}} przed startem",
+    "playerCount": "Liczba graczy",
+    "boardWidth": "Szerokość planszy",
+    "boardHeight": "Wysokość planszy",
+    "boardMinHint": "Minimum dla {{count}} graczy — {{size}}×{{size}}",
+    "colorClash": "Gracze muszą wybrać różne kolory.",
+    "startButton": "Rozpocznij grę",
+    "rulesButton": "Zasady gry",
+    "defaultPlayerName": "Gracz {{n}}",
+    "toggles": {
+      "autoWin": {
+        "label": "Automatyczne zwycięstwo",
+        "hint": "Kończ grę przed czasem, jeśli wynik nie może się już zmienić"
+      },
+      "allowRotation": {
+        "label": "Zezwól na obracanie klocków"
+      },
+      "doublesExtraTurn": {
+        "label": "Dublet daje dodatkową turę",
+        "hint": "Jeśli obie kostki pokażą tę samą liczbę — ten sam gracz rzuca jeszcze raz"
+      },
+      "autoFillEnclosed": {
+        "label": "Automatyczne zajmowanie otoczonego terytorium",
+        "hintTetromino": "Jeśli gracz otoczy obszar swoimi figurami — zostaje on od razu wypełniony tetromino w jego kolorze",
+        "hintHex": "Jeśli gracz otoczy obszar heksagonami — zostaje on od razu wypełniony figurami w jego kolorze"
+      }
+    },
+    "copy": {
+      "dice": {
+        "rotationHint": "Wyłącz dla utrudnienia — blok można ustawić tylko tak, jak wypadł na kostce",
+        "smartLabel": "Inteligentne kostki",
+        "smartHint": "Pod koniec gry kostki częściej wypadają tak, by możliwy był ruch"
+      },
+      "tetromino": {
+        "rotationHint": "Wyłącz dla utrudnienia — figurę można ustawić tylko w takiej orientacji, w jakiej wypadła",
+        "smartLabel": "Inteligentne figury",
+        "smartHint": "Pod koniec gry częściej wypada figura, którą można postawić"
+      },
+      "domino": {
+        "rotationHint": "Wyłącz dla utrudnienia — kostkę domina można ustawić tylko tak, jak wypadła, połówki nie zamieniają się miejscami",
+        "smartLabel": "Inteligentne kostki domina",
+        "smartHint": "Pod koniec gry częściej wypada kostka, którą można postawić"
+      },
+      "hex": {
+        "rotationHint": "Wyłącz dla utrudnienia — figurę można ustawić tylko w takiej orientacji, w jakiej wypadła",
+        "smartLabel": "Inteligentne figury",
+        "smartHint": "Pod koniec gry częściej wypada figura, którą można postawić"
+      }
+    }
+  },
+  "playing": {
+    "exit": "Wyjdź",
+    "timerTitle": "Czas gry",
+    "movesTitle": "Liczba ruchów",
+    "moveLabel": "Ruch {{count}}",
+    "rollLabel": {
+      "dice": "Rzuć kośćmi (Spacja)",
+      "tetromino": "Weź figurę (Spacja)",
+      "domino": "Weź kostkę (Spacja)",
+      "hex": "Rzuć kośćmi (Spacja)"
+    },
+    "rollingLabel": {
+      "dice": "Rzucamy kośćmi…",
+      "tetromino": "Losujemy figurę…",
+      "domino": "Losujemy kostkę…",
+      "hex": "Rzucamy kośćmi…"
+    },
+    "placingLabel": {
+      "dice": "Najedź na planszę i kliknij, aby ustawić prostokąt.",
+      "tetromino": "Najedź na planszę i kliknij, aby ustawić figurę.",
+      "domino": "Najedź na planszę i kliknij, aby ustawić kostkę.",
+      "hexStored": "Najedź na planszę i kliknij, aby ustawić figurę ze schowka.",
+      "hexRoll": "Najedź na planszę i kliknij, aby ustawić figurę (pozostało {{count}})."
+    },
+    "skippedLabel": "Brak dostępnych pozycji dla tego rzutu. Ruch pominięty.",
+    "remainingLabel": "pozostało {{count}}",
+    "nextButton": "Dalej (Spacja)",
+    "rotateButton": "Obróć (R)",
+    "storeButton": "Zachowaj (G)",
+    "placeFromStorageButton": "Postaw ze schowka (1)",
+    "backToRollButton": "Wróć do rzutu",
+    "historyTitle": "Historia",
+    "turnBadge": "ruch",
+    "eliminatedBadge": "odpadł",
+    "cellsCount": "{{count}} pól",
+    "pickFromStorageTitle": "Weź ze schowka ({{n}})",
+    "placeFromStorageTitle": "Postaw ze schowka (1)",
+    "hexShapeLabels": {
+      "1": "1 heksagon",
+      "2": "2 heksagony",
+      "3": "linia z 3",
+      "4": "trójkąt z 3"
+    },
+    "log": {
+      "diceRoll": "{{name}}: kości {{d1}}×{{d2}}{{doubleNote}}",
+      "diceRollSkipped": "{{name}}: kości {{d1}}×{{d2}} — brak dostępnych ruchów, ruch pominięty{{doubleNote}}",
+      "doubleNote": " — dublet! jeszcze jeden ruch",
+      "tetrominoRoll": "{{name}}: figura {{type}}",
+      "tetrominoRollSkipped": "{{name}}: figura {{type}} — brak dostępnych ruchów, ruch pominięty",
+      "dominoRoll": "{{name}}: kostka {{a}}:{{b}}",
+      "dominoRollSkipped": "{{name}}: kostka {{a}}:{{b}} — brak dostępnych ruchów, ruch pominięty",
+      "dominoRollFromStorage": "{{name}}: kostka ze schowka {{a}}:{{b}}",
+      "dominoRollFromStorageSkipped": "{{name}}: kostka ze schowka {{a}}:{{b}} — brak dostępnych ruchów, ruch pominięty",
+      "dominoStored": "{{name}}: schował kostkę {{a}}:{{b}}",
+      "hexRoll": "{{name}}: {{shape}} ×{{count}}",
+      "hexRollSkipped": "{{name}}: {{shape}} ×{{count}} — brak dostępnych ruchów, ruch pominięty",
+      "hexPlaced": "{{name}}: ustawił {{shape}} w ({{x}}, {{y}})",
+      "hexPlacedFromStorage": "{{name}}: ustawił {{shape}} ze schowka w ({{x}}, {{y}})",
+      "hexSkipRemainder": " (pozostało ×{{count}} — brak miejsca, pominięto)",
+      "hexStored": "{{name}}: schował {{shape}}",
+      "eliminated": "{{name}}: odpada — nie ma już możliwych ruchów",
+      "dicePlaced": "{{name}}: ustawił {{w}}×{{h}} w ({{x}}, {{y}})",
+      "tetrominoPlaced": "{{name}}: ustawił figurę {{type}} w ({{x}}, {{y}})",
+      "dominoPlaced": "{{name}}: ustawił kostkę {{a}}:{{b}} w ({{x}}, {{y}})",
+      "autoFillClaimed": "{{name}}: automatycznie zajął otoczone terytorium (+{{count}} pól)"
+    }
+  },
+  "gameOver": {
+    "winnerTitle": "{{name}} wygrywa!",
+    "drawTitle": "Remis!",
+    "drawSubtitle": "Remis — po {{count}} pól",
+    "winnerSubtitle": "Zajęto {{count}} pól planszy",
+    "reasonDecided": "Grę zakończono przed czasem — przeciwnicy nie mieli już szans dogonić lidera",
+    "reasonMajority": "Grę zakończono przed czasem — gracz zajął więcej niż równą część planszy",
+    "movesCount": "{{count}} ruchów",
+    "cellsCount": "{{count}} pól",
+    "restartButton": "Nowa gra"
+  },
+  "rules": {
+    "common": {
+      "cornerSeeding": "Każdy gracz zaczyna od jednego pola w swoim rogu planszy — każda kolejna figura musi przylegać do już zajętego terytorium.",
+      "scoring": "Wygrywa gracz, który do końca gry zajmie najwięcej pól planszy.",
+      "autoWinToggle": "Automatyczne zwycięstwo: gra kończy się przed czasem, jeśli wynik nie może się już zmienić niezależnie od dalszych ruchów.",
+      "smartAssistToggle": "Opcja „Inteligentne…” pod koniec gry, gdy wolnego miejsca zostaje niewiele, częściej dopasowuje losowy wynik tak, by ruch był możliwy — dzięki temu gra nie utyka z powodu pecha.",
+      "rotationToggle": "Zezwól na obracanie klocków: jeśli włączone, figurę można obrócić przed ustawieniem. Wyłącz dla utrudnienia — figurę można ustawić tylko w takiej orientacji, w jakiej wypadła.",
+      "eliminationNote": "Jeśli graczy jest trzech lub czterech i ktoś nie ma już żadnego możliwego ruchu — odpada z kolejki (oznaczane jako „odpadł”), ale jego zajęte pola i wynik pozostają na planszy do końca gry."
+    },
+    "dice": {
+      "title": "Diceritory — zasady",
+      "objective": "Zdobywaj terytorium na prostokątnej planszy, ustawiając prostokąty, których rozmiar określa rzut kośćmi.",
+      "turn": "W swojej turze rzuć dwiema kośćmi — określają one szerokość i wysokość prostokąta, który musisz ustawić w tym ruchu.",
+      "placement": "Prostokąt można ustawić tylko tak, aby przynajmniej jednym bokiem stykał się z polem, które już zająłeś (pionowo lub poziomo).",
+      "toggles": [
+        {
+          "title": "Dublet daje dodatkową turę",
+          "body": "Jeśli obie kostki pokażą tę samą liczbę — ten sam gracz od razu rzuca jeszcze raz."
+        }
+      ]
+    },
+    "tetromino": {
+      "title": "Tetritory — zasady",
+      "objective": "Ta sama walka o terytorium, ale zamiast prostokątów — siedem klasycznych figur z Tetrisa.",
+      "turn": "W swojej turze wylosuj figurę z „worka” na 7 figur (każda pojawia się dokładnie raz, zanim worek zostanie ponownie potasowany) i ustaw ją na planszy.",
+      "placement": "Figurę można ustawić tylko tak, aby przynajmniej jednym polem stykała się z polem, które już zająłeś (pionowo lub poziomo).",
+      "toggles": [
+        {
+          "title": "Automatyczne zajmowanie otoczonego terytorium",
+          "body": "Jeśli otoczysz swoimi figurami obszar planszy tak, że przeciwnicy nie mają już do niego dostępu — zostaje on natychmiast maksymalnie wypełniony tetromino w twoim kolorze, a te pola doliczane są do twojego wyniku."
+        }
+      ]
+    },
+    "domino": {
+      "title": "Dominotory — zasady",
+      "objective": "Ta sama walka o terytorium, ale kostkami domina z dwiema połówkami, każda z własną liczbą.",
+      "turn": "W swojej turze rzuć kostką domina i ustaw obie jej połówki na planszy.",
+      "placement": "Oprócz zwykłej zasady przylegania do własnego terytorium, przynajmniej jedna połówka kostki musi stykać się z już ustawioną połówką o tej samej liczbie — liczby muszą się „zgadzać”, jak w klasycznym domino.",
+      "toggles": [
+        {
+          "title": "Schowek",
+          "body": "Można odłożyć do 4 kostek zamiast od razu je ustawiać i wyjąć dowolną z nich w dowolnej innej swojej turze."
+        }
+      ]
+    },
+    "hex": {
+      "title": "Hexoritory — zasady",
+      "objective": "Ta sama walka o terytorium, ale na planszy z heksagonów (sześciokątów) i figurami z nich złożonymi.",
+      "turn": "W swojej turze pierwsza kostka określa figurę (1 heksagon, 2 heksagony, linia z 3 lub trójkąt z 3), a druga — ile kopii tej figury trzeba ustawić w tym ruchu (1–3). Wszystkie figury z rzutu muszą zostać ustawione w tym samym ruchu.",
+      "placement": "Każda figura musi przylegać przynajmniej jednym bokiem heksagonu do twojego już zajętego terytorium (sąsiedztwo liczy się we wszystkich 6 kierunkach).",
+      "toggles": [
+        {
+          "title": "Schowek",
+          "body": "Jedną figurę z rzutu można schować zamiast ją ustawiać, jeśli schowek jest wolny. Można ją wyjąć w dowolnej innej swojej turze — ale figury, które wypadły w tym ruchu, i tak trzeba ustawić."
+        },
+        {
+          "title": "Automatyczne zajmowanie otoczonego terytorium",
+          "body": "Jeśli otoczysz heksagonami obszar planszy tak, że przeciwnicy nie mają już do niego dostępu — zostaje on natychmiast maksymalnie wypełniony figurami w twoim kolorze."
+        }
+      ]
+    }
+  },
+  "mode": {
+    "subtitle": "Wybierz tryb gry",
+    "hotseat": {
+      "title": "Hot-seat",
+      "description": "Lokalna gra na zmianę — wszyscy gracze przy jednym urządzeniu."
+    },
+    "bots": {
+      "title": "Z botami",
+      "description": "Zagraj przeciwko komputerowym przeciwnikom, wybierając ich liczbę i poziom trudności.",
+      "count": "Liczba botów",
+      "botName": "Bot {{n}}",
+      "difficulty": {
+        "label": "Poziom trudności",
+        "easy": "Łatwy",
+        "medium": "Średni",
+        "hard": "Trudny"
+      }
+    },
+    "online": {
+      "title": "Online",
+      "description": "Utwórz lobby albo dołącz do znajomych za pomocą kodu.",
+      "choice": {
+        "subtitle": "Utwórz nowe lobby albo dołącz za pomocą kodu",
+        "create": "Utwórz lobby",
+        "createHint": "Skonfiguruj grę i zaproś innych za pomocą kodu",
+        "join": "Dołącz do lobby",
+        "joinHint": "Wpisz kod, który do Ciebie wysłano"
+      },
+      "create": {
+        "maxPlayers": "Maksymalna liczba graczy",
+        "submit": "Utwórz lobby",
+        "creating": "Tworzymy lobby…"
+      },
+      "join": {
+        "title": "Dołącz do lobby",
+        "subtitle": "Wpisz kod lobby, który do Ciebie wysłano",
+        "codeLabel": "Kod lobby",
+        "codePlaceholder": "Np. AB12CD",
+        "submit": "Dołącz",
+        "joining": "Dołączamy…",
+        "errors": {
+          "notFound": "Nie znaleziono lobby. Sprawdź kod i spróbuj ponownie.",
+          "full": "To lobby jest już pełne.",
+          "alreadyStarted": "Gra w tym lobby już się rozpoczęła.",
+          "generic": "Nie udało się dołączyć. Spróbuj ponownie."
+        }
+      },
+      "lobby": {
+        "loading": "Wczytywanie lobby…",
+        "closed": "To lobby już nie istnieje.",
+        "codeLabel": "Kod lobby",
+        "playersTitle": "Gracze ({{count}}/{{max}})",
+        "hostBadge": "właściciel",
+        "youBadge": "ty",
+        "startButton": "Rozpocznij grę",
+        "starting": "Rozpoczynamy…",
+        "minPlayersHint": "Potrzeba co najmniej 2 graczy, aby rozpocząć",
+        "waitingHint": "Czekamy, aż właściciel lobby rozpocznie grę…",
+        "leaveButton": "Opuść lobby"
+      }
+    }
+  }
+}

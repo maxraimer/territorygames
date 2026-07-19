@@ -1,0 +1,302 @@
+{
+  "common": {
+    "appName": "Territory Games",
+    "back": "Atrás",
+    "rules": "Reglas del juego",
+    "close": "Cerrar",
+    "theme": "Tema",
+    "themeLight": "Tema claro",
+    "themeDark": "Tema oscuro",
+    "language": "Idioma",
+    "diceAriaLabel": "Dado: {{value}}",
+    "shapeAriaLabel": "Figura: {{value}}",
+    "languages": {
+      "uk": "Українська",
+      "en": "English",
+      "ru": "Русский",
+      "es": "Español",
+      "fr": "Français",
+      "pl": "Polski",
+      "de": "Deutsch"
+    }
+  },
+  "home": {
+    "subtitle": "Elige un juego",
+    "nickname": {
+      "label": "Tu apodo",
+      "placeholder": "Introduce tu apodo",
+      "required": "Introduce tu apodo para continuar"
+    },
+    "games": {
+      "dice": {
+        "name": "Diceritory",
+        "tagline": "Dos dados, táctica infinita: cada tirada es una nueva batalla por cada centímetro del tablero."
+      },
+      "tetromino": {
+        "name": "Tetritory",
+        "tagline": "Las piezas favoritas del Tetris entran en la batalla por el territorio: encaja, rodea, vence."
+      },
+      "domino": {
+        "name": "Dominotory",
+        "tagline": "Los números deben coincidir, las ambiciones no: convierte cada ficha de dominó en una cabeza de playa para conquistar."
+      },
+      "hex": {
+        "name": "Hexoritory",
+        "tagline": "Tablero hexagonal, seis direcciones de ataque: domina los hexágonos y rodea a tus rivales."
+      }
+    }
+  },
+  "setup": {
+    "subtitle": "Configura {{game}} antes de empezar",
+    "playerCount": "Número de jugadores",
+    "boardWidth": "Ancho del tablero",
+    "boardHeight": "Alto del tablero",
+    "boardMinHint": "Mínimo para {{count}} jugadores: {{size}}×{{size}}",
+    "colorClash": "Los jugadores deben elegir colores diferentes.",
+    "startButton": "Empezar partida",
+    "rulesButton": "Reglas del juego",
+    "defaultPlayerName": "Jugador {{n}}",
+    "toggles": {
+      "autoWin": {
+        "label": "Victoria automática",
+        "hint": "Termina la partida antes de tiempo si el resultado ya no puede cambiar"
+      },
+      "allowRotation": {
+        "label": "Permitir rotar las piezas"
+      },
+      "doublesExtraTurn": {
+        "label": "Los dobles dan un turno extra",
+        "hint": "Si ambos dados coinciden, el mismo jugador vuelve a tirar"
+      },
+      "autoFillEnclosed": {
+        "label": "Captura automática del territorio rodeado",
+        "hintTetromino": "Si un jugador rodea una zona con sus piezas, esta se rellena de inmediato con tetrominós de su color",
+        "hintHex": "Si un jugador rodea una zona con hexágonos, esta se rellena de inmediato con figuras de su color"
+      }
+    },
+    "copy": {
+      "dice": {
+        "rotationHint": "Desactívalo para más dificultad: la pieza solo se coloca en la orientación que indica el dado",
+        "smartLabel": "Dados inteligentes",
+        "smartHint": "Hacia el final de la partida, los dados tienden más a caer en un resultado que permita jugar"
+      },
+      "tetromino": {
+        "rotationHint": "Desactívalo para más dificultad: la figura solo se coloca en la orientación en que salió",
+        "smartLabel": "Figuras inteligentes",
+        "smartHint": "Hacia el final de la partida, sale con más frecuencia una figura que se puede colocar"
+      },
+      "domino": {
+        "rotationHint": "Desactívalo para más dificultad: la ficha solo se coloca como salió, sin intercambiar las mitades",
+        "smartLabel": "Fichas inteligentes",
+        "smartHint": "Hacia el final de la partida, sale con más frecuencia una ficha que se puede colocar"
+      },
+      "hex": {
+        "rotationHint": "Desactívalo para más dificultad: la figura solo se coloca en la orientación en que salió",
+        "smartLabel": "Figuras inteligentes",
+        "smartHint": "Hacia el final de la partida, sale con más frecuencia una figura que se puede colocar"
+      }
+    }
+  },
+  "playing": {
+    "exit": "Salir",
+    "timerTitle": "Tiempo de partida",
+    "movesTitle": "Número de turnos",
+    "moveLabel": "Turno {{count}}",
+    "rollLabel": {
+      "dice": "Lanzar dados (Espacio)",
+      "tetromino": "Sacar figura (Espacio)",
+      "domino": "Sacar ficha (Espacio)",
+      "hex": "Lanzar dados (Espacio)"
+    },
+    "rollingLabel": {
+      "dice": "Lanzando dados…",
+      "tetromino": "Sacando figura…",
+      "domino": "Sacando ficha…",
+      "hex": "Lanzando dados…"
+    },
+    "placingLabel": {
+      "dice": "Pasa el cursor sobre el tablero y haz clic para colocar el rectángulo.",
+      "tetromino": "Pasa el cursor sobre el tablero y haz clic para colocar la figura.",
+      "domino": "Pasa el cursor sobre el tablero y haz clic para colocar la ficha.",
+      "hexStored": "Pasa el cursor sobre el tablero y haz clic para colocar la figura guardada.",
+      "hexRoll": "Pasa el cursor sobre el tablero y haz clic para colocar la figura (quedan {{count}})."
+    },
+    "skippedLabel": "No hay posiciones válidas para esta tirada. Turno omitido.",
+    "remainingLabel": "quedan {{count}}",
+    "nextButton": "Siguiente (Espacio)",
+    "rotateButton": "Rotar (R)",
+    "storeButton": "Guardar (G)",
+    "placeFromStorageButton": "Colocar desde el almacén (1)",
+    "backToRollButton": "Volver a la tirada",
+    "historyTitle": "Historial",
+    "turnBadge": "turno",
+    "eliminatedBadge": "eliminado",
+    "cellsCount": "{{count}} casillas",
+    "pickFromStorageTitle": "Tomar del almacén ({{n}})",
+    "placeFromStorageTitle": "Colocar desde el almacén (1)",
+    "hexShapeLabels": {
+      "1": "1 hexágono",
+      "2": "2 hexágonos",
+      "3": "línea de 3",
+      "4": "triángulo de 3"
+    },
+    "log": {
+      "diceRoll": "{{name}}: dados {{d1}}×{{d2}}{{doubleNote}}",
+      "diceRollSkipped": "{{name}}: dados {{d1}}×{{d2}} — sin movimientos válidos, turno omitido{{doubleNote}}",
+      "doubleNote": " — ¡dobles! otro turno",
+      "tetrominoRoll": "{{name}}: figura {{type}}",
+      "tetrominoRollSkipped": "{{name}}: figura {{type}} — sin movimientos válidos, turno omitido",
+      "dominoRoll": "{{name}}: ficha {{a}}:{{b}}",
+      "dominoRollSkipped": "{{name}}: ficha {{a}}:{{b}} — sin movimientos válidos, turno omitido",
+      "dominoRollFromStorage": "{{name}}: ficha del almacén {{a}}:{{b}}",
+      "dominoRollFromStorageSkipped": "{{name}}: ficha del almacén {{a}}:{{b}} — sin movimientos válidos, turno omitido",
+      "dominoStored": "{{name}}: guardó la ficha {{a}}:{{b}}",
+      "hexRoll": "{{name}}: {{shape}} ×{{count}}",
+      "hexRollSkipped": "{{name}}: {{shape}} ×{{count}} — sin movimientos válidos, turno omitido",
+      "hexPlaced": "{{name}}: colocó {{shape}} en ({{x}}, {{y}})",
+      "hexPlacedFromStorage": "{{name}}: colocó {{shape}} del almacén en ({{x}}, {{y}})",
+      "hexSkipRemainder": " (resto ×{{count}} — sin espacio, omitido)",
+      "hexStored": "{{name}}: guardó {{shape}}",
+      "eliminated": "{{name}}: queda eliminado — ya no tiene movimientos posibles",
+      "dicePlaced": "{{name}}: colocó {{w}}×{{h}} en ({{x}}, {{y}})",
+      "tetrominoPlaced": "{{name}}: colocó la figura {{type}} en ({{x}}, {{y}})",
+      "dominoPlaced": "{{name}}: colocó la ficha {{a}}:{{b}} en ({{x}}, {{y}})",
+      "autoFillClaimed": "{{name}}: capturó automáticamente el territorio rodeado (+{{count}} casillas)"
+    }
+  },
+  "gameOver": {
+    "winnerTitle": "¡{{name}} gana!",
+    "drawTitle": "¡Empate!",
+    "drawSubtitle": "Empate — {{count}} casillas cada uno",
+    "winnerSubtitle": "Capturó {{count}} casillas del tablero",
+    "reasonDecided": "Partida terminada antes de tiempo — el/los rival(es) ya no podían alcanzar al líder",
+    "reasonMajority": "Partida terminada antes de tiempo — un jugador capturó más de la parte equitativa del tablero",
+    "movesCount": "{{count}} turnos",
+    "cellsCount": "{{count}} casillas",
+    "restartButton": "Nueva partida"
+  },
+  "rules": {
+    "common": {
+      "cornerSeeding": "Cada jugador empieza con una casilla en su esquina del tablero: todas las piezas siguientes deben tocar el territorio que ya has capturado.",
+      "scoring": "Gana el jugador que, al final de la partida, haya capturado más casillas del tablero.",
+      "autoWinToggle": "Victoria automática: la partida termina antes de tiempo si el resultado ya no puede cambiar sin importar los movimientos siguientes.",
+      "smartAssistToggle": "La opción «…inteligentes» hace que, hacia el final de la partida, cuando queda poco espacio libre, el resultado aleatorio se ajuste con más frecuencia para que haya un movimiento posible; así la partida no se atasca por mala suerte.",
+      "rotationToggle": "Permitir rotar las piezas: si está activado, puedes girar la figura antes de colocarla. Desactívalo para más dificultad: la figura solo se coloca en la orientación en que salió.",
+      "eliminationNote": "Si hay tres o cuatro jugadores y alguno se queda sin ningún movimiento posible, queda eliminado del turno (se marca como «eliminado»), pero sus casillas capturadas y su puntuación permanecen en el tablero hasta el final de la partida."
+    },
+    "dice": {
+      "title": "Diceritory — reglas",
+      "objective": "Captura territorio en un tablero rectangular colocando rectángulos cuyas dimensiones determina la tirada de los dados.",
+      "turn": "En tu turno, lanza dos dados: determinan el ancho y el alto del rectángulo que debes colocar en ese turno.",
+      "placement": "El rectángulo solo se puede colocar de forma que toque, al menos por un lado, una casilla que ya hayas capturado (en vertical u horizontal).",
+      "toggles": [
+        {
+          "title": "Los dobles dan un turno extra",
+          "body": "Si ambos dados muestran el mismo número, el mismo jugador vuelve a lanzar de inmediato."
+        }
+      ]
+    },
+    "tetromino": {
+      "title": "Tetritory — reglas",
+      "objective": "La misma batalla por el territorio, pero en lugar de rectángulos usa las siete piezas clásicas del Tetris.",
+      "turn": "En tu turno, saca una figura de la «bolsa» de 7 piezas (cada una sale exactamente una vez antes de que la bolsa se vuelva a barajar) y colócala en el tablero.",
+      "placement": "La figura solo se puede colocar de forma que toque, al menos por una casilla, una casilla que ya hayas capturado (en vertical u horizontal).",
+      "toggles": [
+        {
+          "title": "Captura automática del territorio rodeado",
+          "body": "Si rodeas con tus piezas una zona del tablero de forma que tus rivales ya no puedan acceder a ella, esta se rellena de inmediato al máximo con tetrominós de tu color, y esas casillas se suman a tu puntuación."
+        }
+      ]
+    },
+    "domino": {
+      "title": "Dominotory — reglas",
+      "objective": "La misma batalla por el territorio, pero con fichas de dominó de dos mitades, cada una con su propio número.",
+      "turn": "En tu turno, lanza una ficha de dominó y coloca sus dos mitades en el tablero.",
+      "placement": "Además de la regla habitual de tocar tu propio territorio, al menos una mitad de la ficha debe tocar una mitad ya colocada con el mismo número: los números deben «coincidir», como en el dominó clásico.",
+      "toggles": [
+        {
+          "title": "Almacén",
+          "body": "Puedes guardar hasta 4 fichas en vez de colocarlas de inmediato, y sacar cualquiera de ellas en cualquier otro turno tuyo."
+        }
+      ]
+    },
+    "hex": {
+      "title": "Hexoritory — reglas",
+      "objective": "La misma batalla por el territorio, pero en un tablero de hexágonos y con figuras formadas por ellos.",
+      "turn": "En tu turno, el primer dado determina la figura (1 hexágono, 2 hexágonos, línea de 3 o triángulo de 3), y el segundo cuántas copias de esa figura debes colocar en el turno (1–3). Todas las figuras de la tirada deben colocarse en ese mismo turno.",
+      "placement": "Cada figura debe tocar, al menos por un lado de un hexágono, tu territorio ya capturado (la adyacencia cuenta en las 6 direcciones).",
+      "toggles": [
+        {
+          "title": "Almacén",
+          "body": "Puedes guardar una figura de la tirada en lugar de colocarla, si el almacén está libre. Puedes sacarla en cualquier otro turno tuyo, pero las figuras restantes de esta tirada deben colocarse igualmente."
+        },
+        {
+          "title": "Captura automática del territorio rodeado",
+          "body": "Si rodeas con hexágonos una zona del tablero de forma que tus rivales ya no puedan acceder a ella, esta se rellena de inmediato al máximo con figuras de tu color."
+        }
+      ]
+    }
+  },
+  "mode": {
+    "subtitle": "Elige un modo de juego",
+    "hotseat": {
+      "title": "Hot-seat",
+      "description": "Partida local por turnos: todos los jugadores comparten el mismo dispositivo."
+    },
+    "bots": {
+      "title": "Contra bots",
+      "description": "Juega contra rivales controlados por la computadora, eligiendo su cantidad y dificultad.",
+      "count": "Número de bots",
+      "botName": "Bot {{n}}",
+      "difficulty": {
+        "label": "Dificultad",
+        "easy": "Fácil",
+        "medium": "Media",
+        "hard": "Difícil"
+      }
+    },
+    "online": {
+      "title": "Online",
+      "description": "Crea una sala o únete a tus amigos con un código.",
+      "choice": {
+        "subtitle": "Crea una sala nueva o únete con un código",
+        "create": "Crear sala",
+        "createHint": "Configura la partida e invita a otros con un código",
+        "join": "Unirse a una sala",
+        "joinHint": "Introduce el código que te enviaron"
+      },
+      "create": {
+        "maxPlayers": "Máximo de jugadores",
+        "submit": "Crear sala",
+        "creating": "Creando sala…"
+      },
+      "join": {
+        "title": "Unirse a una sala",
+        "subtitle": "Introduce el código de la sala que te enviaron",
+        "codeLabel": "Código de la sala",
+        "codePlaceholder": "Por ejemplo, AB12CD",
+        "submit": "Unirse",
+        "joining": "Uniéndose…",
+        "errors": {
+          "notFound": "Sala no encontrada. Comprueba el código e inténtalo de nuevo.",
+          "full": "Esta sala ya está completa.",
+          "alreadyStarted": "La partida en esta sala ya ha comenzado.",
+          "generic": "No se pudo unir. Inténtalo de nuevo."
+        }
+      },
+      "lobby": {
+        "loading": "Cargando sala…",
+        "closed": "Esta sala ya no existe.",
+        "codeLabel": "Código de la sala",
+        "playersTitle": "Jugadores ({{count}}/{{max}})",
+        "hostBadge": "anfitrión",
+        "youBadge": "tú",
+        "startButton": "Empezar partida",
+        "starting": "Empezando…",
+        "minPlayersHint": "Se necesitan al menos 2 jugadores para empezar",
+        "waitingHint": "Esperando a que el anfitrión de la sala empiece la partida…",
+        "leaveButton": "Salir de la sala"
+      }
+    }
+  }
+}

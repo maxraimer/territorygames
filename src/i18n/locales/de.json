@@ -1,0 +1,302 @@
+{
+  "common": {
+    "appName": "Territory Games",
+    "back": "Zurück",
+    "rules": "Spielregeln",
+    "close": "Schließen",
+    "theme": "Design",
+    "themeLight": "Helles Design",
+    "themeDark": "Dunkles Design",
+    "language": "Sprache",
+    "diceAriaLabel": "Würfel: {{value}}",
+    "shapeAriaLabel": "Figur: {{value}}",
+    "languages": {
+      "uk": "Українська",
+      "en": "English",
+      "ru": "Русский",
+      "es": "Español",
+      "fr": "Français",
+      "pl": "Polski",
+      "de": "Deutsch"
+    }
+  },
+  "home": {
+    "subtitle": "Wähle ein Spiel",
+    "nickname": {
+      "label": "Dein Nickname",
+      "placeholder": "Nickname eingeben",
+      "required": "Gib einen Nickname ein, um fortzufahren"
+    },
+    "games": {
+      "dice": {
+        "name": "Diceritory",
+        "tagline": "Zwei Würfel, endlose Taktik: Jeder Wurf ist ein neuer Kampf um jeden Zentimeter des Spielfelds."
+      },
+      "tetromino": {
+        "name": "Tetritory",
+        "tagline": "Die beliebten Tetris-Steine kämpfen um Territorium — platzieren, einkreisen, gewinnen."
+      },
+      "domino": {
+        "name": "Dominotory",
+        "tagline": "Zahlen müssen übereinstimmen, Ambitionen nicht: Verwandle jeden Dominostein in einen Brückenkopf zur Eroberung."
+      },
+      "hex": {
+        "name": "Hexoritory",
+        "tagline": "Ein sechseckiges Spielfeld, sechs Angriffsrichtungen — meistere die Hexagone und kreise deine Gegner ein."
+      }
+    }
+  },
+  "setup": {
+    "subtitle": "Richte {{game}} vor dem Start ein",
+    "playerCount": "Anzahl der Spieler",
+    "boardWidth": "Spielfeldbreite",
+    "boardHeight": "Spielfeldhöhe",
+    "boardMinHint": "Minimum für {{count}} Spieler — {{size}}×{{size}}",
+    "colorClash": "Die Spieler müssen unterschiedliche Farben wählen.",
+    "startButton": "Spiel starten",
+    "rulesButton": "Spielregeln",
+    "defaultPlayerName": "Spieler {{n}}",
+    "toggles": {
+      "autoWin": {
+        "label": "Autosieg",
+        "hint": "Spiel vorzeitig beenden, wenn das Ergebnis nicht mehr geändert werden kann"
+      },
+      "allowRotation": {
+        "label": "Drehen der Blöcke erlauben"
+      },
+      "doublesExtraTurn": {
+        "label": "Pasch gibt einen zweiten Zug",
+        "hint": "Zeigen beide Würfel die gleiche Zahl, würfelt derselbe Spieler noch einmal"
+      },
+      "autoFillEnclosed": {
+        "label": "Automatische Übernahme umschlossener Gebiete",
+        "hintTetromino": "Umschließt ein Spieler mit seinen Steinen ein Gebiet, wird es sofort mit Tetrominos seiner Farbe aufgefüllt",
+        "hintHex": "Umschließt ein Spieler mit Hexagonen ein Gebiet, wird es sofort mit Figuren seiner Farbe aufgefüllt"
+      }
+    },
+    "copy": {
+      "dice": {
+        "rotationHint": "Zum Erschweren deaktivieren — der Block wird nur so platziert, wie er gewürfelt wurde",
+        "smartLabel": "Intelligente Würfel",
+        "smartHint": "Gegen Spielende fallen die Würfel häufiger so, dass ein Zug möglich ist"
+      },
+      "tetromino": {
+        "rotationHint": "Zum Erschweren deaktivieren — die Figur wird nur in der gezogenen Ausrichtung platziert",
+        "smartLabel": "Intelligente Figuren",
+        "smartHint": "Gegen Spielende erscheint häufiger eine Figur, die platziert werden kann"
+      },
+      "domino": {
+        "rotationHint": "Zum Erschweren deaktivieren — der Stein wird nur so platziert, wie er gewürfelt wurde, die Hälften werden nicht vertauscht",
+        "smartLabel": "Intelligente Steine",
+        "smartHint": "Gegen Spielende erscheint häufiger ein Stein, der platziert werden kann"
+      },
+      "hex": {
+        "rotationHint": "Zum Erschweren deaktivieren — die Figur wird nur in der gezogenen Ausrichtung platziert",
+        "smartLabel": "Intelligente Figuren",
+        "smartHint": "Gegen Spielende erscheint häufiger eine Figur, die platziert werden kann"
+      }
+    }
+  },
+  "playing": {
+    "exit": "Verlassen",
+    "timerTitle": "Spielzeit",
+    "movesTitle": "Anzahl der Züge",
+    "moveLabel": "Zug {{count}}",
+    "rollLabel": {
+      "dice": "Würfel werfen (Leertaste)",
+      "tetromino": "Figur ziehen (Leertaste)",
+      "domino": "Stein ziehen (Leertaste)",
+      "hex": "Würfel werfen (Leertaste)"
+    },
+    "rollingLabel": {
+      "dice": "Würfel werden geworfen…",
+      "tetromino": "Figur wird gezogen…",
+      "domino": "Stein wird gezogen…",
+      "hex": "Würfel werden geworfen…"
+    },
+    "placingLabel": {
+      "dice": "Zeige auf das Feld und klicke, um das Rechteck zu platzieren.",
+      "tetromino": "Zeige auf das Feld und klicke, um die Figur zu platzieren.",
+      "domino": "Zeige auf das Feld und klicke, um den Stein zu platzieren.",
+      "hexStored": "Zeige auf das Feld und klicke, um die Figur aus dem Speicher zu platzieren.",
+      "hexRoll": "Zeige auf das Feld und klicke, um die Figur zu platzieren (noch {{count}})."
+    },
+    "skippedLabel": "Keine gültigen Positionen für diesen Wurf. Zug ausgesetzt.",
+    "remainingLabel": "noch {{count}}",
+    "nextButton": "Weiter (Leertaste)",
+    "rotateButton": "Drehen (R)",
+    "storeButton": "Speichern (G)",
+    "placeFromStorageButton": "Aus Speicher platzieren (1)",
+    "backToRollButton": "Zurück zum Wurf",
+    "historyTitle": "Verlauf",
+    "turnBadge": "Zug",
+    "eliminatedBadge": "ausgeschieden",
+    "cellsCount": "{{count}} Felder",
+    "pickFromStorageTitle": "Aus Speicher wählen ({{n}})",
+    "placeFromStorageTitle": "Aus Speicher platzieren (1)",
+    "hexShapeLabels": {
+      "1": "1 Hexagon",
+      "2": "2 Hexagone",
+      "3": "Linie aus 3",
+      "4": "Dreieck aus 3"
+    },
+    "log": {
+      "diceRoll": "{{name}}: Würfel {{d1}}×{{d2}}{{doubleNote}}",
+      "diceRollSkipped": "{{name}}: Würfel {{d1}}×{{d2}} — keine gültigen Züge, Zug ausgesetzt{{doubleNote}}",
+      "doubleNote": " — Pasch! noch ein Zug",
+      "tetrominoRoll": "{{name}}: Figur {{type}}",
+      "tetrominoRollSkipped": "{{name}}: Figur {{type}} — keine gültigen Züge, Zug ausgesetzt",
+      "dominoRoll": "{{name}}: Stein {{a}}:{{b}}",
+      "dominoRollSkipped": "{{name}}: Stein {{a}}:{{b}} — keine gültigen Züge, Zug ausgesetzt",
+      "dominoRollFromStorage": "{{name}}: Stein aus dem Speicher {{a}}:{{b}}",
+      "dominoRollFromStorageSkipped": "{{name}}: Stein aus dem Speicher {{a}}:{{b}} — keine gültigen Züge, Zug ausgesetzt",
+      "dominoStored": "{{name}}: hat Stein {{a}}:{{b}} eingelagert",
+      "hexRoll": "{{name}}: {{shape}} ×{{count}}",
+      "hexRollSkipped": "{{name}}: {{shape}} ×{{count}} — keine gültigen Züge, Zug ausgesetzt",
+      "hexPlaced": "{{name}}: hat {{shape}} bei ({{x}}, {{y}}) platziert",
+      "hexPlacedFromStorage": "{{name}}: hat {{shape}} aus dem Speicher bei ({{x}}, {{y}}) platziert",
+      "hexSkipRemainder": " (Rest ×{{count}} — kein Platz, übersprungen)",
+      "hexStored": "{{name}}: hat {{shape}} eingelagert",
+      "eliminated": "{{name}}: scheidet aus — keine möglichen Züge mehr",
+      "dicePlaced": "{{name}}: hat {{w}}×{{h}} bei ({{x}}, {{y}}) platziert",
+      "tetrominoPlaced": "{{name}}: hat Figur {{type}} bei ({{x}}, {{y}}) platziert",
+      "dominoPlaced": "{{name}}: hat Stein {{a}}:{{b}} bei ({{x}}, {{y}}) platziert",
+      "autoFillClaimed": "{{name}}: hat umschlossenes Gebiet automatisch übernommen (+{{count}} Felder)"
+    }
+  },
+  "gameOver": {
+    "winnerTitle": "{{name}} gewinnt!",
+    "drawTitle": "Unentschieden!",
+    "drawSubtitle": "Gleichstand — je {{count}} Felder",
+    "winnerSubtitle": "{{count}} Felder des Spielfelds erobert",
+    "reasonDecided": "Spiel vorzeitig beendet — der/die Gegner konnte(n) den Anführer nicht mehr einholen",
+    "reasonMajority": "Spiel vorzeitig beendet — ein Spieler hat mehr als den gleichen Anteil des Feldes erobert",
+    "movesCount": "{{count}} Züge",
+    "cellsCount": "{{count}} Felder",
+    "restartButton": "Neues Spiel"
+  },
+  "rules": {
+    "common": {
+      "cornerSeeding": "Jeder Spieler beginnt mit einer Zelle in seiner Ecke des Spielfelds — alle weiteren Figuren müssen an bereits eroberte Gebiete angrenzen.",
+      "scoring": "Es gewinnt der Spieler, der bis zum Ende des Spiels die meisten Felder erobert hat.",
+      "autoWinToggle": "Autosieg: Das Spiel endet vorzeitig, wenn sich das Ergebnis unabhängig von weiteren Zügen nicht mehr ändern kann.",
+      "smartAssistToggle": "Die Option „Intelligente …“ passt gegen Spielende, wenn nur noch wenig freier Platz übrig ist, das Zufallsergebnis häufiger so an, dass ein Zug möglich ist — so bleibt das Spiel nicht wegen Pech stecken.",
+      "rotationToggle": "Drehen der Blöcke erlauben: Ist diese Option aktiviert, kann die Figur vor dem Platzieren gedreht werden. Zum Erschweren deaktivieren — die Figur wird dann nur in der gezogenen Ausrichtung platziert.",
+      "eliminationNote": "Sind drei oder vier Spieler dabei und hat jemand keinen möglichen Zug mehr, scheidet er aus der Zugreihenfolge aus (markiert als „ausgeschieden“) — seine eroberten Felder und sein Punktestand bleiben aber bis zum Ende des Spiels auf dem Feld erhalten."
+    },
+    "dice": {
+      "title": "Diceritory — Regeln",
+      "objective": "Erobere Territorium auf einem rechteckigen Spielfeld, indem du Rechtecke platzierst, deren Größe durch den Würfelwurf bestimmt wird.",
+      "turn": "Wirf in deinem Zug zwei Würfel — sie bestimmen Breite und Höhe des Rechtecks, das du in diesem Zug platzieren musst.",
+      "placement": "Das Rechteck darf nur so platziert werden, dass es mit mindestens einer Seite an eine bereits von dir eroberte Zelle angrenzt (senkrecht oder waagerecht).",
+      "toggles": [
+        {
+          "title": "Pasch gibt einen zweiten Zug",
+          "body": "Zeigen beide Würfel die gleiche Zahl, würfelt derselbe Spieler sofort noch einmal."
+        }
+      ]
+    },
+    "tetromino": {
+      "title": "Tetritory — Regeln",
+      "objective": "Derselbe Kampf um Territorium, aber statt Rechtecken gibt es die sieben klassischen Tetris-Steine.",
+      "turn": "Ziehe in deinem Zug eine Figur aus dem „Beutel“ mit 7 Figuren (jede erscheint genau einmal, bevor der Beutel neu gemischt wird) und platziere sie auf dem Feld.",
+      "placement": "Die Figur darf nur so platziert werden, dass sie mit mindestens einer Zelle an eine bereits von dir eroberte Zelle angrenzt (senkrecht oder waagerecht).",
+      "toggles": [
+        {
+          "title": "Automatische Übernahme umschlossener Gebiete",
+          "body": "Hast du mit deinen Steinen ein Gebiet so umschlossen, dass die Gegner keinen Zugriff mehr darauf haben, wird es sofort maximal mit Tetrominos deiner Farbe aufgefüllt, und diese Felder werden deinem Punktestand hinzugefügt."
+        }
+      ]
+    },
+    "domino": {
+      "title": "Dominotory — Regeln",
+      "objective": "Derselbe Kampf um Territorium, aber mit Dominosteinen mit zwei Hälften, jede mit ihrer eigenen Zahl.",
+      "turn": "Wirf in deinem Zug einen Dominostein und platziere beide Hälften auf dem Feld.",
+      "placement": "Zusätzlich zur üblichen Regel des Angrenzens an dein eigenes Gebiet muss mindestens eine Hälfte des Steins eine bereits platzierte Hälfte mit derselben Zahl berühren — die Zahlen müssen „übereinstimmen“, wie beim klassischen Domino.",
+      "toggles": [
+        {
+          "title": "Speicher",
+          "body": "Du kannst bis zu 4 Steine einlagern, statt sie sofort zu platzieren, und in einem beliebigen späteren Zug einen davon herausnehmen."
+        }
+      ]
+    },
+    "hex": {
+      "title": "Hexoritory — Regeln",
+      "objective": "Derselbe Kampf um Territorium, aber auf einem Feld aus Hexagonen (Sechsecken) mit Figuren, die aus ihnen zusammengesetzt sind.",
+      "turn": "In deinem Zug bestimmt der erste Würfel die Figur (1 Hexagon, 2 Hexagone, Linie aus 3 oder Dreieck aus 3), der zweite, wie viele Kopien dieser Figur du in diesem Zug platzieren musst (1–3). Alle gewürfelten Figuren müssen in diesem Zug platziert werden.",
+      "placement": "Jede Figur muss mit mindestens einer Seite eines Hexagons an dein bereits erobertes Gebiet angrenzen (Nachbarschaft zählt in allen 6 Richtungen).",
+      "toggles": [
+        {
+          "title": "Speicher",
+          "body": "Eine der gewürfelten Figuren kannst du einlagern, statt sie zu platzieren, sofern der Speicher frei ist. Du kannst sie in einem beliebigen späteren Zug herausnehmen — die in diesem Zug gewürfelten Figuren musst du aber trotzdem platzieren."
+        },
+        {
+          "title": "Automatische Übernahme umschlossener Gebiete",
+          "body": "Hast du mit Hexagonen ein Gebiet so umschlossen, dass die Gegner keinen Zugriff mehr darauf haben, wird es sofort maximal mit Figuren deiner Farbe aufgefüllt."
+        }
+      ]
+    }
+  },
+  "mode": {
+    "subtitle": "Wähle einen Spielmodus",
+    "hotseat": {
+      "title": "Hot-Seat",
+      "description": "Lokales Spiel im Wechsel — alle Spieler an einem Gerät."
+    },
+    "bots": {
+      "title": "Gegen Bots",
+      "description": "Spiele gegen computergesteuerte Gegner — wähle ihre Anzahl und Schwierigkeit.",
+      "count": "Anzahl der Bots",
+      "botName": "Bot {{n}}",
+      "difficulty": {
+        "label": "Schwierigkeit",
+        "easy": "Leicht",
+        "medium": "Mittel",
+        "hard": "Schwer"
+      }
+    },
+    "online": {
+      "title": "Online",
+      "description": "Erstelle eine Lobby oder tritt Freunden per Code bei.",
+      "choice": {
+        "subtitle": "Erstelle eine neue Lobby oder tritt per Code bei",
+        "create": "Lobby erstellen",
+        "createHint": "Richte das Spiel ein und lade andere per Code ein",
+        "join": "Lobby beitreten",
+        "joinHint": "Gib den Code ein, den du erhalten hast"
+      },
+      "create": {
+        "maxPlayers": "Maximale Spielerzahl",
+        "submit": "Lobby erstellen",
+        "creating": "Lobby wird erstellt…"
+      },
+      "join": {
+        "title": "Lobby beitreten",
+        "subtitle": "Gib den Lobby-Code ein, den du erhalten hast",
+        "codeLabel": "Lobby-Code",
+        "codePlaceholder": "Zum Beispiel AB12CD",
+        "submit": "Beitreten",
+        "joining": "Trete bei…",
+        "errors": {
+          "notFound": "Lobby nicht gefunden. Überprüfe den Code und versuche es erneut.",
+          "full": "Diese Lobby ist bereits voll.",
+          "alreadyStarted": "Das Spiel in dieser Lobby hat bereits begonnen.",
+          "generic": "Beitritt fehlgeschlagen. Versuche es erneut."
+        }
+      },
+      "lobby": {
+        "loading": "Lobby wird geladen…",
+        "closed": "Diese Lobby existiert nicht mehr.",
+        "codeLabel": "Lobby-Code",
+        "playersTitle": "Spieler ({{count}}/{{max}})",
+        "hostBadge": "Host",
+        "youBadge": "du",
+        "startButton": "Spiel starten",
+        "starting": "Wird gestartet…",
+        "minPlayersHint": "Mindestens 2 Spieler nötig, um zu starten",
+        "waitingHint": "Warten, bis der Lobby-Host das Spiel startet…",
+        "leaveButton": "Lobby verlassen"
+      }
+    }
+  }
+}

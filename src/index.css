@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: emerald --default, dim --prefersdark;
+}
+
+body {
+  margin: 0;
+}
+
+@keyframes dice-roll {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-14deg) scale(1.08);
+  }
+  50% {
+    transform: rotate(10deg) scale(0.92);
+  }
+  75% {
+    transform: rotate(-8deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes dice-land {
+  0% {
+    transform: scale(1.35) rotate(10deg);
+  }
+  60% {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-dice-roll {
+  animation: dice-roll 0.32s ease-in-out infinite;
+}
+
+.animate-dice-land {
+  animation: dice-land 0.3s ease-out;
+}
+
+@keyframes place-pop {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.4;
+  }
+  55% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-place-pop {
+  animation: place-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

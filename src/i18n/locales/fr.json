@@ -1,0 +1,302 @@
+{
+  "common": {
+    "appName": "Territory Games",
+    "back": "Retour",
+    "rules": "Règles du jeu",
+    "close": "Fermer",
+    "theme": "Thème",
+    "themeLight": "Thème clair",
+    "themeDark": "Thème sombre",
+    "language": "Langue",
+    "diceAriaLabel": "Dé : {{value}}",
+    "shapeAriaLabel": "Forme : {{value}}",
+    "languages": {
+      "uk": "Українська",
+      "en": "English",
+      "ru": "Русский",
+      "es": "Español",
+      "fr": "Français",
+      "pl": "Polski",
+      "de": "Deutsch"
+    }
+  },
+  "home": {
+    "subtitle": "Choisissez un jeu",
+    "nickname": {
+      "label": "Votre pseudo",
+      "placeholder": "Entrez votre pseudo",
+      "required": "Entrez un pseudo pour continuer"
+    },
+    "games": {
+      "dice": {
+        "name": "Diceritory",
+        "tagline": "Deux dés, une tactique infinie : chaque lancer déclenche une nouvelle bataille pour chaque centimètre du plateau."
+      },
+      "tetromino": {
+        "name": "Tetritory",
+        "tagline": "Les pièces cultes de Tetris entrent en lice pour le territoire — assemblez, encerclez, triomphez."
+      },
+      "domino": {
+        "name": "Dominotory",
+        "tagline": "Les chiffres doivent correspondre, pas vos ambitions : transformez chaque domino en tête de pont pour la conquête."
+      },
+      "hex": {
+        "name": "Hexoritory",
+        "tagline": "Un plateau hexagonal, six directions d'attaque — maîtrisez les hexagones et encerclez vos adversaires."
+      }
+    }
+  },
+  "setup": {
+    "subtitle": "Configurez {{game}} avant de commencer",
+    "playerCount": "Nombre de joueurs",
+    "boardWidth": "Largeur du plateau",
+    "boardHeight": "Hauteur du plateau",
+    "boardMinHint": "Minimum pour {{count}} joueurs — {{size}}×{{size}}",
+    "colorClash": "Les joueurs doivent choisir des couleurs différentes.",
+    "startButton": "Commencer la partie",
+    "rulesButton": "Règles du jeu",
+    "defaultPlayerName": "Joueur {{n}}",
+    "toggles": {
+      "autoWin": {
+        "label": "Victoire automatique",
+        "hint": "Terminer la partie plus tôt si le résultat ne peut plus changer"
+      },
+      "allowRotation": {
+        "label": "Autoriser la rotation des pièces"
+      },
+      "doublesExtraTurn": {
+        "label": "Les doubles donnent un tour supplémentaire",
+        "hint": "Si les deux dés affichent le même nombre, le même joueur relance"
+      },
+      "autoFillEnclosed": {
+        "label": "Capture automatique du territoire encerclé",
+        "hintTetromino": "Si un joueur encercle une zone avec ses pièces, elle est aussitôt remplie de tétrominos de sa couleur",
+        "hintHex": "Si un joueur encercle une zone avec ses hexagones, elle est aussitôt remplie de formes de sa couleur"
+      }
+    },
+    "copy": {
+      "dice": {
+        "rotationHint": "Désactivez pour plus de difficulté — la pièce ne peut être posée que dans l'orientation du lancer",
+        "smartLabel": "Dés intelligents",
+        "smartHint": "En fin de partie, les dés tombent plus souvent sur un résultat jouable"
+      },
+      "tetromino": {
+        "rotationHint": "Désactivez pour plus de difficulté — la pièce ne peut être posée que dans l'orientation tirée",
+        "smartLabel": "Pièces intelligentes",
+        "smartHint": "En fin de partie, une pièce plaçable est tirée plus souvent"
+      },
+      "domino": {
+        "rotationHint": "Désactivez pour plus de difficulté — le domino ne peut être posé que tel qu'il est tiré, sans échanger les moitiés",
+        "smartLabel": "Dominos intelligents",
+        "smartHint": "En fin de partie, un domino plaçable est tiré plus souvent"
+      },
+      "hex": {
+        "rotationHint": "Désactivez pour plus de difficulté — la pièce ne peut être posée que dans l'orientation tirée",
+        "smartLabel": "Pièces intelligentes",
+        "smartHint": "En fin de partie, une pièce plaçable est tirée plus souvent"
+      }
+    }
+  },
+  "playing": {
+    "exit": "Quitter",
+    "timerTitle": "Temps de jeu",
+    "movesTitle": "Nombre de coups",
+    "moveLabel": "Coup {{count}}",
+    "rollLabel": {
+      "dice": "Lancer les dés (Espace)",
+      "tetromino": "Piocher une pièce (Espace)",
+      "domino": "Piocher un domino (Espace)",
+      "hex": "Lancer les dés (Espace)"
+    },
+    "rollingLabel": {
+      "dice": "Lancer des dés…",
+      "tetromino": "Pioche de la pièce…",
+      "domino": "Pioche du domino…",
+      "hex": "Lancer des dés…"
+    },
+    "placingLabel": {
+      "dice": "Survolez le plateau et cliquez pour placer le rectangle.",
+      "tetromino": "Survolez le plateau et cliquez pour placer la pièce.",
+      "domino": "Survolez le plateau et cliquez pour placer le domino.",
+      "hexStored": "Survolez le plateau et cliquez pour placer la pièce depuis la réserve.",
+      "hexRoll": "Survolez le plateau et cliquez pour placer la pièce (il en reste {{count}})."
+    },
+    "skippedLabel": "Aucune position valide pour ce résultat. Tour passé.",
+    "remainingLabel": "il en reste {{count}}",
+    "nextButton": "Suivant (Espace)",
+    "rotateButton": "Pivoter (R)",
+    "storeButton": "Stocker (G)",
+    "placeFromStorageButton": "Placer depuis la réserve (1)",
+    "backToRollButton": "Revenir au lancer",
+    "historyTitle": "Historique",
+    "turnBadge": "tour",
+    "eliminatedBadge": "éliminé",
+    "cellsCount": "{{count}} cases",
+    "pickFromStorageTitle": "Prendre depuis la réserve ({{n}})",
+    "placeFromStorageTitle": "Placer depuis la réserve (1)",
+    "hexShapeLabels": {
+      "1": "1 hexagone",
+      "2": "2 hexagones",
+      "3": "ligne de 3",
+      "4": "triangle de 3"
+    },
+    "log": {
+      "diceRoll": "{{name}} : dés {{d1}}×{{d2}}{{doubleNote}}",
+      "diceRollSkipped": "{{name}} : dés {{d1}}×{{d2}} — aucun coup valide, tour passé{{doubleNote}}",
+      "doubleNote": " — double ! un tour de plus",
+      "tetrominoRoll": "{{name}} : pièce {{type}}",
+      "tetrominoRollSkipped": "{{name}} : pièce {{type}} — aucun coup valide, tour passé",
+      "dominoRoll": "{{name}} : domino {{a}}:{{b}}",
+      "dominoRollSkipped": "{{name}} : domino {{a}}:{{b}} — aucun coup valide, tour passé",
+      "dominoRollFromStorage": "{{name}} : domino de la réserve {{a}}:{{b}}",
+      "dominoRollFromStorageSkipped": "{{name}} : domino de la réserve {{a}}:{{b}} — aucun coup valide, tour passé",
+      "dominoStored": "{{name}} : a stocké le domino {{a}}:{{b}}",
+      "hexRoll": "{{name}} : {{shape}} ×{{count}}",
+      "hexRollSkipped": "{{name}} : {{shape}} ×{{count}} — aucun coup valide, tour passé",
+      "hexPlaced": "{{name}} : a placé {{shape}} en ({{x}}, {{y}})",
+      "hexPlacedFromStorage": "{{name}} : a placé {{shape}} depuis la réserve en ({{x}}, {{y}})",
+      "hexSkipRemainder": " (reste ×{{count}} — pas de place, ignoré)",
+      "hexStored": "{{name}} : a stocké {{shape}}",
+      "eliminated": "{{name}} : est éliminé — plus aucun coup possible",
+      "dicePlaced": "{{name}} : a placé {{w}}×{{h}} en ({{x}}, {{y}})",
+      "tetrominoPlaced": "{{name}} : a placé la pièce {{type}} en ({{x}}, {{y}})",
+      "dominoPlaced": "{{name}} : a placé le domino {{a}}:{{b}} en ({{x}}, {{y}})",
+      "autoFillClaimed": "{{name}} : a capturé automatiquement le territoire encerclé (+{{count}} cases)"
+    }
+  },
+  "gameOver": {
+    "winnerTitle": "{{name}} remporte la partie !",
+    "drawTitle": "Match nul !",
+    "drawSubtitle": "Égalité — {{count}} cases chacun",
+    "winnerSubtitle": "{{count}} cases du plateau capturées",
+    "reasonDecided": "Partie terminée par anticipation — le(s) adversaire(s) ne pouvaient plus rattraper le meneur",
+    "reasonMajority": "Partie terminée par anticipation — un joueur a capturé plus que sa part équitable du plateau",
+    "movesCount": "{{count}} coups",
+    "cellsCount": "{{count}} cases",
+    "restartButton": "Nouvelle partie"
+  },
+  "rules": {
+    "common": {
+      "cornerSeeding": "Chaque joueur commence avec une case dans son coin du plateau — toutes les pièces suivantes doivent toucher un territoire déjà conquis.",
+      "scoring": "Le vainqueur est le joueur qui, à la fin de la partie, a capturé le plus de cases du plateau.",
+      "autoWinToggle": "Victoire automatique : la partie se termine par anticipation si le résultat ne peut plus changer, quels que soient les coups suivants.",
+      "smartAssistToggle": "L'option « … intelligent(s) » ajuste plus souvent le résultat aléatoire en fin de partie, quand il reste peu de place libre, pour qu'un coup reste possible — cela évite que la partie ne se bloque à cause de la malchance.",
+      "rotationToggle": "Autoriser la rotation des pièces : si activé, la pièce peut être pivotée avant d'être placée. Désactivez pour plus de difficulté — la pièce ne peut être posée que dans l'orientation tirée.",
+      "eliminationNote": "Si la partie compte trois ou quatre joueurs et que l'un d'eux n'a plus aucun coup possible, il est éliminé du tour de jeu (marqué « éliminé »), mais ses cases capturées et son score restent sur le plateau jusqu'à la fin de la partie."
+    },
+    "dice": {
+      "title": "Diceritory — règles",
+      "objective": "Conquérez le territoire d'un plateau rectangulaire en plaçant des rectangles dont les dimensions sont déterminées par le lancer de dés.",
+      "turn": "À votre tour, lancez deux dés — ils déterminent la largeur et la hauteur du rectangle à placer ce tour-ci.",
+      "placement": "Le rectangle ne peut être placé que s'il touche par au moins un côté une case que vous avez déjà capturée (verticalement ou horizontalement).",
+      "toggles": [
+        {
+          "title": "Les doubles donnent un tour supplémentaire",
+          "body": "Si les deux dés affichent le même nombre, le même joueur relance aussitôt."
+        }
+      ]
+    },
+    "tetromino": {
+      "title": "Tetritory — règles",
+      "objective": "La même bataille pour le territoire, mais avec les sept pièces classiques de Tetris à la place des rectangles.",
+      "turn": "À votre tour, piochez une pièce dans un « sac » de 7 pièces (chacune sort exactement une fois avant que le sac ne soit rebrassé) et placez-la sur le plateau.",
+      "placement": "La pièce ne peut être placée que si au moins une de ses cases touche une case que vous avez déjà capturée (verticalement ou horizontalement).",
+      "toggles": [
+        {
+          "title": "Capture automatique du territoire encerclé",
+          "body": "Si vous encerclez une zone du plateau avec vos pièces de sorte que vos adversaires n'y ont plus accès, elle est aussitôt remplie au maximum de tétrominos de votre couleur, et ces cases s'ajoutent à votre score."
+        }
+      ]
+    },
+    "domino": {
+      "title": "Dominotory — règles",
+      "objective": "La même bataille pour le territoire, mais avec des dominos à deux moitiés, chacune portant son propre chiffre.",
+      "turn": "À votre tour, tirez un domino et placez ses deux moitiés sur le plateau.",
+      "placement": "Outre la règle habituelle d'adjacence à votre territoire, au moins une moitié du domino doit toucher une moitié déjà posée portant le même chiffre — les chiffres doivent « correspondre », comme au domino classique.",
+      "toggles": [
+        {
+          "title": "Réserve",
+          "body": "Vous pouvez mettre jusqu'à 4 dominos de côté au lieu de les placer immédiatement, et en récupérer un lors de n'importe quel autre de vos tours."
+        }
+      ]
+    },
+    "hex": {
+      "title": "Hexoritory — règles",
+      "objective": "La même bataille pour le territoire, mais sur un plateau d'hexagones et avec des formes composées d'hexagones.",
+      "turn": "À votre tour, le premier dé détermine la forme (1 hexagone, 2 hexagones, ligne de 3 ou triangle de 3), et le second combien d'exemplaires de cette forme placer ce tour-ci (1 à 3). Toutes les formes du lancer doivent être placées durant ce même tour.",
+      "placement": "Chaque forme doit toucher par au moins un côté d'hexagone votre territoire déjà capturé (l'adjacence compte dans les 6 directions).",
+      "toggles": [
+        {
+          "title": "Réserve",
+          "body": "Une forme du lancer peut être mise en réserve au lieu d'être placée, si la réserve est libre. Vous pouvez la récupérer lors de n'importe quel autre de vos tours — mais les formes tirées ce tour-ci doivent tout de même être placées."
+        },
+        {
+          "title": "Capture automatique du territoire encerclé",
+          "body": "Si vous encerclez une zone du plateau avec vos hexagones de sorte que vos adversaires n'y ont plus accès, elle est aussitôt remplie au maximum de formes de votre couleur."
+        }
+      ]
+    }
+  },
+  "mode": {
+    "subtitle": "Choisissez un mode de jeu",
+    "hotseat": {
+      "title": "Hot-seat",
+      "description": "Partie locale au tour par tour — tous les joueurs sur le même appareil."
+    },
+    "bots": {
+      "title": "Contre des bots",
+      "description": "Affrontez des adversaires contrôlés par l'ordinateur en choisissant leur nombre et leur difficulté.",
+      "count": "Nombre de bots",
+      "botName": "Bot {{n}}",
+      "difficulty": {
+        "label": "Difficulté",
+        "easy": "Facile",
+        "medium": "Moyenne",
+        "hard": "Difficile"
+      }
+    },
+    "online": {
+      "title": "En ligne",
+      "description": "Créez un salon ou rejoignez vos amis avec un code.",
+      "choice": {
+        "subtitle": "Créez un nouveau salon ou rejoignez-en un avec un code",
+        "create": "Créer un salon",
+        "createHint": "Configurez la partie et invitez d'autres joueurs avec un code",
+        "join": "Rejoindre un salon",
+        "joinHint": "Entrez le code qu'on vous a envoyé"
+      },
+      "create": {
+        "maxPlayers": "Nombre maximum de joueurs",
+        "submit": "Créer le salon",
+        "creating": "Création du salon…"
+      },
+      "join": {
+        "title": "Rejoindre un salon",
+        "subtitle": "Entrez le code du salon qu'on vous a envoyé",
+        "codeLabel": "Code du salon",
+        "codePlaceholder": "Par exemple, AB12CD",
+        "submit": "Rejoindre",
+        "joining": "Connexion en cours…",
+        "errors": {
+          "notFound": "Salon introuvable. Vérifiez le code et réessayez.",
+          "full": "Ce salon est déjà complet.",
+          "alreadyStarted": "La partie de ce salon a déjà commencé.",
+          "generic": "Impossible de rejoindre le salon. Réessayez."
+        }
+      },
+      "lobby": {
+        "loading": "Chargement du salon…",
+        "closed": "Ce salon n'existe plus.",
+        "codeLabel": "Code du salon",
+        "playersTitle": "Joueurs ({{count}}/{{max}})",
+        "hostBadge": "hôte",
+        "youBadge": "vous",
+        "startButton": "Lancer la partie",
+        "starting": "Lancement…",
+        "minPlayersHint": "Il faut au moins 2 joueurs pour commencer",
+        "waitingHint": "En attente que l'hôte lance la partie…",
+        "leaveButton": "Quitter le salon"
+      }
+    }
+  }
+}

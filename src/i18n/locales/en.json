@@ -1,0 +1,302 @@
+{
+  "common": {
+    "appName": "Territory Games",
+    "back": "Back",
+    "rules": "Game rules",
+    "close": "Close",
+    "theme": "Theme",
+    "themeLight": "Light theme",
+    "themeDark": "Dark theme",
+    "language": "Language",
+    "diceAriaLabel": "Die: {{value}}",
+    "shapeAriaLabel": "Shape: {{value}}",
+    "languages": {
+      "uk": "Українська",
+      "en": "English",
+      "ru": "Русский",
+      "es": "Español",
+      "fr": "Français",
+      "pl": "Polski",
+      "de": "Deutsch"
+    }
+  },
+  "home": {
+    "subtitle": "Choose a game",
+    "nickname": {
+      "label": "Your nickname",
+      "placeholder": "Enter your nickname",
+      "required": "Enter a nickname to continue"
+    },
+    "games": {
+      "dice": {
+        "name": "Diceritory",
+        "tagline": "Two dice, endless tactics: every roll starts a new battle for every inch of the board."
+      },
+      "tetromino": {
+        "name": "Tetritory",
+        "tagline": "Your favorite Tetris pieces enter the battle for territory — stack, surround, and win."
+      },
+      "domino": {
+        "name": "Dominotory",
+        "tagline": "The numbers have to match — your ambitions don't: turn every domino into a foothold for conquest."
+      },
+      "hex": {
+        "name": "Hexoritory",
+        "tagline": "A hexagonal board, six directions of attack — master the hexes and surround your rivals."
+      }
+    }
+  },
+  "setup": {
+    "subtitle": "Set up {{game}} before you start",
+    "playerCount": "Number of players",
+    "boardWidth": "Board width",
+    "boardHeight": "Board height",
+    "boardMinHint": "Minimum for {{count}} players — {{size}}×{{size}}",
+    "colorClash": "Players must choose different colors.",
+    "startButton": "Start game",
+    "rulesButton": "Game rules",
+    "defaultPlayerName": "Player {{n}}",
+    "toggles": {
+      "autoWin": {
+        "label": "Auto-win",
+        "hint": "End the game early once the outcome can no longer change"
+      },
+      "allowRotation": {
+        "label": "Allow rotating pieces"
+      },
+      "doublesExtraTurn": {
+        "label": "Doubles grant an extra turn",
+        "hint": "If both dice match, the same player rolls again"
+      },
+      "autoFillEnclosed": {
+        "label": "Auto-claim enclosed territory",
+        "hintTetromino": "If a player encloses an area with their pieces, it's immediately filled with tetrominoes in their color",
+        "hintHex": "If a player encloses an area with hexes, it's immediately filled with shapes in their color"
+      }
+    },
+    "copy": {
+      "dice": {
+        "rotationHint": "Turn off for a harder game — the block can only be placed exactly as rolled",
+        "smartLabel": "Smart dice",
+        "smartHint": "Toward the end of the game, the dice are more likely to roll a move you can actually make"
+      },
+      "tetromino": {
+        "rotationHint": "Turn off for a harder game — the piece can only be placed in the orientation it was drawn in",
+        "smartLabel": "Smart pieces",
+        "smartHint": "Toward the end of the game, you're more likely to draw a piece you can actually place"
+      },
+      "domino": {
+        "rotationHint": "Turn off for a harder game — the domino can only be placed exactly as rolled, its halves can't be swapped",
+        "smartLabel": "Smart dominoes",
+        "smartHint": "Toward the end of the game, you're more likely to roll a domino you can actually place"
+      },
+      "hex": {
+        "rotationHint": "Turn off for a harder game — the shape can only be placed in the orientation it was drawn in",
+        "smartLabel": "Smart shapes",
+        "smartHint": "Toward the end of the game, you're more likely to draw a shape you can actually place"
+      }
+    }
+  },
+  "playing": {
+    "exit": "Exit",
+    "timerTitle": "Game time",
+    "movesTitle": "Move count",
+    "moveLabel": "Move {{count}}",
+    "rollLabel": {
+      "dice": "Roll dice (Space)",
+      "tetromino": "Draw piece (Space)",
+      "domino": "Draw domino (Space)",
+      "hex": "Roll dice (Space)"
+    },
+    "rollingLabel": {
+      "dice": "Rolling dice…",
+      "tetromino": "Drawing piece…",
+      "domino": "Drawing domino…",
+      "hex": "Rolling dice…"
+    },
+    "placingLabel": {
+      "dice": "Hover over the board and click to place the rectangle.",
+      "tetromino": "Hover over the board and click to place the piece.",
+      "domino": "Hover over the board and click to place the domino.",
+      "hexStored": "Hover over the board and click to place the shape from storage.",
+      "hexRoll": "Hover over the board and click to place the shape ({{count}} remaining)."
+    },
+    "skippedLabel": "No valid positions for this roll. Turn skipped.",
+    "remainingLabel": "{{count}} remaining",
+    "nextButton": "Next (Space)",
+    "rotateButton": "Rotate (R)",
+    "storeButton": "Store (G)",
+    "placeFromStorageButton": "Place from storage (1)",
+    "backToRollButton": "Back to roll",
+    "historyTitle": "History",
+    "turnBadge": "turn",
+    "eliminatedBadge": "eliminated",
+    "cellsCount": "{{count}} cells",
+    "pickFromStorageTitle": "Take from storage ({{n}})",
+    "placeFromStorageTitle": "Place from storage (1)",
+    "hexShapeLabels": {
+      "1": "1 hex",
+      "2": "2 hexes",
+      "3": "3 in a line",
+      "4": "3 in a triangle"
+    },
+    "log": {
+      "diceRoll": "{{name}}: dice {{d1}}×{{d2}}{{doubleNote}}",
+      "diceRollSkipped": "{{name}}: dice {{d1}}×{{d2}} — no valid moves, turn skipped{{doubleNote}}",
+      "doubleNote": " — doubles! another turn",
+      "tetrominoRoll": "{{name}}: piece {{type}}",
+      "tetrominoRollSkipped": "{{name}}: piece {{type}} — no valid moves, turn skipped",
+      "dominoRoll": "{{name}}: domino {{a}}:{{b}}",
+      "dominoRollSkipped": "{{name}}: domino {{a}}:{{b}} — no valid moves, turn skipped",
+      "dominoRollFromStorage": "{{name}}: domino from storage {{a}}:{{b}}",
+      "dominoRollFromStorageSkipped": "{{name}}: domino from storage {{a}}:{{b}} — no valid moves, turn skipped",
+      "dominoStored": "{{name}}: stored domino {{a}}:{{b}}",
+      "hexRoll": "{{name}}: {{shape}} ×{{count}}",
+      "hexRollSkipped": "{{name}}: {{shape}} ×{{count}} — no valid moves, turn skipped",
+      "hexPlaced": "{{name}}: placed {{shape}} at ({{x}}, {{y}})",
+      "hexPlacedFromStorage": "{{name}}: placed {{shape}} from storage at ({{x}}, {{y}})",
+      "hexSkipRemainder": " (remaining ×{{count}} — no room, skipped)",
+      "hexStored": "{{name}}: stored {{shape}}",
+      "eliminated": "{{name}}: eliminated — no more possible moves",
+      "dicePlaced": "{{name}}: placed {{w}}×{{h}} at ({{x}}, {{y}})",
+      "tetrominoPlaced": "{{name}}: placed piece {{type}} at ({{x}}, {{y}})",
+      "dominoPlaced": "{{name}}: placed domino {{a}}:{{b}} at ({{x}}, {{y}})",
+      "autoFillClaimed": "{{name}}: auto-claimed enclosed territory (+{{count}} cells)"
+    }
+  },
+  "gameOver": {
+    "winnerTitle": "{{name}} wins!",
+    "drawTitle": "Draw!",
+    "drawSubtitle": "Tied — {{count}} cells each",
+    "winnerSubtitle": "Claimed {{count}} cells of the board",
+    "reasonDecided": "Game ended early — the opponent(s) could no longer catch up to the leader",
+    "reasonMajority": "Game ended early — a player claimed more than an equal share of the board",
+    "movesCount": "{{count}} moves",
+    "cellsCount": "{{count}} cells",
+    "restartButton": "New game"
+  },
+  "rules": {
+    "common": {
+      "cornerSeeding": "Each player starts with a single cell in their corner of the board — every piece placed after that must touch territory you've already claimed.",
+      "scoring": "The player who has claimed the most cells by the end of the game wins.",
+      "autoWinToggle": "Auto-win: the game ends early once the outcome can no longer change, no matter what happens next.",
+      "smartAssistToggle": "The “Smart …” option makes the random roll more likely to produce a move you can actually make once free space runs low late in the game — this keeps the game from stalling out on bad luck.",
+      "rotationToggle": "Allow rotating pieces: when enabled, you can rotate a piece before placing it. Turn it off for a harder game — the piece can only be placed in the orientation it was drawn in.",
+      "eliminationNote": "With three or four players, if someone runs out of possible moves, they're eliminated from the turn order (marked “eliminated”) — but their claimed cells and score stay on the board until the game ends."
+    },
+    "dice": {
+      "title": "Diceritory — Rules",
+      "objective": "Claim territory on a rectangular board by placing rectangles whose dimensions are determined by a roll of the dice.",
+      "turn": "On your turn, roll two dice — they determine the width and height of the rectangle you must place this turn.",
+      "placement": "You can only place the rectangle so that at least one of its edges touches a cell you already control (vertically or horizontally).",
+      "toggles": [
+        {
+          "title": "Doubles grant an extra turn",
+          "body": "If both dice come up the same, the same player immediately rolls again."
+        }
+      ]
+    },
+    "tetromino": {
+      "title": "Tetritory — Rules",
+      "objective": "The same battle for territory, but instead of rectangles you place the seven classic Tetris pieces.",
+      "turn": "On your turn, draw a piece from a 7-piece bag (each piece appears exactly once before the bag is reshuffled) and place it on the board.",
+      "placement": "You can only place the piece so that at least one of its cells touches a cell you already control (vertically or horizontally).",
+      "toggles": [
+        {
+          "title": "Auto-claim enclosed territory",
+          "body": "If your pieces enclose an area of the board that your opponents can no longer reach, it's immediately filled as much as possible with tetrominoes in your color, and those cells are added to your score."
+        }
+      ]
+    },
+    "domino": {
+      "title": "Dominotory — Rules",
+      "objective": "The same battle for territory, but with dominoes made of two halves, each bearing its own number.",
+      "turn": "On your turn, roll a domino and place both of its halves on the board.",
+      "placement": "Besides the usual rule of touching your own territory, at least one half of the domino must touch an already-placed half bearing the same number — the numbers have to “match,” just like in classic dominoes.",
+      "toggles": [
+        {
+          "title": "Storage",
+          "body": "You can set aside up to 4 dominoes instead of placing them right away, and retrieve any of them on any later turn of yours."
+        }
+      ]
+    },
+    "hex": {
+      "title": "Hexoritory — Rules",
+      "objective": "The same battle for territory, but on a board of hexagons, with shapes made up of them.",
+      "turn": "On your turn, the first die determines the shape (1 hex, 2 hexes, 3 in a line, or 3 in a triangle), and the second determines how many copies of that shape you must place this turn (1–3). All the shapes from the roll must be placed this same turn.",
+      "placement": "Each shape must touch your already-claimed territory along at least one hex edge (adjacency counts in all 6 directions).",
+      "toggles": [
+        {
+          "title": "Storage",
+          "body": "You can stash one shape from the roll instead of placing it, if the storage slot is free. You can retrieve it on any later turn of yours — but you still have to place the other shapes from this roll."
+        },
+        {
+          "title": "Auto-claim enclosed territory",
+          "body": "If your hexes enclose an area of the board that your opponents can no longer reach, it's immediately filled as much as possible with shapes in your color."
+        }
+      ]
+    }
+  },
+  "mode": {
+    "subtitle": "Choose a game mode",
+    "hotseat": {
+      "title": "Hot-seat",
+      "description": "Local turn-based play — all players share one device."
+    },
+    "bots": {
+      "title": "Vs. bots",
+      "description": "Play against computer opponents, choosing their number and difficulty.",
+      "count": "Number of bots",
+      "botName": "Bot {{n}}",
+      "difficulty": {
+        "label": "Difficulty",
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      }
+    },
+    "online": {
+      "title": "Online",
+      "description": "Create a lobby or join friends with a code.",
+      "choice": {
+        "subtitle": "Create a new lobby or join one with a code",
+        "create": "Create lobby",
+        "createHint": "Set up the game and invite others with a code",
+        "join": "Join lobby",
+        "joinHint": "Enter the code you were sent"
+      },
+      "create": {
+        "maxPlayers": "Maximum players",
+        "submit": "Create lobby",
+        "creating": "Creating lobby…"
+      },
+      "join": {
+        "title": "Join lobby",
+        "subtitle": "Enter the lobby code you were sent",
+        "codeLabel": "Lobby code",
+        "codePlaceholder": "e.g. AB12CD",
+        "submit": "Join",
+        "joining": "Joining…",
+        "errors": {
+          "notFound": "Lobby not found. Check the code and try again.",
+          "full": "This lobby is already full.",
+          "alreadyStarted": "The game in this lobby has already started.",
+          "generic": "Couldn't join. Please try again."
+        }
+      },
+      "lobby": {
+        "loading": "Loading lobby…",
+        "closed": "This lobby no longer exists.",
+        "codeLabel": "Lobby code",
+        "playersTitle": "Players ({{count}}/{{max}})",
+        "hostBadge": "host",
+        "youBadge": "you",
+        "startButton": "Start game",
+        "starting": "Starting…",
+        "minPlayersHint": "At least 2 players are needed to start",
+        "waitingHint": "Waiting for the lobby host to start the game…",
+        "leaveButton": "Leave lobby"
+      }
+    }
+  }
+}
