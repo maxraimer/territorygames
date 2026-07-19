@@ -381,7 +381,8 @@ export default function App() {
   }
 
   const previewPlacement = useMemo(() => {
-    if (!board || !currentPlayer || turnPhase !== "placing" || !hoverCell || !shapeCells) return null;
+    if (!board || !currentPlayer || currentPlayer.type === "bot" || turnPhase !== "placing" || !hoverCell || !shapeCells)
+      return null;
     let cells;
     if (game.gameType === "hex") {
       cells = hexShapeToOffsetCells(shapeCells, hoverCell.x, hoverCell.y);
@@ -1399,6 +1400,7 @@ export default function App() {
                 onHoverCell={handleHoverCell}
                 onLeaveBoard={() => setHoverCell(null)}
                 onPlaceClick={handleHexPlaceClick}
+                interactive={currentPlayer?.type !== "bot"}
               />
             ) : (
               <Board
@@ -1410,6 +1412,7 @@ export default function App() {
                 onHoverCell={handleHoverCell}
                 onLeaveBoard={() => setHoverCell(null)}
                 onPlaceClick={handlePlaceClick}
+                interactive={currentPlayer?.type !== "bot"}
               />
             )}
           </div>
