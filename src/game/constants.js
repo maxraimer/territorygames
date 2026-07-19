@@ -86,10 +86,10 @@ export const DEFAULT_AUTO_FILL_ENCLOSED = false;
 export const GAME_TYPES = [{ id: "dice" }, { id: "tetromino" }, { id: "domino" }, { id: "hex" }];
 
 export const GAME_LOGOS = {
-  dice: "/logo_diceritory.png",
-  tetromino: "/logo_tetritory.png",
-  domino: "/logo_dominotory.png",
-  hex: "/logo_hexoritory.png",
+  dice: `${import.meta.env.BASE_URL}logo_diceritory.png`,
+  tetromino: `${import.meta.env.BASE_URL}logo_tetritory.png`,
+  domino: `${import.meta.env.BASE_URL}logo_dominotory.png`,
+  hex: `${import.meta.env.BASE_URL}logo_hexoritory.png`,
 };
 
 // The two-part split used to color just the first chunk of each game's
