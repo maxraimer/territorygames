@@ -17,7 +17,7 @@ import {
   GAME_TITLE_PARTS,
   gridMinForPlayerCount,
 } from "../game/constants";
-import { makeHumanPlayer, makeBotPlayer, BOT_DIFFICULTIES } from "../game/players";
+import { makeHumanPlayer, makeBotPlayer, pickBotColors, BOT_DIFFICULTIES } from "../game/players";
 import HeaderControls from "./HeaderControls";
 import RulesModal from "./RulesModal";
 import GameConfigFields from "./GameConfigFields";
@@ -56,9 +56,10 @@ export default function BotSetupScreen({ gameType, firstPlayerName, onStart, onB
   function handleSubmit(event) {
     event.preventDefault();
     const botNameFn = (n) => t("mode.bots.botName", { n });
+    const botColors = pickBotColors([humanColor], botCount);
     const players = [
       makeHumanPlayer(0, firstPlayerName, humanColor),
-      ...Array.from({ length: botCount }, (_, i) => makeBotPlayer(i + 1, difficulty, botNameFn)),
+      ...Array.from({ length: botCount }, (_, i) => makeBotPlayer(i + 1, difficulty, botNameFn, botColors[i])),
     ];
     onStart({
       cols,

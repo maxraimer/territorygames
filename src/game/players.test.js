@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { makeHumanPlayer, makeBotPlayer, BOT_DIFFICULTIES } from "./players";
+import { makeHumanPlayer, makeBotPlayer, pickBotColors, BOT_DIFFICULTIES } from "./players";
 import { COLOR_PALETTE } from "./constants";
 
 describe("makeHumanPlayer", () => {
@@ -29,5 +29,33 @@ describe("makeBotPlayer", () => {
 
   it("exposes exactly the 3 expected difficulty levels", () => {
     expect(BOT_DIFFICULTIES).toEqual(["easy", "medium", "hard"]);
+  });
+});
+
+describe("pickBotColors", () => {
+  it("never picks an excluded color", () => {
+    for (let i = 0; i < 20; i++) {
+      const colors = pickBotColors([COLOR_PALETTE[0]], 3);
+      expect(colors).not.toContain(COLOR_PALETTE[0]);
+    }
+  });
+
+  it("never repeats a color across the picked set (no bot-vs-bot collisions either)", () => {
+    for (let i = 0; i < 20; i++) {
+      const colors = pickBotColors([COLOR_PALETTE[0]], 3);
+      expect(new Set(colors).size).toBe(colors.length);
+    }
+  });
+
+  it("returns exactly `count` colors when the palette has enough room", () => {
+    expect(pickBotColors([COLOR_PALETTE[0]], 3)).toHaveLength(3);
+  });
+
+  it("varies across calls (not a fixed order)", () => {
+    const seen = new Set();
+    for (let i = 0; i < 20; i++) {
+      seen.add(pickBotColors([COLOR_PALETTE[0]], 1)[0]);
+    }
+    expect(seen.size).toBeGreaterThan(1);
   });
 });
