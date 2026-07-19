@@ -4,9 +4,9 @@ import { GAME_LOGOS, GAME_TITLE_PARTS } from "../game/constants";
 import HeaderControls from "./HeaderControls";
 
 const MODES = [
-  { id: "hotseat", icon: FiUsers },
-  { id: "bots", icon: FiCpu },
-  { id: "online", icon: FiGlobe },
+  { id: "hotseat", icon: FiUsers, disabled: false },
+  { id: "bots", icon: FiCpu, disabled: false },
+  { id: "online", icon: FiGlobe, disabled: true },
 ];
 
 export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
@@ -35,17 +35,25 @@ export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {MODES.map(({ id, icon: Icon }) => (
+          {MODES.map(({ id, icon: Icon, disabled }) => (
             <button
               key={id}
               type="button"
+              disabled={disabled}
               onClick={() => onSelect(id)}
-              className="card bg-base-100 text-left shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl cursor-pointer"
+              title={disabled ? t("mode.online.comingSoon") : undefined}
+              className={
+                "card bg-base-100 text-left shadow-xl transition " +
+                (disabled
+                  ? "cursor-not-allowed opacity-50"
+                  : "hover:-translate-y-0.5 hover:shadow-2xl cursor-pointer")
+              }
             >
               <div className="card-body items-center gap-2 text-center">
                 <Icon className="h-8 w-8 text-primary" />
                 <h2 className="card-title">{t(`mode.${id}.title`)}</h2>
                 <p className="text-sm text-base-content/60">{t(`mode.${id}.description`)}</p>
+                {disabled && <span className="badge badge-ghost badge-sm">{t("mode.online.comingSoon")}</span>}
               </div>
             </button>
           ))}

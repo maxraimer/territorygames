@@ -70,8 +70,16 @@ import {
 } from "./game/constants";
 import { contrastTextColor } from "./game/color";
 import { detectNewEliminations, nextActivePlayerIndex } from "./game/elimination";
+import {
+  chooseDiceBotMove,
+  chooseTetrominoBotMove,
+  chooseDominoBotMove,
+  chooseHexBotMove,
+  shouldBankDominoOnSkip,
+} from "./game/bots";
 
 const ROLL_ANIMATION_MS = 650;
+const BOT_MOVE_DELAY_MS = 600;
 
 function makeGameState(gameType, config) {
   const { cols, rows, players, autoWin, allowRotation, doublesExtraTurn, smartAssist, autoFillEnclosed } = config;
@@ -320,8 +328,12 @@ export default function App() {
   const [game, setGame] = useState(null);
   const [hoverCell, setHoverCell] = useState(null);
   const rollTimeoutRef = useRef(null);
+  const botTimeoutRef = useRef(null);
 
-  useEffect(() => () => clearTimeout(rollTimeoutRef.current), []);
+  useEffect(() => () => {
+    clearTimeout(rollTimeoutRef.current);
+    clearTimeout(botTimeoutRef.current);
+  }, []);
 
   const board = game?.board ?? null;
   const players = game?.players ?? [];
@@ -408,6 +420,7 @@ export default function App() {
 
   function handleBackToSetup() {
     clearTimeout(rollTimeoutRef.current);
+    clearTimeout(botTimeoutRef.current);
     setGame(null);
     setHoverCell(null);
     setScreen(mode === "bots" ? "botSetup" : mode === "online" ? "mode" : "setup");
@@ -415,6 +428,7 @@ export default function App() {
 
   function handleBackToMode() {
     clearTimeout(rollTimeoutRef.current);
+    clearTimeout(botTimeoutRef.current);
     setGame(null);
     setMode(null);
     setHoverCell(null);
@@ -423,6 +437,7 @@ export default function App() {
 
   function handleBackToHome() {
     clearTimeout(rollTimeoutRef.current);
+    clearTimeout(botTimeoutRef.current);
     setGame(null);
     setGameType(null);
     setMode(null);
@@ -680,13 +695,16 @@ export default function App() {
       !board
     )
       return;
+    commitHexPlacement(previewPlacement.cells);
+  }
 
+  function commitHexPlacement(cells) {
     const source = game.activeSource;
     const shapeIndex = source === "roll" ? game.hexShapeIndex : game.storageByPlayer[currentPlayer.id];
     const piece = {
       id: `${currentPlayer.id}-${board.pieces.length}`,
       playerId: currentPlayer.id,
-      cells: previewPlacement.cells,
+      cells,
     };
     const placedBoard = { ...board, pieces: [...board.pieces, piece] };
     const anchor = cellsAnchor(piece.cells);
@@ -902,16 +920,22 @@ export default function App() {
 
   function handlePlaceClick() {
     if (turnPhase !== "placing" || !previewPlacement || !previewPlacement.valid || !currentPlayer || !board || !game) return;
+    commitSquarePlacement(previewPlacement.cells);
+  }
+
+  function commitSquarePlacement(cells) {
     const piece = {
       id: `${currentPlayer.id}-${board.pieces.length}`,
       playerId: currentPlayer.id,
-      cells: previewPlacement.cells,
+      cells,
     };
     const placedBoard = { ...board, pieces: [...board.pieces, piece] };
     const anchor = cellsAnchor(piece.cells);
+    const placedW = Math.max(...cells.map((c) => c.x)) - Math.min(...cells.map((c) => c.x)) + 1;
+    const placedH = Math.max(...cells.map((c) => c.y)) - Math.min(...cells.map((c) => c.y)) + 1;
     const logEntry =
       game.gameType === "dice"
-        ? i18n.t("playing.log.dicePlaced", { name: currentPlayer.name, w: dims.w, h: dims.h, x: anchor.x, y: anchor.y })
+        ? i18n.t("playing.log.dicePlaced", { name: currentPlayer.name, w: placedW, h: placedH, x: anchor.x, y: anchor.y })
         : game.gameType === "tetromino"
           ? i18n.t("playing.log.tetrominoPlaced", { name: currentPlayer.name, type: pieceType, x: anchor.x, y: anchor.y })
           : i18n.t("playing.log.dominoPlaced", {
@@ -978,6 +1002,74 @@ export default function App() {
     }
     advanceTurn();
   }
+
+  // Drives bot turns end-to-end: roll -> (after a short delay) decide + place -> advance.
+  // Depends on the whole `game` object rather than hand-picked fields, same trade-off
+  // `previewPlacement`'s memo above makes (see its eslint-disable comment) — this is also
+  // what makes hex's multi-piece turns "just work" with no special-casing: after one copy
+  // is placed, `turnPhase` stays "placing" but `game` is a new reference, so the effect
+  // re-fires on its own for the next copy.
+  useEffect(() => {
+    if (screen !== "playing" || !game || !currentPlayer || currentPlayer.type !== "bot") return;
+
+    if (game.turnPhase === "idle") {
+      handleRoll();
+      return;
+    }
+
+    if (game.turnPhase === "placing") {
+      botTimeoutRef.current = setTimeout(() => {
+        const opponents = players.filter(
+          (p) => p.id !== currentPlayer.id && !(game.eliminatedPlayerIds ?? []).includes(p.id)
+        );
+        let cells = null;
+        if (game.gameType === "dice") {
+          cells = chooseDiceBotMove(board, currentPlayer.id, game.dice, game.allowRotation, currentPlayer.difficulty, opponents);
+        } else if (game.gameType === "tetromino") {
+          cells = chooseTetrominoBotMove(
+            board,
+            currentPlayer.id,
+            game.pieceType,
+            game.allowRotation,
+            currentPlayer.difficulty,
+            opponents
+          );
+        } else if (game.gameType === "domino") {
+          cells = chooseDominoBotMove(
+            board,
+            currentPlayer.id,
+            game.domino.values,
+            game.allowRotation,
+            currentPlayer.difficulty,
+            opponents
+          );
+        } else {
+          const activeShapeIndex = game.activeSource === "roll" ? game.hexShapeIndex : game.storageByPlayer[currentPlayer.id];
+          cells = chooseHexBotMove(board, currentPlayer.id, activeShapeIndex, game.allowRotation, currentPlayer.difficulty, opponents);
+        }
+        if (cells) {
+          if (game.gameType === "hex") commitHexPlacement(cells);
+          else commitSquarePlacement(cells);
+        } else {
+          advanceTurn();
+        }
+      }, BOT_MOVE_DELAY_MS);
+      return () => clearTimeout(botTimeoutRef.current);
+    }
+
+    if (game.turnPhase === "skipped") {
+      botTimeoutRef.current = setTimeout(() => {
+        if (game.gameType === "domino" && shouldBankDominoOnSkip(currentPlayer.difficulty, storage.length, DOMINO_STORAGE_LIMIT)) {
+          handleStore();
+        } else {
+          advanceTurn();
+        }
+      }, BOT_MOVE_DELAY_MS);
+      return () => clearTimeout(botTimeoutRef.current);
+    }
+    // "rolling": nothing to do here, handleRoll's own rollTimeoutRef resolves it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately scoped to `game` as a whole (see comment above)
+  }, [screen, game, currentPlayer, board, players, storage]);
 
   if (screen === "home" || !gameType) {
     return <HomeScreen nickname={nickname} onNicknameChange={setNickname} onSelect={handleSelectGame} />;

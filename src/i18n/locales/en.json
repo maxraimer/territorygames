@@ -258,6 +258,7 @@
     "online": {
       "title": "Online",
       "description": "Create a lobby or join friends with a code.",
+      "comingSoon": "Coming soon",
       "choice": {
         "subtitle": "Create a new lobby or join one with a code",
         "create": "Create lobby",

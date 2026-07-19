@@ -258,6 +258,7 @@
     "online": {
       "title": "Online",
       "description": "Erstelle eine Lobby oder tritt Freunden per Code bei.",
+      "comingSoon": "Demnächst",
       "choice": {
         "subtitle": "Erstelle eine neue Lobby oder tritt per Code bei",
         "create": "Lobby erstellen",

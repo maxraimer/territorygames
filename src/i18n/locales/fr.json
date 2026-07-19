@@ -258,6 +258,7 @@
     "online": {
       "title": "En ligne",
       "description": "Créez un salon ou rejoignez vos amis avec un code.",
+      "comingSoon": "Bientôt disponible",
       "choice": {
         "subtitle": "Créez un nouveau salon ou rejoignez-en un avec un code",
         "create": "Créer un salon",
