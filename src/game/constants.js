@@ -98,8 +98,7 @@ export const GAME_LOGOS = {
   tetromino: `${import.meta.env.BASE_URL}logo_tetritory.png`,
   domino: `${import.meta.env.BASE_URL}logo_dominotory.png`,
   hex: `${import.meta.env.BASE_URL}logo_hexoritory.png`,
-  // Placeholder SVG until a matching PNG (like the other 4 games') is ready.
-  route: `${import.meta.env.BASE_URL}logo_routeritory.svg`,
+  route: `${import.meta.env.BASE_URL}logo_routeritory.png`,
 };
 
 // The two-part split used to color just the first chunk of each game's
