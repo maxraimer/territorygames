@@ -20,8 +20,8 @@ const SMALL_ISLAND_MIN_FRACTION = 0.06;
 const SMALL_ISLAND_MAX_FRACTION = 0.25;
 const LARGE_ISLAND_MIN_FRACTION = 0.3;
 const MOUNTAIN_CORNER_BUFFER = 2;
+const MOUNTAIN_PLACEMENT_ATTEMPTS = 10;
 const MAX_GENERATION_ATTEMPTS = 60;
-const MAX_MOUNTAIN_ATTEMPTS = 15;
 // For each edge, which end (t=0 or t=1 in edgePoint's parametrization) sits at
 // the corner it shares with a given adjacent edge — used to bias the river's
 // entry point and its short pocket-branch exit toward the same corner, so
@@ -52,10 +52,14 @@ function isNearCorner(cell, corners, buffer) {
 }
 
 // ---------------------------------------------------------------------------
-// River generation — pure 4-directional random walks. Because a step never
-// moves diagonally, the river cell set is always a fully edge-connected
-// barrier: two land cells on opposite sides of it can never be orthogonally
-// adjacent, so the flood fill below can't "leak" across it.
+// River generation — a random walk that can step diagonally (for a more
+// natural, meandering shape) but never as a bare 1-cell diagonal hop: a
+// diagonal step also drops an orthogonal "elbow" cell between the two
+// diagonal cells, so every consecutive pair in the path shares a full edge.
+// Without the elbow, two diagonal river cells would only touch at a corner,
+// and land cells on opposite sides could still slip past through that corner
+// gap during the (edge-only) flood fill below — the barrier has to be
+// edge-connected, not just visually contiguous.
 // ---------------------------------------------------------------------------
 
 function edgePoint(cols, rows, edge, t) {
@@ -81,7 +85,7 @@ function pickEdgePoint(cols, rows, edge) {
 /** Like pickEdgePoint, but hugs the end of `edge` nearest the corner it shares with `nearEdge`. */
 function pickEdgePointBiased(cols, rows, edge, towardTEnd) {
   const margin = 0.06;
-  const span = 0.14 + Math.random() * 0.12;
+  const span = 0.3 + Math.random() * 0.15;
   const t = towardTEnd === 0 ? margin + Math.random() * span : 1 - margin - Math.random() * span;
   return edgePoint(cols, rows, edge, t);
 }
@@ -90,16 +94,21 @@ function manhattan(a, b) {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 }
 
+const STEP_DIRS = [
+  { x: 1, y: 0 },
+  { x: -1, y: 0 },
+  { x: 0, y: 1 },
+  { x: 0, y: -1 },
+  { x: 1, y: 1 },
+  { x: 1, y: -1 },
+  { x: -1, y: 1 },
+  { x: -1, y: -1 },
+];
+
 function chooseStep(current, target, wobble, cols, rows) {
-  const dirs = [
-    { x: 1, y: 0 },
-    { x: -1, y: 0 },
-    { x: 0, y: 1 },
-    { x: 0, y: -1 },
-  ];
-  const valid = dirs
-    .map((d) => ({ x: current.x + d.x, y: current.y + d.y }))
-    .filter((p) => p.x >= 0 && p.x < cols && p.y >= 0 && p.y < rows);
+  const valid = STEP_DIRS.map((d) => ({ dx: d.x, dy: d.y, x: current.x + d.x, y: current.y + d.y })).filter(
+    (p) => p.x >= 0 && p.x < cols && p.y >= 0 && p.y < rows
+  );
   if (Math.random() < wobble) return valid[Math.floor(Math.random() * valid.length)];
   valid.sort((a, b) => manhattan(a, target) - manhattan(b, target));
   return valid[0];
@@ -110,7 +119,13 @@ function walkUntil(start, target, isDone, cols, rows, maxSteps) {
   let current = start;
   let steps = 0;
   while (!isDone(current) && steps < maxSteps) {
-    current = chooseStep(current, target, RIVER_WOBBLE, cols, rows);
+    const step = chooseStep(current, target, RIVER_WOBBLE, cols, rows);
+    if (step.dx !== 0 && step.dy !== 0) {
+      const elbow =
+        Math.random() < 0.5 ? { x: current.x + step.dx, y: current.y } : { x: current.x, y: current.y + step.dy };
+      path.push(elbow);
+    }
+    current = { x: step.x, y: step.y };
     path.push(current);
     steps++;
   }
@@ -134,7 +149,7 @@ function generateRiver(cols, rows) {
 
   const maxSteps = cols + rows;
   const center = { x: Math.floor(cols / 2), y: Math.floor(rows / 2) };
-  const forkFraction = 0.18 + Math.random() * 0.14; // stays close to entry, not the center
+  const forkFraction = 0.5 + Math.random() * 0.2; // roughly halfway to the center, enough depth for a real pocket
   const forkTarget = {
     x: Math.round(entry.x + (center.x - entry.x) * forkFraction),
     y: Math.round(entry.y + (center.y - entry.y) * forkFraction),
@@ -328,15 +343,29 @@ function growMountainCluster(cols, rows, occupied, corners) {
   return [];
 }
 
+/**
+ * Grows each cluster and validates it against the island split immediately,
+ * skipping just that one cluster (not the whole batch) if it would sever an
+ * island or shrink one below the size thresholds — validating only after
+ * placing all clusters at once (the previous approach) meant a single bad
+ * cluster discarded every other valid one too, which is why mountains were
+ * regularly generating empty under the stricter 2-large/1-small split.
+ */
 function generateMountainClusters(cols, rows, riverBlocked, corners) {
   const clusterCount = Math.max(3, Math.min(8, Math.round((cols * rows) / 150)));
   const occupied = new Set(riverBlocked);
   const clusters = [];
   for (let i = 0; i < clusterCount; i++) {
-    const cluster = growMountainCluster(cols, rows, occupied, corners);
-    if (cluster.length >= 2) {
+    for (let attempt = 0; attempt < MOUNTAIN_PLACEMENT_ATTEMPTS; attempt++) {
+      const cluster = growMountainCluster(cols, rows, occupied, corners);
+      if (cluster.length < 2) continue;
+      const candidateBlocked = new Set(occupied);
+      for (const c of cluster) candidateBlocked.add(cellKey(c.x, c.y));
+      const { sizes } = computeIslands(cols, rows, candidateBlocked);
+      if (!isValidIslandSplit(sizes, cols * rows - candidateBlocked.size)) continue;
       clusters.push(cluster);
       for (const c of cluster) occupied.add(cellKey(c.x, c.y));
+      break;
     }
   }
   return clusters;
@@ -397,22 +426,10 @@ function tryGenerateTerrain(cols, rows, corners) {
   const withoutMountains = computeIslands(cols, rows, riverBlocked);
   if (!isValidIslandSplit(withoutMountains.sizes, cols * rows - riverBlocked.size)) return null;
 
-  let mountainClusters = [];
-  let islands = withoutMountains;
-  for (let attempt = 0; attempt < MAX_MOUNTAIN_ATTEMPTS; attempt++) {
-    const clusters = generateMountainClusters(cols, rows, riverBlocked, corners);
-    const blocked = new Set([...riverBlocked, ...clusters.flat().map((c) => cellKey(c.x, c.y))]);
-    const withMountains = computeIslands(cols, rows, blocked);
-    if (isValidIslandSplit(withMountains.sizes, cols * rows - blocked.size)) {
-      mountainClusters = clusters;
-      islands = withMountains;
-      break;
-    }
-    // A cluster kept severing an island every attempt — ship the game without
-    // mountains rather than fail generation entirely over a cosmetic feature.
-  }
-
+  const mountainClusters = generateMountainClusters(cols, rows, riverBlocked, corners);
   const blocked = new Set([...riverBlocked, ...mountainClusters.flat().map((c) => cellKey(c.x, c.y))]);
+  const islands = computeIslands(cols, rows, blocked);
+
   const candidatesByArm = computeBridgeCandidates(river, islands.islandOf);
   if (["trunk", "branchA", "branchB"].some((arm) => candidatesByArm[arm].length === 0)) return null;
 

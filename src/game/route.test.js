@@ -85,9 +85,11 @@ describe("generateRouteTerrain", () => {
       { x: cols - 1, y: rows - 1 },
       { x: 0, y: rows - 1 },
     ];
+    let runsWithMountains = 0;
     for (let i = 0; i < 20; i++) {
       const terrain = generateRouteTerrain(cols, rows);
       const allTerrainCells = [...terrain.riverCells, ...terrain.mountainClusters.flat()];
+      if (terrain.mountainClusters.length > 0) runsWithMountains++;
 
       for (const c of terrain.riverCells) {
         expect(corners.some((k) => k.x === c.x && k.y === c.y)).toBe(false);
@@ -111,6 +113,34 @@ describe("generateRouteTerrain", () => {
       expect(terrain.islands.largeIslandIds).toHaveLength(2);
       expect(terrain.islands.smallIslandId).not.toBe(terrain.islands.largeIslandIds[0]);
       expect(terrain.islands.smallIslandId).not.toBe(terrain.islands.largeIslandIds[1]);
+    }
+    // Mountains should reliably appear now that a bad cluster only forfeits
+    // itself instead of the whole batch (see generateMountainClusters).
+    expect(runsWithMountains).toBeGreaterThan(15);
+  });
+
+  it("the river cell set is always a single edge-connected blob, even with diagonal steps", () => {
+    // A diagonal-only touch between two river cells would leave the river as
+    // 2+ disconnected components under edge-only (squareNeighbors) adjacency
+    // — this is exactly the "leak" the elbow-fill guard in walkUntil exists
+    // to prevent (see the river generation comment in route.js).
+    for (let i = 0; i < 20; i++) {
+      const terrain = generateRouteTerrain(20, 20);
+      const riverSet = new Set(terrain.riverCells.map(cellKey));
+      const start = terrain.riverCells[0];
+      const visited = new Set([cellKey(start)]);
+      const queue = [start];
+      while (queue.length) {
+        const cell = queue.pop();
+        for (const n of squareNeighbors(cell.x, cell.y)) {
+          const key = cellKey(n);
+          if (riverSet.has(key) && !visited.has(key)) {
+            visited.add(key);
+            queue.push(n);
+          }
+        }
+      }
+      expect(visited.size).toBe(riverSet.size);
     }
   });
 });
