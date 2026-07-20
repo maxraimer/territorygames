@@ -75,7 +75,8 @@
       "autoFillEnclosed": {
         "label": "Capture automatique du territoire encerclé",
         "hintTetromino": "Si un joueur encercle une zone avec ses pièces, elle est aussitôt remplie de tétrominos de sa couleur",
-        "hintHex": "Si un joueur encercle une zone avec ses hexagones, elle est aussitôt remplie de formes de sa couleur"
+        "hintHex": "Si un joueur encercle une zone avec ses hexagones, elle est aussitôt remplie de formes de sa couleur",
+        "hintRoute": "Si un joueur encercle une zone avec son territoire (la rivière et les montagnes comptent aussi comme une frontière), elle lui est aussitôt attribuée"
       }
     },
     "copy": {
@@ -136,6 +137,12 @@
     "placeFromStorageButton": "Placer depuis la réserve (1)",
     "backToRollButton": "Revenir au lancer",
     "historyTitle": "Historique",
+    "terrainLegend": {
+      "title": "Légende",
+      "river": "Rivière",
+      "mountain": "Montagnes",
+      "bridge": "Pont"
+    },
     "turnBadge": "tour",
     "eliminatedBadge": "éliminé",
     "cellsCount": "{{count}} cases",
@@ -169,6 +176,7 @@
       "routePlaced": "{{name}} : a capturé ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}} : a traversé le pont et capturé ({{x}}, {{y}})",
       "routeStreakBonus": "— série de résultats identiques ! Un tour de plus",
+      "routeRevived": "{{name}} : un pont a bougé et lui a rouvert un coup — de retour dans la partie",
       "eliminated": "{{name}} : est éliminé — plus aucun coup possible",
       "dicePlaced": "{{name}} : a placé {{w}}×{{h}} en ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}} : a placé la pièce {{type}} en ({{x}}, {{y}})",
@@ -261,6 +269,10 @@
         {
           "title": "Série de résultats identiques",
           "body": "Si le dé affiche le même nombre trois fois de suite, ce joueur obtient un tour supplémentaire. Mais si le quatrième lancer d'affilée correspond aussi, aucun tour bonus n'est accordé et la série recommence à zéro."
+        },
+        {
+          "title": "Capture automatique du territoire encerclé",
+          "body": "Si activé : une zone du plateau qu'un joueur a entièrement encerclée avec son territoire (la rivière et les montagnes comptent aussi comme une frontière), de sorte qu'aucun autre joueur ne peut plus l'atteindre, lui est aussitôt attribuée, case par case."
         }
       ]
     }

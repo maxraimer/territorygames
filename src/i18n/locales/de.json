@@ -75,7 +75,8 @@
       "autoFillEnclosed": {
         "label": "Automatische Übernahme umschlossener Gebiete",
         "hintTetromino": "Umschließt ein Spieler mit seinen Steinen ein Gebiet, wird es sofort mit Tetrominos seiner Farbe aufgefüllt",
-        "hintHex": "Umschließt ein Spieler mit Hexagonen ein Gebiet, wird es sofort mit Figuren seiner Farbe aufgefüllt"
+        "hintHex": "Umschließt ein Spieler mit Hexagonen ein Gebiet, wird es sofort mit Figuren seiner Farbe aufgefüllt",
+        "hintRoute": "Umschließt ein Spieler mit seinem Gebiet eine Fläche (Fluss und Berge zählen auch als Grenze), geht sie sofort in seinen Besitz über"
       }
     },
     "copy": {
@@ -136,6 +137,12 @@
     "placeFromStorageButton": "Aus Speicher platzieren (1)",
     "backToRollButton": "Zurück zum Wurf",
     "historyTitle": "Verlauf",
+    "terrainLegend": {
+      "title": "Legende",
+      "river": "Fluss",
+      "mountain": "Berge",
+      "bridge": "Brücke"
+    },
     "turnBadge": "Zug",
     "eliminatedBadge": "ausgeschieden",
     "cellsCount": "{{count}} Felder",
@@ -169,6 +176,7 @@
       "routePlaced": "{{name}}: hat ({{x}}, {{y}}) erobert",
       "routeBridgeCrossed": "{{name}}: hat die Brücke überquert und ({{x}}, {{y}}) erobert",
       "routeStreakBonus": "— Serie gleicher Würfe! Noch ein Zug",
+      "routeRevived": "{{name}}: eine Brücke hat sich verschoben und ihm wieder einen Zug ermöglicht — zurück im Spiel",
       "eliminated": "{{name}}: scheidet aus — keine möglichen Züge mehr",
       "dicePlaced": "{{name}}: hat {{w}}×{{h}} bei ({{x}}, {{y}}) platziert",
       "tetrominoPlaced": "{{name}}: hat Figur {{type}} bei ({{x}}, {{y}}) platziert",
@@ -261,6 +269,10 @@
         {
           "title": "Serie gleicher Würfe",
           "body": "Zeigt der Würfel dreimal in Folge dieselbe Zahl, erhält dieser Spieler einen zusätzlichen Zug. Stimmt aber auch der vierte Wurf in Folge überein, wird kein weiterer Bonus gewährt, und die Serie beginnt neu zu zählen."
+        },
+        {
+          "title": "Automatische Übernahme umschlossener Gebiete",
+          "body": "Wenn aktiviert: Eine Fläche des Spielfelds, die ein Spieler vollständig mit seinem Gebiet umschlossen hat (Fluss und Berge zählen auch als Grenze), sodass kein anderer Spieler sie mehr erreichen kann, geht sofort Feld für Feld in seinen Besitz über."
         }
       ]
     }

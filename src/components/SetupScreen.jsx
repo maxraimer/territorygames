@@ -47,7 +47,7 @@ export default function SetupScreen({ gameType, firstPlayerName, onStart, onBack
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const logo = GAME_LOGOS[gameType] ?? GAME_LOGOS.dice;
   const gameName = t(`home.games.${gameType}.name`);
-  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
+  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex" || gameType === "route";
 
   const colorClash = new Set(players.map((p) => p.color)).size !== players.length;
   const gridMin = gridMinForPlayerCount(players.length, gameType);

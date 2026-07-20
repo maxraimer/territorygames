@@ -41,7 +41,7 @@ export default function BotSetupScreen({ gameType, firstPlayerName, onStart, onB
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const logo = GAME_LOGOS[gameType] ?? GAME_LOGOS.dice;
   const gameName = t(`home.games.${gameType}.name`);
-  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
+  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex" || gameType === "route";
 
   const totalPlayers = 1 + botCount;
   const gridMin = gridMinForPlayerCount(totalPlayers, gameType);

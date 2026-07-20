@@ -70,6 +70,25 @@ describe("findEnclosedRegions", () => {
     expect(keys).toEqual(["2,2", "2,3", "3,2", "3,3"]);
   });
 
+  it("treats an ignored owner (e.g. Routeritory's terrain sentinels) as a neutral border, not a second owner", () => {
+    // Same 3x3 ring as the first test, but one ring cell (directly bordering
+    // the empty center) belongs to a sentinel "terrain" owner instead of p1.
+    // Without ignoredOwnerIds this disqualifies the region (2 distinct
+    // border owners); with it listed, the terrain cell doesn't count
+    // against the single real owner.
+    const board = makeBoard(3, 3, [
+      { id: "a", playerId: "p1", x: 0, y: 0, w: 3, h: 1 },
+      { id: "b", playerId: "p1", x: 0, y: 1, w: 1, h: 1 },
+      { id: "c", playerId: "__mountain__", x: 2, y: 1, w: 1, h: 1 },
+      { id: "d", playerId: "p1", x: 0, y: 2, w: 3, h: 1 },
+    ]);
+    expect(findEnclosedRegions(board, undefined, new Set(["__mountain__"]))).toEqual([
+      { playerId: "p1", cells: [{ x: 1, y: 1 }] },
+    ]);
+    // Without the ignore set, the mountain cell counts as a second "owner".
+    expect(findEnclosedRegions(board)).toEqual([]);
+  });
+
   it("accepts a neighborsFn override — a hex ring encloses its center under hexNeighbors", () => {
     const center = { x: 4, y: 4 };
     const ring = hexNeighbors(center.x, center.y);

@@ -75,7 +75,8 @@
       "autoFillEnclosed": {
         "label": "Captura automática del territorio rodeado",
         "hintTetromino": "Si un jugador rodea una zona con sus piezas, esta se rellena de inmediato con tetrominós de su color",
-        "hintHex": "Si un jugador rodea una zona con hexágonos, esta se rellena de inmediato con figuras de su color"
+        "hintHex": "Si un jugador rodea una zona con hexágonos, esta se rellena de inmediato con figuras de su color",
+        "hintRoute": "Si un jugador rodea una zona con su territorio (el río y las montañas también cuentan como límite), se le asigna de inmediato"
       }
     },
     "copy": {
@@ -136,6 +137,12 @@
     "placeFromStorageButton": "Colocar desde el almacén (1)",
     "backToRollButton": "Volver a la tirada",
     "historyTitle": "Historial",
+    "terrainLegend": {
+      "title": "Leyenda",
+      "river": "Río",
+      "mountain": "Montañas",
+      "bridge": "Puente"
+    },
     "turnBadge": "turno",
     "eliminatedBadge": "eliminado",
     "cellsCount": "{{count}} casillas",
@@ -169,6 +176,7 @@
       "routePlaced": "{{name}}: capturó ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}}: cruzó el puente y capturó ({{x}}, {{y}})",
       "routeStreakBonus": "— ¡racha de coincidencias! Otro turno",
+      "routeRevived": "{{name}}: un puente se movió y le abrió un movimiento de nuevo — vuelve a la partida",
       "eliminated": "{{name}}: queda eliminado — ya no tiene movimientos posibles",
       "dicePlaced": "{{name}}: colocó {{w}}×{{h}} en ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}}: colocó la figura {{type}} en ({{x}}, {{y}})",
@@ -261,6 +269,10 @@
         {
           "title": "Racha de tiradas iguales",
           "body": "Si el dado muestra el mismo número tres veces seguidas, ese jugador obtiene un turno extra. Pero si la cuarta tirada seguida también coincide, no se concede otro turno extra y la racha vuelve a contarse desde cero."
+        },
+        {
+          "title": "Captura automática del territorio rodeado",
+          "body": "Si está activado: una zona del tablero que un jugador ha rodeado por completo con su territorio (el río y las montañas también cuentan como límite), de modo que ningún otro jugador puede alcanzarla ya, se le asigna de inmediato, casilla por casilla."
         }
       ]
     }

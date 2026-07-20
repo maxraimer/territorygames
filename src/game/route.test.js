@@ -16,6 +16,7 @@ import {
   makeRouteNeighborsFn,
   relocateBridge,
   shouldRelocateBridges,
+  reviveEligiblePlayers,
   nextRollStreak,
 } from "./route";
 
@@ -72,6 +73,22 @@ describe("computeBridgeCandidates", () => {
     ]);
     const river = { trunk: [{ x: 2, y: 1 }], branchA: [], branchB: [] };
     expect(computeBridgeCandidates(river, islandOf).trunk).toHaveLength(0);
+  });
+
+  it("still finds a valid crossing on a river cell with 3+ land neighbors (a wider stretch, not just 1-cell-wide)", () => {
+    // (2,1) has 3 land neighbors: (1,1) and (2,0) on island 0, (3,1) on island 1.
+    const islandOf = new Map([
+      [cellKey({ x: 1, y: 1 }), 0],
+      [cellKey({ x: 2, y: 0 }), 0],
+      [cellKey({ x: 3, y: 1 }), 1],
+    ]);
+    const river = { trunk: [{ x: 2, y: 1 }], branchA: [], branchB: [] };
+    const result = computeBridgeCandidates(river, islandOf);
+    expect(result.trunk).toHaveLength(1);
+    const [candidate] = result.trunk;
+    const bankKeys = new Set([cellKey(candidate.bankA), cellKey(candidate.bankB)]);
+    expect(bankKeys.has(cellKey({ x: 3, y: 1 }))).toBe(true);
+    expect(bankKeys.has(cellKey({ x: 1, y: 1 })) || bankKeys.has(cellKey({ x: 2, y: 0 }))).toBe(true);
   });
 });
 
@@ -278,6 +295,31 @@ describe("relocateBridge / shouldRelocateBridges", () => {
     expect(shouldRelocateBridges(6, 2)).toBe(true);
     expect(shouldRelocateBridges(2, 1)).toBe(false);
     expect(shouldRelocateBridges(3, 1)).toBe(true);
+  });
+});
+
+describe("reviveEligiblePlayers", () => {
+  it("un-eliminates a player who regains a move once a bridge relocates next to them", () => {
+    // p1 is boxed in on a 1-cell island with no bridge — genuinely eliminated.
+    const boardNoBridge = { cols: 5, rows: 1, pieces: [seed("p1", 0, 0), seed("__mountain__", 1, 0)], bridges: [] };
+    expect(hasAnyPossibleRouteMove(boardNoBridge, "p1")).toBe(false);
+
+    // A bridge relocates to sit right at p1's border, with a free far bank.
+    const boardWithBridge = {
+      ...boardNoBridge,
+      pieces: [seed("p1", 0, 0), { id: "river", playerId: RIVER_OWNER, cells: [{ x: 1, y: 0 }] }],
+      bridges: [{ cell: { x: 1, y: 0 }, bankA: { x: 0, y: 0 }, bankB: { x: 2, y: 0 }, arm: "trunk" }],
+    };
+    const { eliminatedPlayerIds, revived } = reviveEligiblePlayers(["p1"], boardWithBridge);
+    expect(revived).toEqual(["p1"]);
+    expect(eliminatedPlayerIds).toEqual([]);
+  });
+
+  it("leaves a still-boxed-in player eliminated, and is a no-op with nobody eliminated", () => {
+    const board = { cols: 5, rows: 1, pieces: [seed("p1", 0, 0), seed("__mountain__", 1, 0)], bridges: [] };
+    const result = reviveEligiblePlayers(["p1"], board);
+    expect(result).toEqual({ eliminatedPlayerIds: ["p1"], revived: [] });
+    expect(reviveEligiblePlayers([], board)).toEqual({ eliminatedPlayerIds: [], revived: [] });
   });
 });
 

@@ -39,7 +39,7 @@ export default function CreateLobbyScreen({ gameType, firstPlayerName, onCreated
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const logo = GAME_LOGOS[gameType] ?? GAME_LOGOS.dice;
   const gameName = t(`home.games.${gameType}.name`);
-  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
+  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex" || gameType === "route";
   const gridMin = gridMinForPlayerCount(maxPlayers);
 
   function handleMaxPlayersChange(count) {

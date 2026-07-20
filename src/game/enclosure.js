@@ -17,9 +17,12 @@ function cellKey(x, y) {
  * A region touching no pieces yet, or bordering more than one player, is
  * left out — it isn't exclusively anyone's. `neighborsFn` defaults to
  * 4-directional square adjacency; Hexoritory passes `hexNeighbors` for its
- * 6-directional board instead.
+ * 6-directional board instead. `ignoredOwnerIds` (Routeritory's river/
+ * mountain sentinel playerIds) lets impassable terrain act as a neutral
+ * border — bordering it doesn't disqualify a region the way bordering a
+ * second player would.
  */
-export function findEnclosedRegions(board, neighborsFn = squareNeighbors) {
+export function findEnclosedRegions(board, neighborsFn = squareNeighbors, ignoredOwnerIds) {
   const occupied = buildOccupiedSet(board);
   const ownerOf = new Map();
   for (const piece of board.pieces) {
@@ -46,7 +49,8 @@ export function findEnclosedRegions(board, neighborsFn = squareNeighbors) {
           if (n.x < 0 || n.y < 0 || n.x >= board.cols || n.y >= board.rows) continue;
           const nKey = cellKey(n.x, n.y);
           if (occupied.has(nKey)) {
-            borderOwners.add(ownerOf.get(nKey));
+            const owner = ownerOf.get(nKey);
+            if (!ignoredOwnerIds || !ignoredOwnerIds.has(owner)) borderOwners.add(owner);
           } else if (!visited.has(nKey)) {
             visited.add(nKey);
             queue.push(n);

@@ -372,8 +372,12 @@ function generateMountainClusters(cols, rows, riverBlocked, corners) {
 }
 
 // ---------------------------------------------------------------------------
-// Bridges — one per river arm, only valid on a river cell whose 2 land
-// neighbors sit on 2 different islands (a genuine bank-to-bank crossing).
+// Bridges — one per river arm, valid on any river cell that has at least 2
+// land neighbors on 2 different islands (a genuine bank-to-bank crossing).
+// Not restricted to cells with *exactly* 2 land neighbors: the diagonal
+// "elbow" cells the river walk drops can leave a crossing with 3 land
+// neighbors (e.g. at a corner where the river briefly widens to 2 cells),
+// and that's just as valid a bridge site as a plain 1-cell-wide stretch.
 // ---------------------------------------------------------------------------
 
 export function computeBridgeCandidates(river, islandOf) {
@@ -383,10 +387,16 @@ export function computeBridgeCandidates(river, islandOf) {
     const candidates = [];
     for (const cell of cells) {
       const landNeighbors = squareNeighbors(cell.x, cell.y).filter((n) => islandOf.has(cellKey(n.x, n.y)));
-      if (landNeighbors.length !== 2) continue;
-      const [bankA, bankB] = landNeighbors;
-      if (islandOf.get(cellKey(bankA.x, bankA.y)) === islandOf.get(cellKey(bankB.x, bankB.y))) continue;
-      candidates.push({ cell, bankA, bankB, arm });
+      let bridgeBanks = null;
+      for (let i = 0; i < landNeighbors.length && !bridgeBanks; i++) {
+        for (let j = i + 1; j < landNeighbors.length && !bridgeBanks; j++) {
+          const idA = islandOf.get(cellKey(landNeighbors[i].x, landNeighbors[i].y));
+          const idB = islandOf.get(cellKey(landNeighbors[j].x, landNeighbors[j].y));
+          if (idA !== idB) bridgeBanks = [landNeighbors[i], landNeighbors[j]];
+        }
+      }
+      if (!bridgeBanks) continue;
+      candidates.push({ cell, bankA: bridgeBanks[0], bankB: bridgeBanks[1], arm });
     }
     result[arm] = candidates;
   }
@@ -538,6 +548,24 @@ export function enumerateValidRouteCells(board, playerId) {
 /** Whether the player has any legal claim at all — used for elimination/game-over. */
 export function hasAnyPossibleRouteMove(board, playerId) {
   return enumerateValidRouteCells(board, playerId).length > 0;
+}
+
+/**
+ * Re-checks every eliminated player against the current board and un-
+ * eliminates anyone who now has a legal move. Elimination isn't permanent
+ * here the way it is in every other game (where the board only ever fills
+ * up, so "no moves" can never become "moves" again): Routeritory's bridges
+ * relocate periodically, and a player who was genuinely boxed in a moment
+ * ago can suddenly gain access to a fresh crossing. Call this whenever
+ * bridges move.
+ */
+export function reviveEligiblePlayers(eliminatedPlayerIds, board) {
+  const revived = eliminatedPlayerIds.filter((id) => hasAnyPossibleRouteMove(board, id));
+  if (revived.length === 0) return { eliminatedPlayerIds, revived };
+  return {
+    eliminatedPlayerIds: eliminatedPlayerIds.filter((id) => !revived.includes(id)),
+    revived,
+  };
 }
 
 /**

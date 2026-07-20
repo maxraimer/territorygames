@@ -3,6 +3,7 @@ import { FaTrophy, FaHandshake } from "react-icons/fa";
 import { FiClock, FiRepeat } from "react-icons/fi";
 import Board from "./Board";
 import HexBoard from "./HexBoard";
+import TerrainLegend from "./TerrainLegend";
 import { formatDuration } from "../game/time";
 import { playerArea } from "../game/rules";
 import { terrainLayersForRender } from "../game/route";
@@ -61,6 +62,8 @@ export default function GameOverScreen({ board, players, gameType, startedAt, en
           </div>
         ))}
       </div>
+
+      {gameType === "route" && <TerrainLegend />}
 
       <div className="max-w-full overflow-x-auto rounded-lg border border-base-300 bg-base-100 p-2">
         {gameType === "hex" ? (

@@ -43,7 +43,7 @@ export default function GameConfigFields({
   onAutoFillEnclosedChange,
 }) {
   const { t } = useTranslation();
-  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
+  const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex" || gameType === "route";
   // Route claims are always single cells (no shape to rotate), and roll
   // "playability" doesn't depend on the rolled number the way it does for
   // every other game's shape/size — there's nothing for either toggle to
@@ -119,7 +119,11 @@ export default function GameConfigFields({
         {supportsAutoFillEnclosed && (
           <Toggle
             label={t("setup.toggles.autoFillEnclosed.label")}
-            hint={t(`setup.toggles.autoFillEnclosed.hint${gameType === "hex" ? "Hex" : "Tetromino"}`)}
+            hint={t(
+              `setup.toggles.autoFillEnclosed.hint${
+                gameType === "hex" ? "Hex" : gameType === "route" ? "Route" : "Tetromino"
+              }`
+            )}
             checked={autoFillEnclosed}
             onChange={onAutoFillEnclosedChange}
           />

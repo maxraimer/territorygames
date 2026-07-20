@@ -14,6 +14,7 @@ import OnlineModeScreen from "./components/online/OnlineModeScreen";
 import GameOverScreen from "./components/GameOverScreen";
 import GameTimer from "./components/GameTimer";
 import HeaderControls from "./components/HeaderControls";
+import TerrainLegend from "./components/TerrainLegend";
 import useNickname from "./hooks/useNickname";
 import { rollDice } from "./game/dice";
 import {
@@ -28,6 +29,7 @@ import {
   findPlayableDiceSizes,
   playerArea,
   rectCells,
+  squareNeighbors,
 } from "./game/rules";
 import {
   pieceCells,
@@ -86,9 +88,14 @@ import {
   makeRouteNeighborsFn,
   relocateBridge,
   shouldRelocateBridges,
+  reviveEligiblePlayers,
   terrainLayersForRender,
   nextRollStreak,
+  RIVER_OWNER,
+  MOUNTAIN_OWNER,
 } from "./game/route";
+
+const ROUTE_TERRAIN_OWNERS = new Set([RIVER_OWNER, MOUNTAIN_OWNER]);
 
 const ROLL_ANIMATION_MS = 650;
 const BOT_MOVE_DELAY_MS = 600;
@@ -272,9 +279,18 @@ function rollWeightedHexShape(board, playerId, badRollStreak, smartAssist, allow
   return { shapeIndex: forced, count, nextBadRollStreak: 0 };
 }
 
-/** Reason an early (non-exhausted) end is warranted, or null if play should continue. */
+/**
+ * Reason an early (non-exhausted) end is warranted, or null if play should
+ * continue. hasMajorityShare is only a *rigorous* guarantee for 2 players
+ * (see its docstring in rules.js) — with 3+, a player can cross the T/P
+ * share threshold while the remaining board is still large enough for a
+ * single trailing player to catch up or overtake if it all concentrated in
+ * their hands, so it's only trusted as a shortcut here for the 2-player
+ * case. For 3+ players, isOutcomeDecided's flood-fill-backed check is the
+ * only one that actually proves nobody else can still win.
+ */
 function checkAutoWin(board, players, neighborsFn, claimableTotal) {
-  if (hasMajorityShare(board, players, claimableTotal)) return "majority";
+  if (players.length === 2 && hasMajorityShare(board, players, claimableTotal)) return "majority";
   if (isOutcomeDecided(board, players, neighborsFn)) return "decided";
   return null;
 }
@@ -329,6 +345,35 @@ function applyAutoFillEnclosedHex(board, players) {
       i18n.t("playing.log.autoFillClaimed", {
         name: player?.name ?? region.playerId,
         count: claimedCells,
+      })
+    );
+  }
+  return { board: nextBoard, entries };
+}
+
+/**
+ * Routeritory's version of applyAutoFillEnclosed: terrain (river/mountain)
+ * counts as a neutral border rather than a second "owner", and since every
+ * claim is always a single cell (no shape to pack), each enclosed cell just
+ * becomes its own piece directly — same visual granularity as an ordinary
+ * roll-and-claim turn.
+ */
+function applyAutoFillEnclosedRoute(board, players) {
+  const regions = findEnclosedRegions(board, squareNeighbors, ROUTE_TERRAIN_OWNERS);
+  let nextBoard = board;
+  const entries = [];
+  for (const region of regions) {
+    const newPieces = region.cells.map((cell, i) => ({
+      id: `${region.playerId}-autofill-${nextBoard.pieces.length + i}`,
+      playerId: region.playerId,
+      cells: [cell],
+    }));
+    nextBoard = { ...nextBoard, pieces: [...nextBoard.pieces, ...newPieces] };
+    const player = players.find((p) => p.id === region.playerId);
+    entries.push(
+      i18n.t("playing.log.autoFillClaimed", {
+        name: player?.name ?? region.playerId,
+        count: region.cells.length,
       })
     );
   }
@@ -478,32 +523,45 @@ export default function App() {
 
   function advanceTurn() {
     setGame((prev) => {
-      const eliminated = prev.eliminatedPlayerIds ?? [];
-      const currentEliminated = eliminated.includes(prev.players[prev.currentPlayerIndex].id);
+      const priorEliminated = prev.eliminatedPlayerIds ?? [];
+      const currentEliminated = priorEliminated.includes(prev.players[prev.currentPlayerIndex].id);
       const keepSamePlayer =
         (prev.doublesExtraTurn && prev.lastRollWasDouble && !currentEliminated) ||
         (prev.gameType === "route" && prev.pendingBonusTurn && !currentEliminated);
 
       let nextBoard = prev.board;
       let turnsSinceBridgeMove = prev.turnsSinceBridgeMove;
+      let eliminatedPlayerIds = priorEliminated;
+      let revivedEntries = [];
       if (prev.gameType === "route") {
         turnsSinceBridgeMove = (prev.turnsSinceBridgeMove ?? 0) + 1;
-        const activePlayerCount = prev.players.length - eliminated.length;
+        const activePlayerCount = prev.players.length - priorEliminated.length;
         if (shouldRelocateBridges(turnsSinceBridgeMove, activePlayerCount)) {
           const relocated = prev.board.bridges.map((bridge) => relocateBridge(bridge, prev.board.bridgeCandidatesByArm));
           nextBoard = { ...prev.board, bridges: relocated };
           turnsSinceBridgeMove = 0;
+
+          // Unlike every other game, elimination isn't permanent here: bridges
+          // just moved, so a player boxed in a moment ago might have a fresh
+          // crossing now — re-check everyone currently marked out.
+          const { eliminatedPlayerIds: revivedIds, revived } = reviveEligiblePlayers(priorEliminated, nextBoard);
+          eliminatedPlayerIds = revivedIds;
+          revivedEntries = revived.map((id) => {
+            const player = prev.players.find((p) => p.id === id);
+            return i18n.t("playing.log.routeRevived", { name: player?.name ?? id });
+          });
         }
       }
 
       return {
         ...prev,
         board: nextBoard,
+        eliminatedPlayerIds,
         turnsSinceBridgeMove,
         pendingBonusTurn: false,
         currentPlayerIndex: keepSamePlayer
           ? prev.currentPlayerIndex
-          : nextActivePlayerIndex(prev.players, prev.currentPlayerIndex, eliminated),
+          : nextActivePlayerIndex(prev.players, prev.currentPlayerIndex, eliminatedPlayerIds),
         dice: null,
         swapped: false,
         pieceType: null,
@@ -517,6 +575,7 @@ export default function App() {
         rotationIndex: 0,
         turnPhase: "idle",
         lastRollWasDouble: false,
+        log: revivedEntries.length ? [...revivedEntries.slice().reverse(), ...prev.log].slice(0, 40) : prev.log,
       };
     });
     setHoverCell(null);
@@ -1107,8 +1166,12 @@ export default function App() {
 
     const nextPiecesRemaining = game.piecesRemaining - 1;
 
+    const { board: newBoard, entries: autoFillEntries } = game.autoFillEnclosed
+      ? applyAutoFillEnclosedRoute(placedBoard, players)
+      : { board: placedBoard, entries: [] };
+
     const { eliminatedPlayerIds, newlyEliminated } = detectNewEliminations(
-      placedBoard,
+      newBoard,
       players,
       hasAnyPossibleRouteMove,
       game.eliminatedPlayerIds ?? []
@@ -1117,25 +1180,30 @@ export default function App() {
 
     setGame((prev) => ({
       ...prev,
-      board: placedBoard,
+      board: newBoard,
       eliminatedPlayerIds,
       piecesRemaining: nextPiecesRemaining,
       turnPhase: "placing",
-      log: [...eliminationEntries.slice().reverse(), logEntry, ...prev.log].slice(0, 40),
+      log: [
+        ...eliminationEntries.slice().reverse(),
+        ...autoFillEntries.slice().reverse(),
+        logEntry,
+        ...prev.log,
+      ].slice(0, 40),
     }));
     setHoverCell(null);
 
-    if (isGameOver(placedBoard, players, hasAnyPossibleRouteMove)) {
+    if (isGameOver(newBoard, players, hasAnyPossibleRouteMove)) {
       setGame((prev) => ({ ...prev, endedAt: Date.now(), endedReason: "exhausted" }));
       setScreen("gameover");
       return;
     }
     if (game.autoWin) {
       const autoWinReason = checkAutoWin(
-        placedBoard,
+        newBoard,
         players,
-        makeRouteNeighborsFn(board.bridges),
-        board.claimableTotal
+        makeRouteNeighborsFn(newBoard.bridges),
+        newBoard.claimableTotal
       );
       if (autoWinReason) {
         setGame((prev) => ({ ...prev, endedAt: Date.now(), endedReason: autoWinReason }));
@@ -1434,6 +1502,8 @@ export default function App() {
               </div>
             </div>
           </div>
+
+          {game.gameType === "route" && <TerrainLegend />}
 
           <div className="card bg-base-100 shadow-sm">
             <div className="card-body gap-2 p-4">

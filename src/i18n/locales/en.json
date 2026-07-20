@@ -75,7 +75,8 @@
       "autoFillEnclosed": {
         "label": "Auto-claim enclosed territory",
         "hintTetromino": "If a player encloses an area with their pieces, it's immediately filled with tetrominoes in their color",
-        "hintHex": "If a player encloses an area with hexes, it's immediately filled with shapes in their color"
+        "hintHex": "If a player encloses an area with hexes, it's immediately filled with shapes in their color",
+        "hintRoute": "If a player encloses an area with their territory (river and mountains count as a border too), it's immediately claimed for them"
       }
     },
     "copy": {
@@ -136,6 +137,12 @@
     "placeFromStorageButton": "Place from storage (1)",
     "backToRollButton": "Back to roll",
     "historyTitle": "History",
+    "terrainLegend": {
+      "title": "Legend",
+      "river": "River",
+      "mountain": "Mountains",
+      "bridge": "Bridge"
+    },
     "turnBadge": "turn",
     "eliminatedBadge": "eliminated",
     "cellsCount": "{{count}} cells",
@@ -169,6 +176,7 @@
       "routePlaced": "{{name}}: claimed ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}}: crossed the bridge and claimed ({{x}}, {{y}})",
       "routeStreakBonus": "— matching streak! Another turn",
+      "routeRevived": "{{name}}: a bridge moved and opened up a move again — back in the game",
       "eliminated": "{{name}}: eliminated — no more possible moves",
       "dicePlaced": "{{name}}: placed {{w}}×{{h}} at ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}}: placed piece {{type}} at ({{x}}, {{y}})",
@@ -261,6 +269,10 @@
         {
           "title": "Matching-roll streak",
           "body": "If the die shows the same number three times in a row, that player gets an extra turn. But if the fourth roll in a row also matches, no further bonus is granted, and the streak starts counting fresh."
+        },
+        {
+          "title": "Auto-claim enclosed territory",
+          "body": "If enabled: an area a player has fully enclosed with their own territory (river and mountains count as a border too), so no other player can reach it anymore, is immediately claimed for them, cell by cell."
         }
       ]
     }
