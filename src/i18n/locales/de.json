@@ -233,6 +233,7 @@
       "objective": "Derselbe Kampf um Territorium, aber mit Dominosteinen mit zwei Hälften, jede mit ihrer eigenen Zahl.",
       "turn": "Wirf in deinem Zug einen Dominostein und platziere beide Hälften auf dem Feld.",
       "placement": "Zusätzlich zur üblichen Regel des Angrenzens an dein eigenes Gebiet muss mindestens eine Hälfte des Steins eine bereits platzierte Hälfte mit derselben Zahl berühren — die Zahlen müssen „übereinstimmen“, wie beim klassischen Domino.",
+      "exampleCaption": "Beispiel: Ein neuer Stein 4|5 wird neben deinem Stein 2|4 platziert, sodass sich die beiden Vieren berühren.",
       "toggles": [
         {
           "title": "Speicher",
@@ -264,7 +265,7 @@
       "toggles": [
         {
           "title": "Brücken",
-          "body": "Alle paar Runden verschieben sich alle 3 Brücken zufällig innerhalb ihres eigenen Flussarms, sodass die Übergangsstelle nicht immer dieselbe bleibt."
+          "body": "Alle paar Runden verschieben sich alle 3 Brücken zufällig innerhalb ihres eigenen Flussarms, sodass die Übergangsstelle nicht immer dieselbe bleibt. Ein Spieler ohne jeden möglichen Zug scheidet aus, kehrt aber sofort ins Spiel zurück, sobald eine verschobene Brücke ihm einen Übergang ermöglicht."
         },
         {
           "title": "Serie gleicher Würfe",

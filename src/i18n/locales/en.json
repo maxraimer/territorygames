@@ -233,6 +233,7 @@
       "objective": "The same battle for territory, but with dominoes made of two halves, each bearing its own number.",
       "turn": "On your turn, roll a domino and place both of its halves on the board.",
       "placement": "Besides the usual rule of touching your own territory, at least one half of the domino must touch an already-placed half bearing the same number — the numbers have to “match,” just like in classic dominoes.",
+      "exampleCaption": "Example: a new 4|5 domino is placed next to your own 2|4 domino so the two 4s touch.",
       "toggles": [
         {
           "title": "Storage",
@@ -264,7 +265,7 @@
       "toggles": [
         {
           "title": "Bridges",
-          "body": "Every few rounds, all 3 bridges randomly relocate within their own arm of the river, so the crossing point doesn't stay put."
+          "body": "Every few rounds, all 3 bridges randomly relocate within their own arm of the river, so the crossing point doesn't stay put. A player with no possible move is eliminated, but if a bridge relocation opens up a crossing for them, they're immediately back in the game."
         },
         {
           "title": "Matching-roll streak",

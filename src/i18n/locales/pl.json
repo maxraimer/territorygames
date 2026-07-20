@@ -233,6 +233,7 @@
       "objective": "Ta sama walka o terytorium, ale kostkami domina z dwiema połówkami, każda z własną liczbą.",
       "turn": "W swojej turze rzuć kostką domina i ustaw obie jej połówki na planszy.",
       "placement": "Oprócz zwykłej zasady przylegania do własnego terytorium, przynajmniej jedna połówka kostki musi stykać się z już ustawioną połówką o tej samej liczbie — liczby muszą się „zgadzać”, jak w klasycznym domino.",
+      "exampleCaption": "Przykład: nowa kostka 4|5 jest ustawiana obok twojej kostki 2|4 tak, by dwie czwórki się stykały.",
       "toggles": [
         {
           "title": "Schowek",
@@ -264,7 +265,7 @@
       "toggles": [
         {
           "title": "Mosty",
-          "body": "Co kilka rund wszystkie 3 mosty losowo przemieszczają się w obrębie swojego ramienia rzeki, więc miejsce przeprawy nie zawsze jest takie samo."
+          "body": "Co kilka rund wszystkie 3 mosty losowo przemieszczają się w obrębie swojego ramienia rzeki, więc miejsce przeprawy nie zawsze jest takie samo. Gracz bez żadnego możliwego ruchu odpada, ale jeśli po przesunięciu mostów pojawi się dla niego przejście — natychmiast wraca do gry."
         },
         {
           "title": "Seria takich samych rzutów",

@@ -233,6 +233,7 @@
       "objective": "La misma batalla por el territorio, pero con fichas de dominó de dos mitades, cada una con su propio número.",
       "turn": "En tu turno, lanza una ficha de dominó y coloca sus dos mitades en el tablero.",
       "placement": "Además de la regla habitual de tocar tu propio territorio, al menos una mitad de la ficha debe tocar una mitad ya colocada con el mismo número: los números deben «coincidir», como en el dominó clásico.",
+      "exampleCaption": "Ejemplo: una nueva ficha 4|5 se coloca junto a tu ficha 2|4 de modo que los dos 4 se toquen.",
       "toggles": [
         {
           "title": "Almacén",
@@ -264,7 +265,7 @@
       "toggles": [
         {
           "title": "Puentes",
-          "body": "Cada varios turnos, los 3 puentes se desplazan aleatoriamente dentro de su propia rama del río, así que el cruce no siempre está en el mismo lugar."
+          "body": "Cada varios turnos, los 3 puentes se desplazan aleatoriamente dentro de su propia rama del río, así que el cruce no siempre está en el mismo lugar. Un jugador sin ningún movimiento posible queda eliminado, pero si el desplazamiento de un puente le abre un cruce, vuelve a la partida de inmediato."
         },
         {
           "title": "Racha de tiradas iguales",

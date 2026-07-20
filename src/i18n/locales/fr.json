@@ -233,6 +233,7 @@
       "objective": "La même bataille pour le territoire, mais avec des dominos à deux moitiés, chacune portant son propre chiffre.",
       "turn": "À votre tour, tirez un domino et placez ses deux moitiés sur le plateau.",
       "placement": "Outre la règle habituelle d'adjacence à votre territoire, au moins une moitié du domino doit toucher une moitié déjà posée portant le même chiffre — les chiffres doivent « correspondre », comme au domino classique.",
+      "exampleCaption": "Exemple : un nouveau domino 4|5 est posé à côté de votre domino 2|4 de sorte que les deux 4 se touchent.",
       "toggles": [
         {
           "title": "Réserve",
@@ -264,7 +265,7 @@
       "toggles": [
         {
           "title": "Ponts",
-          "body": "Tous les quelques tours, les 3 ponts se déplacent aléatoirement au sein de leur propre bras de la rivière, si bien que le point de passage ne reste pas toujours au même endroit."
+          "body": "Tous les quelques tours, les 3 ponts se déplacent aléatoirement au sein de leur propre bras de la rivière, si bien que le point de passage ne reste pas toujours au même endroit. Un joueur sans aucun coup possible est éliminé, mais si le déplacement d'un pont lui ouvre un passage, il revient aussitôt dans la partie."
         },
         {
           "title": "Série de résultats identiques",
