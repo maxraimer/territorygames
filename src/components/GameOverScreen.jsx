@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { FaTrophy, FaHandshake } from "react-icons/fa";
 import { FiClock, FiRepeat } from "react-icons/fi";
@@ -7,9 +8,26 @@ import TerrainLegend from "./TerrainLegend";
 import { formatDuration } from "../game/time";
 import { playerArea } from "../game/rules";
 import { terrainLayersForRender } from "../game/route";
+import { getCellSize, getHexSize, BASE_CELL_SIZE, BASE_HEX_SIZE } from "../game/constants";
+import useFitCellSize from "../hooks/useFitCellSize";
 
 export default function GameOverScreen({ board, players, gameType, startedAt, endedAt, moveCount, reason, onRestart }) {
   const { t } = useTranslation();
+  const boardWrapperRef = useRef(null);
+  const isHexBoard = gameType === "hex";
+  const fittedCellSize = useFitCellSize(boardWrapperRef, isHexBoard
+    ? {
+        heightPerUnit: 1.5 * board.rows + 1,
+        widthPerUnit: Math.sqrt(3) * (board.cols + 0.5),
+        staticSize: getHexSize(board.rows),
+        maxSize: Math.round(BASE_HEX_SIZE * 1.5),
+      }
+    : {
+        heightPerUnit: board.rows,
+        widthPerUnit: board.cols,
+        staticSize: getCellSize(board.rows),
+        maxSize: Math.round(BASE_CELL_SIZE * 1.5),
+      });
   const scored = players
     .map((p) => ({ ...p, area: playerArea(board, p.id) }))
     .sort((a, b) => b.area - a.area);
@@ -65,9 +83,9 @@ export default function GameOverScreen({ board, players, gameType, startedAt, en
 
       {gameType === "route" && <TerrainLegend />}
 
-      <div className="max-w-full overflow-x-auto rounded-lg border border-base-300 bg-base-100 p-2">
+      <div ref={boardWrapperRef} className="max-w-full overflow-x-auto rounded-lg border border-base-300 bg-base-100 p-2">
         {gameType === "hex" ? (
-          <HexBoard board={board} players={players} previewPlacement={null} interactive={false} />
+          <HexBoard board={board} players={players} previewPlacement={null} interactive={false} hexSize={fittedCellSize} />
         ) : (
           <Board
             board={board}
@@ -75,6 +93,7 @@ export default function GameOverScreen({ board, players, gameType, startedAt, en
             previewPlacement={null}
             interactive={false}
             terrain={gameType === "route" ? terrainLayersForRender(board) : undefined}
+            cellSize={fittedCellSize}
           />
         )}
       </div>

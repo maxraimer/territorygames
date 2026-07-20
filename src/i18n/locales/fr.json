@@ -76,7 +76,7 @@
         "label": "Capture automatique du territoire encerclé",
         "hintTetromino": "Si un joueur encercle une zone avec ses pièces, elle est aussitôt remplie de tétrominos de sa couleur",
         "hintHex": "Si un joueur encercle une zone avec ses hexagones, elle est aussitôt remplie de formes de sa couleur",
-        "hintRoute": "Si un joueur encercle une zone avec son territoire (la rivière et les montagnes comptent aussi comme une frontière), elle lui est aussitôt attribuée"
+        "hintRoute": "Si un joueur encercle entièrement une zone avec son seul territoire (la rivière et les montagnes ne comptent pas comme frontière, seules ses propres cases comptent), elle lui est aussitôt attribuée"
       }
     },
     "copy": {
@@ -273,7 +273,7 @@
         },
         {
           "title": "Capture automatique du territoire encerclé",
-          "body": "Si activé : une zone du plateau qu'un joueur a entièrement encerclée avec son territoire (la rivière et les montagnes comptent aussi comme une frontière), de sorte qu'aucun autre joueur ne peut plus l'atteindre, lui est aussitôt attribuée, case par case."
+          "body": "Si activé : une zone entièrement entourée par les cases d'un seul joueur (la rivière et les montagnes ne comptent pas comme frontière, seules les cases de ce joueur comptent) lui est aussitôt attribuée, case par case."
         }
       ]
     }

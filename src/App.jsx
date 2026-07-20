@@ -29,7 +29,6 @@ import {
   findPlayableDiceSizes,
   playerArea,
   rectCells,
-  squareNeighbors,
 } from "./game/rules";
 import {
   pieceCells,
@@ -69,7 +68,12 @@ import {
   FORCE_PLAYABLE_ROLL_AFTER,
   GAME_TITLE_PARTS,
   DOMINO_STORAGE_LIMIT,
+  getCellSize,
+  getHexSize,
+  BASE_CELL_SIZE,
+  BASE_HEX_SIZE,
 } from "./game/constants";
+import useFitCellSize from "./hooks/useFitCellSize";
 import { contrastTextColor } from "./game/color";
 import { detectNewEliminations, nextActivePlayerIndex } from "./game/elimination";
 import {
@@ -91,11 +95,7 @@ import {
   reviveEligiblePlayers,
   terrainLayersForRender,
   nextRollStreak,
-  RIVER_OWNER,
-  MOUNTAIN_OWNER,
 } from "./game/route";
-
-const ROUTE_TERRAIN_OWNERS = new Set([RIVER_OWNER, MOUNTAIN_OWNER]);
 
 const ROLL_ANIMATION_MS = 650;
 const BOT_MOVE_DELAY_MS = 600;
@@ -354,13 +354,19 @@ function applyAutoFillEnclosedHex(board, players) {
 
 /**
  * Routeritory's version of applyAutoFillEnclosed: terrain (river/mountain)
- * counts as a neutral border rather than a second "owner", and since every
- * claim is always a single cell (no shape to pack), each enclosed cell just
- * becomes its own piece directly — same visual granularity as an ordinary
- * roll-and-claim turn.
+ * borders disqualify a region exactly like a second player's border would —
+ * capture requires the region be walled off entirely by the claiming
+ * player's own cells. Treating terrain as a neutral border here (as an
+ * earlier version did) let the first player to touch the neutral island
+ * auto-capture the rest of it for free, since an island's interior is
+ * already fully bounded by river/mountain on every non-player side —
+ * terrain "closing the loop" isn't the player's own encirclement. Since
+ * every claim is always a single cell (no shape to pack), each enclosed
+ * cell just becomes its own piece directly — same visual granularity as an
+ * ordinary roll-and-claim turn.
  */
 function applyAutoFillEnclosedRoute(board, players) {
-  const regions = findEnclosedRegions(board, squareNeighbors, ROUTE_TERRAIN_OWNERS);
+  const regions = findEnclosedRegions(board);
   let nextBoard = board;
   const entries = [];
   for (const region of regions) {
@@ -406,6 +412,23 @@ export default function App() {
   }, []);
 
   const board = game?.board ?? null;
+  const boardWrapperRef = useRef(null);
+  const isHexBoard = game?.gameType === "hex";
+  const boardRows = board?.rows ?? 1;
+  const boardCols = board?.cols ?? 1;
+  const fittedCellSize = useFitCellSize(boardWrapperRef, isHexBoard
+    ? {
+        heightPerUnit: 1.5 * boardRows + 1,
+        widthPerUnit: Math.sqrt(3) * (boardCols + 0.5),
+        staticSize: getHexSize(boardRows),
+        maxSize: Math.round(BASE_HEX_SIZE * 1.5),
+      }
+    : {
+        heightPerUnit: boardRows,
+        widthPerUnit: boardCols,
+        staticSize: getCellSize(boardRows),
+        maxSize: Math.round(BASE_CELL_SIZE * 1.5),
+      });
   const players = game?.players ?? [];
   const currentPlayerIndex = game?.currentPlayerIndex ?? 0;
   const currentPlayer = players[currentPlayerIndex] ?? null;
@@ -538,7 +561,9 @@ export default function App() {
         turnsSinceBridgeMove = (prev.turnsSinceBridgeMove ?? 0) + 1;
         const activePlayerCount = prev.players.length - priorEliminated.length;
         if (shouldRelocateBridges(turnsSinceBridgeMove, activePlayerCount)) {
-          const relocated = prev.board.bridges.map((bridge) => relocateBridge(bridge, prev.board.bridgeCandidatesByArm));
+          const relocated = prev.board.bridges.map((bridge) =>
+            relocateBridge(bridge, prev.board.bridgeCandidatesByArm, prev.board.bridges)
+          );
           nextBoard = { ...prev.board, bridges: relocated };
           turnsSinceBridgeMove = 0;
 
@@ -1615,7 +1640,7 @@ export default function App() {
             })}
           </div>
 
-          <div className="max-w-full overflow-x-auto rounded-lg border border-base-300 bg-base-100 p-2">
+          <div ref={boardWrapperRef} className="max-w-full overflow-x-auto rounded-lg border border-base-300 bg-base-100 p-2">
             {game.gameType === "hex" ? (
               <HexBoard
                 board={board}
@@ -1626,6 +1651,7 @@ export default function App() {
                 onLeaveBoard={() => setHoverCell(null)}
                 onPlaceClick={handleHexPlaceClick}
                 interactive={currentPlayer?.type !== "bot"}
+                hexSize={fittedCellSize}
               />
             ) : (
               <Board
@@ -1639,6 +1665,7 @@ export default function App() {
                 onPlaceClick={handlePlaceClick}
                 interactive={currentPlayer?.type !== "bot"}
                 terrain={game.gameType === "route" ? terrainLayersForRender(board) : undefined}
+                cellSize={fittedCellSize}
               />
             )}
           </div>

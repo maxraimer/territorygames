@@ -8,7 +8,7 @@ import { dominoContactInfo } from "../game/domino";
 // so the icon reads clearly against its own background instead of blending in.
 const TERRAIN_ICON_COLORS = {
   river: "#38bdf8",
-  mountain: "#78350f",
+  mountain: "#d6d3d1",
   bridge: "#92400e",
 };
 
@@ -86,8 +86,9 @@ export default function Board({
   onPlaceClick,
   interactive = true,
   terrain, // { river: Cell[], mountain: Cell[], bridges: Cell[] } | undefined
+  cellSize: cellSizeProp, // optional override — see useFitCellSize
 }) {
-  const cellSize = getCellSize(board.rows);
+  const cellSize = cellSizeProp ?? getCellSize(board.rows);
   const width = board.cols * cellSize;
   const height = board.rows * cellSize;
   const cornerRadius = Math.max(2, Math.round(cellSize * 0.18));

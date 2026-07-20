@@ -76,7 +76,7 @@
         "label": "Captura automática del territorio rodeado",
         "hintTetromino": "Si un jugador rodea una zona con sus piezas, esta se rellena de inmediato con tetrominós de su color",
         "hintHex": "Si un jugador rodea una zona con hexágonos, esta se rellena de inmediato con figuras de su color",
-        "hintRoute": "Si un jugador rodea una zona con su territorio (el río y las montañas también cuentan como límite), se le asigna de inmediato"
+        "hintRoute": "Si un jugador rodea completamente una zona solo con su propio territorio (el río y las montañas no cuentan como límite, únicamente las celdas del jugador), se le asigna de inmediato"
       }
     },
     "copy": {
@@ -273,7 +273,7 @@
         },
         {
           "title": "Captura automática del territorio rodeado",
-          "body": "Si está activado: una zona del tablero que un jugador ha rodeado por completo con su territorio (el río y las montañas también cuentan como límite), de modo que ningún otro jugador puede alcanzarla ya, se le asigna de inmediato, casilla por casilla."
+          "body": "Si está activado: una zona completamente rodeada por las celdas de un solo jugador (el río y las montañas no cuentan como límite, únicamente las celdas propias del jugador) se le asigna de inmediato, casilla por casilla."
         }
       ]
     }

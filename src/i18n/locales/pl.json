@@ -76,7 +76,7 @@
         "label": "Automatyczne zajmowanie otoczonego terytorium",
         "hintTetromino": "Jeśli gracz otoczy obszar swoimi figurami — zostaje on od razu wypełniony tetromino w jego kolorze",
         "hintHex": "Jeśli gracz otoczy obszar heksagonami — zostaje on od razu wypełniony figurami w jego kolorze",
-        "hintRoute": "Jeśli gracz otoczy obszar swoim terytorium (rzeka i góry też liczą się jako granica) — od razu przechodzi on pod jego kontrolę"
+        "hintRoute": "Jeśli gracz w pełni otoczy obszar wyłącznie własnym terytorium (rzeka i góry nie liczą się jako granica — tylko pola samego gracza) — od razu przechodzi on pod jego kontrolę"
       }
     },
     "copy": {
@@ -273,7 +273,7 @@
         },
         {
           "title": "Automatyczne zajmowanie otoczonego terytorium",
-          "body": "Jeśli włączone: obszar planszy, który gracz całkowicie otoczył swoim terytorium (rzeka i góry też liczą się jako granica), tak że żaden inny gracz nie ma już do niego dostępu — od razu przechodzi pod jego kontrolę, pole po polu."
+          "body": "Jeśli włączone: obszar w pełni otoczony polami jednego gracza (rzeka i góry nie liczą się jako granica — tylko własne pola gracza) — od razu przechodzi pod jego kontrolę, pole po polu."
         }
       ]
     }

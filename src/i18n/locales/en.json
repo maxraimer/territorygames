@@ -76,7 +76,7 @@
         "label": "Auto-claim enclosed territory",
         "hintTetromino": "If a player encloses an area with their pieces, it's immediately filled with tetrominoes in their color",
         "hintHex": "If a player encloses an area with hexes, it's immediately filled with shapes in their color",
-        "hintRoute": "If a player encloses an area with their territory (river and mountains count as a border too), it's immediately claimed for them"
+        "hintRoute": "If a player fully encloses an area with their own territory (river and mountains don't count as a border — only the player's own cells do), it's immediately claimed for them"
       }
     },
     "copy": {
@@ -273,7 +273,7 @@
         },
         {
           "title": "Auto-claim enclosed territory",
-          "body": "If enabled: an area a player has fully enclosed with their own territory (river and mountains count as a border too), so no other player can reach it anymore, is immediately claimed for them, cell by cell."
+          "body": "If enabled: an area fully surrounded by a single player's own cells (river and mountains don't count as a border — only that player's own cells do) is immediately claimed for them, cell by cell."
         }
       ]
     }

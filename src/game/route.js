@@ -383,26 +383,54 @@ function landNeighborsOn(cell, islandOf) {
   return squareNeighbors(cell.x, cell.y).filter((n) => islandOf.has(cellKey(n.x, n.y)));
 }
 
-/** The first 2 cells within `list` that sit on different islands, or null. */
-function firstCrossIslandPairWithin(list, islandOf) {
+function squaredDist(a, b) {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return dx * dx + dy * dy;
+}
+
+/**
+ * The pair of cells within `list` that sit on different islands and are
+ * farthest apart (by squared Euclidean distance — Manhattan distance ties
+ * every pair of a single cell's 4 orthogonal neighbors at 2, so it can't
+ * tell a straight-across pair from a right-angle one; squared Euclidean
+ * distance scores directly-opposite neighbors higher), or null if no such
+ * pair exists. Farthest-apart biases toward banks roughly opposite each
+ * other across the bridge instead of an arbitrary near-perpendicular pick,
+ * which otherwise made some crossings look like an unintuitive right-angle
+ * jump instead of a straight hop over the water.
+ */
+function widestCrossIslandPairWithin(list, islandOf) {
+  let best = null;
+  let bestDist = -1;
   for (let i = 0; i < list.length; i++) {
     for (let j = i + 1; j < list.length; j++) {
-      if (islandOf.get(cellKey(list[i].x, list[i].y)) !== islandOf.get(cellKey(list[j].x, list[j].y))) {
-        return [list[i], list[j]];
+      if (islandOf.get(cellKey(list[i].x, list[i].y)) === islandOf.get(cellKey(list[j].x, list[j].y))) continue;
+      const dist = squaredDist(list[i], list[j]);
+      if (dist > bestDist) {
+        bestDist = dist;
+        best = [list[i], list[j]];
       }
     }
   }
-  return null;
+  return best;
 }
 
-/** The first cell from `listA` and cell from `listB` that sit on different islands, or null. */
-function firstCrossIslandPairAcross(listA, listB, islandOf) {
+/** Like widestCrossIslandPairWithin, but pairing a cell from `listA` with one from `listB`. */
+function widestCrossIslandPairAcross(listA, listB, islandOf) {
+  let best = null;
+  let bestDist = -1;
   for (const a of listA) {
     for (const b of listB) {
-      if (islandOf.get(cellKey(a.x, a.y)) !== islandOf.get(cellKey(b.x, b.y))) return [a, b];
+      if (islandOf.get(cellKey(a.x, a.y)) === islandOf.get(cellKey(b.x, b.y))) continue;
+      const dist = squaredDist(a, b);
+      if (dist > bestDist) {
+        bestDist = dist;
+        best = [a, b];
+      }
     }
   }
-  return null;
+  return best;
 }
 
 export function computeBridgeCandidates(river, islandOf) {
@@ -413,7 +441,7 @@ export function computeBridgeCandidates(river, islandOf) {
     const cellSet = new Set(cells.map((c) => cellKey(c.x, c.y)));
 
     for (const cell of cells) {
-      const banks = firstCrossIslandPairWithin(landNeighborsOn(cell, islandOf), islandOf);
+      const banks = widestCrossIslandPairWithin(landNeighborsOn(cell, islandOf), islandOf);
       if (banks) candidates.push({ cells: [cell], bankA: banks[0], bankB: banks[1], arm });
     }
 
@@ -424,7 +452,7 @@ export function computeBridgeCandidates(river, islandOf) {
         if (cellB.x < cellA.x || (cellB.x === cellA.x && cellB.y < cellA.y)) continue;
         const landA = landNeighborsOn(cellA, islandOf).filter((c) => !(c.x === cellB.x && c.y === cellB.y));
         const landB = landNeighborsOn(cellB, islandOf).filter((c) => !(c.x === cellA.x && c.y === cellA.y));
-        const banks = firstCrossIslandPairAcross(landA, landB, islandOf);
+        const banks = widestCrossIslandPairAcross(landA, landB, islandOf);
         if (banks) candidates.push({ cells: [cellA, cellB], bankA: banks[0], bankB: banks[1], arm });
       }
     }
@@ -441,20 +469,50 @@ function bridgeCandidateKey(candidate) {
     .join("|");
 }
 
-function pickInitialBridges(candidatesByArm) {
-  return ["trunk", "branchA", "branchB"].map((arm) => {
-    const pool = candidatesByArm[arm];
-    return pool[Math.floor(Math.random() * pool.length)];
-  });
+// Bridges from different arms can legitimately land close together (the
+// river can pass near itself on a meander), but picking uniformly at random
+// let that happen often enough to look like one confusing bridge cluster
+// instead of 3 distinct crossings. Prefer spacing them out; only fall back
+// to a close one when the arm genuinely has no farther-away option.
+const MIN_BRIDGE_SEPARATION = 4;
+
+function candidateDistanceToBridges(candidate, otherBridges) {
+  let min = Infinity;
+  for (const other of otherBridges) {
+    for (const c1 of candidate.cells) {
+      for (const c2 of other.cells) min = Math.min(min, manhattan(c1, c2));
+    }
+  }
+  return min;
 }
 
-/** A new position for `bridge` within its own arm, distinct from its current span when possible. */
-export function relocateBridge(bridge, candidatesByArm) {
+function pickSpacedFrom(pool, otherBridges) {
+  const spaced = pool.filter((c) => candidateDistanceToBridges(c, otherBridges) >= MIN_BRIDGE_SEPARATION);
+  const finalPool = spaced.length > 0 ? spaced : pool;
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
+}
+
+function pickInitialBridges(candidatesByArm) {
+  const chosen = [];
+  for (const arm of ["trunk", "branchA", "branchB"]) {
+    chosen.push(pickSpacedFrom(candidatesByArm[arm], chosen));
+  }
+  return chosen;
+}
+
+/**
+ * A new position for `bridge` within its own arm, distinct from its current
+ * span when possible and, when possible, spaced away from the other 2 arms'
+ * current bridges (`allBridges`, defaulting to none for callers — like
+ * tests — that don't care about cross-arm spacing).
+ */
+export function relocateBridge(bridge, candidatesByArm, allBridges = []) {
   const candidates = candidatesByArm[bridge.arm];
   const currentKey = bridgeCandidateKey(bridge);
   const others = candidates.filter((c) => bridgeCandidateKey(c) !== currentKey);
   const pool = others.length > 0 ? others : candidates;
-  return pool[Math.floor(Math.random() * pool.length)];
+  const siblingBridges = allBridges.filter((b) => b.arm !== bridge.arm);
+  return pickSpacedFrom(pool, siblingBridges);
 }
 
 /** Every 3 rounds (each active player having taken ~3 turns) since the last relocation. */

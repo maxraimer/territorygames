@@ -55,8 +55,9 @@ export default function HexBoard({
   onLeaveBoard,
   onPlaceClick,
   interactive = true,
+  hexSize: hexSizeProp, // optional override — see useFitCellSize
 }) {
-  const size = getHexSize(board.rows);
+  const size = hexSizeProp ?? getHexSize(board.rows);
   const padX = size * (SQRT3 / 2);
   const padY = size;
   const width = size * SQRT3 * board.cols + padX;

@@ -76,7 +76,7 @@
         "label": "Automatische Übernahme umschlossener Gebiete",
         "hintTetromino": "Umschließt ein Spieler mit seinen Steinen ein Gebiet, wird es sofort mit Tetrominos seiner Farbe aufgefüllt",
         "hintHex": "Umschließt ein Spieler mit Hexagonen ein Gebiet, wird es sofort mit Figuren seiner Farbe aufgefüllt",
-        "hintRoute": "Umschließt ein Spieler mit seinem Gebiet eine Fläche (Fluss und Berge zählen auch als Grenze), geht sie sofort in seinen Besitz über"
+        "hintRoute": "Umschließt ein Spieler eine Fläche vollständig mit seinem eigenen Gebiet (Fluss und Berge zählen nicht als Grenze — nur die eigenen Felder des Spielers), geht sie sofort in seinen Besitz über"
       }
     },
     "copy": {
@@ -273,7 +273,7 @@
         },
         {
           "title": "Automatische Übernahme umschlossener Gebiete",
-          "body": "Wenn aktiviert: Eine Fläche des Spielfelds, die ein Spieler vollständig mit seinem Gebiet umschlossen hat (Fluss und Berge zählen auch als Grenze), sodass kein anderer Spieler sie mehr erreichen kann, geht sofort Feld für Feld in seinen Besitz über."
+          "body": "Wenn aktiviert: Eine Fläche, die vollständig von den Feldern eines einzigen Spielers umschlossen ist (Fluss und Berge zählen nicht als Grenze — nur die eigenen Felder des Spielers), geht sofort Feld für Feld in seinen Besitz über."
         }
       ]
     }
