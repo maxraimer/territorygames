@@ -215,4 +215,45 @@ describe("packTetrominoesGreedy", () => {
       }
     }
   });
+
+  it("finds a full 2-piece tiling instead of getting stuck after a naive first pick", () => {
+    // A shape where taking the "obvious" first piece that fits at the very
+    // first (reading-order) cell rules out ever fully tiling the rest —
+    // this exact region left 4 of its 8 cells permanently uncovered under
+    // the old plain-greedy pass (reported: an enclosed pocket got a 2x2
+    // block placed in it when an L+J combination would have covered it
+    // completely).
+    //   X X X .
+    //   X X X X
+    //   . X . .
+    const region = [
+      { x: 0, y: 0 }, { x: 1, y: 0 }, { x: 2, y: 0 },
+      { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 2, y: 1 }, { x: 3, y: 1 },
+      { x: 1, y: 2 },
+    ];
+    const regionKeys = new Set(region.map((c) => `${c.x},${c.y}`));
+    const placements = packTetrominoesGreedy(region);
+    expect(placements).toHaveLength(2);
+    const seen = new Set();
+    for (const piece of placements) {
+      expect(piece).toHaveLength(4);
+      for (const c of piece) {
+        const key = `${c.x},${c.y}`;
+        expect(regionKeys.has(key)).toBe(true);
+        expect(seen.has(key)).toBe(false);
+        seen.add(key);
+      }
+    }
+    expect(seen.size).toBe(region.length); // every cell covered, nothing left over
+  });
+
+  it("stays fast and matches-or-beats plain greedy on a large fully-open region", () => {
+    const region = [];
+    for (let y = 0; y < 24; y++) {
+      for (let x = 0; x < 24; x++) region.push({ x, y });
+    }
+    const placements = packTetrominoesGreedy(region);
+    const coveredCount = placements.flat().length;
+    expect(coveredCount).toBe(region.length); // a plain grid always tiles losslessly
+  });
 });

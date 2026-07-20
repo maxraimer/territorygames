@@ -376,61 +376,40 @@ function generateMountainClusters(cols, rows, riverBlocked, corners) {
 // wherever a single cell already has land neighbors on 2 different islands)
 // or 2 orthogonally-adjacent river cells (valid at a diagonal "elbow" step,
 // where the river is 2 cells wide and neither cell alone touches both
-// banks — the crossing only exists by hopping over the pair together).
+// banks — the crossing only exists by hopping over the pair together). Every
+// land cell touching the bridge's cells counts as a bank, tagged with which
+// island it's on — a bridge doesn't have one fixed entry/exit pair, any
+// owned bank can jump to any empty bank on a different island, so all sides
+// of the bridge are usable both to enter and to exit (never into the river
+// itself, which never has an empty cell to land on anyway).
 // ---------------------------------------------------------------------------
 
 function landNeighborsOn(cell, islandOf) {
   return squareNeighbors(cell.x, cell.y).filter((n) => islandOf.has(cellKey(n.x, n.y)));
 }
 
-function squaredDist(a, b) {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-  return dx * dx + dy * dy;
-}
-
-/**
- * The pair of cells within `list` that sit on different islands and are
- * farthest apart (by squared Euclidean distance — Manhattan distance ties
- * every pair of a single cell's 4 orthogonal neighbors at 2, so it can't
- * tell a straight-across pair from a right-angle one; squared Euclidean
- * distance scores directly-opposite neighbors higher), or null if no such
- * pair exists. Farthest-apart biases toward banks roughly opposite each
- * other across the bridge instead of an arbitrary near-perpendicular pick,
- * which otherwise made some crossings look like an unintuitive right-angle
- * jump instead of a straight hop over the water.
- */
-function widestCrossIslandPairWithin(list, islandOf) {
-  let best = null;
-  let bestDist = -1;
-  for (let i = 0; i < list.length; i++) {
-    for (let j = i + 1; j < list.length; j++) {
-      if (islandOf.get(cellKey(list[i].x, list[i].y)) === islandOf.get(cellKey(list[j].x, list[j].y))) continue;
-      const dist = squaredDist(list[i], list[j]);
-      if (dist > bestDist) {
-        bestDist = dist;
-        best = [list[i], list[j]];
-      }
+/** Every distinct land cell touching any of `cells`, tagged with its island id. */
+function bankGroupsFor(cells, islandOf) {
+  const seen = new Set();
+  const banks = [];
+  for (const cell of cells) {
+    for (const n of landNeighborsOn(cell, islandOf)) {
+      const key = cellKey(n.x, n.y);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      banks.push({ x: n.x, y: n.y, islandId: islandOf.get(key) });
     }
   }
-  return best;
+  return banks;
 }
 
-/** Like widestCrossIslandPairWithin, but pairing a cell from `listA` with one from `listB`. */
-function widestCrossIslandPairAcross(listA, listB, islandOf) {
-  let best = null;
-  let bestDist = -1;
-  for (const a of listA) {
-    for (const b of listB) {
-      if (islandOf.get(cellKey(a.x, a.y)) === islandOf.get(cellKey(b.x, b.y))) continue;
-      const dist = squaredDist(a, b);
-      if (dist > bestDist) {
-        bestDist = dist;
-        best = [a, b];
-      }
+function hasCrossIslandPair(banks) {
+  for (let i = 0; i < banks.length; i++) {
+    for (let j = i + 1; j < banks.length; j++) {
+      if (banks[i].islandId !== banks[j].islandId) return true;
     }
   }
-  return best;
+  return false;
 }
 
 export function computeBridgeCandidates(river, islandOf) {
@@ -441,8 +420,8 @@ export function computeBridgeCandidates(river, islandOf) {
     const cellSet = new Set(cells.map((c) => cellKey(c.x, c.y)));
 
     for (const cell of cells) {
-      const banks = widestCrossIslandPairWithin(landNeighborsOn(cell, islandOf), islandOf);
-      if (banks) candidates.push({ cells: [cell], bankA: banks[0], bankB: banks[1], arm });
+      const banks = bankGroupsFor([cell], islandOf);
+      if (hasCrossIslandPair(banks)) candidates.push({ cells: [cell], banks, arm });
     }
 
     for (const cellA of cells) {
@@ -450,10 +429,8 @@ export function computeBridgeCandidates(river, islandOf) {
         if (!cellSet.has(cellKey(cellB.x, cellB.y))) continue;
         // Only consider each unordered pair once.
         if (cellB.x < cellA.x || (cellB.x === cellA.x && cellB.y < cellA.y)) continue;
-        const landA = landNeighborsOn(cellA, islandOf).filter((c) => !(c.x === cellB.x && c.y === cellB.y));
-        const landB = landNeighborsOn(cellB, islandOf).filter((c) => !(c.x === cellA.x && c.y === cellA.y));
-        const banks = widestCrossIslandPairAcross(landA, landB, islandOf);
-        if (banks) candidates.push({ cells: [cellA, cellB], bankA: banks[0], bankB: banks[1], arm });
+        const banks = bankGroupsFor([cellA, cellB], islandOf);
+        if (hasCrossIslandPair(banks)) candidates.push({ cells: [cellA, cellB], banks, arm });
       }
     }
 
@@ -597,9 +574,24 @@ export function createInitialRouteBoard(cols, rows, players) {
 
 // ---------------------------------------------------------------------------
 // Claim validity — ordinary adjacency (via rules.js) plus the bridge-jump
-// rule: owning one bank of a currently-positioned bridge makes the empty
-// far bank claimable, without the bridge cell itself ever being claimed.
+// rule: owning any bank of a currently-positioned bridge makes any empty
+// bank on a different island claimable, without the bridge cell itself ever
+// being claimed. Every side of the bridge works both to enter and to exit —
+// there's no single fixed "far bank", just "some island other than the one
+// you're jumping from".
 // ---------------------------------------------------------------------------
+
+/** Empty banks of `bridge` reachable this turn, given `own`/`occupied` cell sets. */
+function jumpTargetsFromBridge(bridge, own, occupied) {
+  const targets = [];
+  for (const target of bridge.banks) {
+    const key = cellKey(target.x, target.y);
+    if (occupied.has(key)) continue;
+    const ownsOtherSide = bridge.banks.some((b) => b.islandId !== target.islandId && own.has(cellKey(b.x, b.y)));
+    if (ownsOtherSide) targets.push({ x: target.x, y: target.y });
+  }
+  return targets;
+}
 
 /** The bridge `cell` would cross, or null if this isn't a valid bridge-jump claim. */
 export function isBridgeJumpClaim(board, playerId, cell) {
@@ -608,8 +600,7 @@ export function isBridgeJumpClaim(board, playerId, cell) {
   const key = cellKey(cell.x, cell.y);
   if (occupied.has(key)) return null;
   for (const bridge of board.bridges ?? []) {
-    if (cellKey(bridge.bankB.x, bridge.bankB.y) === key && own.has(cellKey(bridge.bankA.x, bridge.bankA.y))) return bridge;
-    if (cellKey(bridge.bankA.x, bridge.bankA.y) === key && own.has(cellKey(bridge.bankB.x, bridge.bankB.y))) return bridge;
+    if (jumpTargetsFromBridge(bridge, own, occupied).some((t) => cellKey(t.x, t.y) === key)) return bridge;
   }
   return null;
 }
@@ -624,13 +615,7 @@ export function enumerateValidRouteCells(board, playerId) {
   const ordinary = enumerateValidPlacements(board, playerId, [{ x: 0, y: 0 }]).map((cells) => cells[0]);
   const own = buildOwnSet(board, playerId);
   const occupied = buildOccupiedSet(board);
-  const jumps = [];
-  for (const bridge of board.bridges ?? []) {
-    const aKey = cellKey(bridge.bankA.x, bridge.bankA.y);
-    const bKey = cellKey(bridge.bankB.x, bridge.bankB.y);
-    if (own.has(aKey) && !occupied.has(bKey)) jumps.push(bridge.bankB);
-    if (own.has(bKey) && !occupied.has(aKey)) jumps.push(bridge.bankA);
-  }
+  const jumps = (board.bridges ?? []).flatMap((bridge) => jumpTargetsFromBridge(bridge, own, occupied));
   const seen = new Set();
   const results = [];
   for (const cell of [...ordinary, ...jumps]) {
@@ -677,8 +662,11 @@ export function makeRouteNeighborsFn(bridges) {
     const base = squareNeighbors(x, y);
     const extra = [];
     for (const bridge of bridges ?? []) {
-      if (bridge.bankA.x === x && bridge.bankA.y === y) extra.push(bridge.bankB);
-      else if (bridge.bankB.x === x && bridge.bankB.y === y) extra.push(bridge.bankA);
+      const self = bridge.banks.find((b) => b.x === x && b.y === y);
+      if (!self) continue;
+      for (const other of bridge.banks) {
+        if (other.islandId !== self.islandId) extra.push({ x: other.x, y: other.y });
+      }
     }
     return extra.length ? [...base, ...extra] : base;
   };

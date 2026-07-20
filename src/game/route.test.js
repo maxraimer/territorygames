@@ -61,7 +61,7 @@ describe("computeBridgeCandidates", () => {
     expect(result.branchA).toHaveLength(0);
     expect(result.branchB).toHaveLength(0);
     const [candidate] = result.trunk;
-    expect(new Set([cellKey(candidate.bankA), cellKey(candidate.bankB)])).toEqual(
+    expect(new Set(candidate.banks.map(cellKey))).toEqual(
       new Set([cellKey({ x: 1, y: 1 }), cellKey({ x: 3, y: 1 })])
     );
   });
@@ -94,14 +94,11 @@ describe("computeBridgeCandidates", () => {
     const [candidate] = twoCellCandidates;
     const spanKeys = new Set(candidate.cells.map(cellKey));
     expect(spanKeys).toEqual(new Set([cellKey({ x: 2, y: 0 }), cellKey({ x: 2, y: 1 })]));
-    const bankIslands = new Set([
-      islandOf.get(cellKey(candidate.bankA)),
-      islandOf.get(cellKey(candidate.bankB)),
-    ]);
+    const bankIslands = new Set(candidate.banks.map((b) => b.islandId));
     expect(bankIslands).toEqual(new Set([0, 1]));
   });
 
-  it("still finds a valid crossing on a river cell with 3+ land neighbors (a wider stretch, not just 1-cell-wide)", () => {
+  it("collects every land neighbor as a bank, not just one pair, on a river cell with 3+ land neighbors", () => {
     // (2,1) has 3 land neighbors: (1,1) and (2,0) on island 0, (3,1) on island 1.
     const islandOf = new Map([
       [cellKey({ x: 1, y: 1 }), 0],
@@ -112,9 +109,10 @@ describe("computeBridgeCandidates", () => {
     const result = computeBridgeCandidates(river, islandOf);
     expect(result.trunk).toHaveLength(1);
     const [candidate] = result.trunk;
-    const bankKeys = new Set([cellKey(candidate.bankA), cellKey(candidate.bankB)]);
-    expect(bankKeys.has(cellKey({ x: 3, y: 1 }))).toBe(true);
-    expect(bankKeys.has(cellKey({ x: 1, y: 1 })) || bankKeys.has(cellKey({ x: 2, y: 0 }))).toBe(true);
+    const bankKeys = new Set(candidate.banks.map(cellKey));
+    expect(bankKeys).toEqual(
+      new Set([cellKey({ x: 3, y: 1 }), cellKey({ x: 1, y: 1 }), cellKey({ x: 2, y: 0 })])
+    );
   });
 });
 
@@ -237,7 +235,16 @@ describe("classifyIslands / seedRoutePlayers", () => {
 });
 
 describe("route claim validity", () => {
-  function boardWithBridge({ bridges = [{ cells: [{ x: 2, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" }], extraPieces = [] } = {}) {
+  function boardWithBridge({
+    bridges = [
+      {
+        cells: [{ x: 2, y: 0 }],
+        banks: [{ x: 1, y: 0, islandId: 0 }, { x: 3, y: 0, islandId: 1 }],
+        arm: "trunk",
+      },
+    ],
+    extraPieces = [],
+  } = {}) {
     return {
       cols: 5,
       rows: 1,
@@ -284,10 +291,52 @@ describe("route claim validity", () => {
     const board = boardWithBridge({ extraPieces: [seed("p2", 3, 0)] });
     expect(isValidRouteClaim(board, "p1", { x: 3, y: 0 })).toBe(false);
   });
+
+  it("any owned bank on one side can jump to any empty bank on the other side, not just one fixed pair", () => {
+    // A river cell with 2 banks on island 0 ((1,0) and (2,1)) and 2 banks on
+    // island 1 ((3,0) and (2,-1) — kept off-board-safe by using a taller
+    // board). p1 owns only (2,1), a "side" bank that was never anyone's
+    // designated bankA/bankB in the old 1-pair model.
+    const board = {
+      cols: 5,
+      rows: 3,
+      pieces: [
+        seed("p1", 2, 2),
+        { id: "river", playerId: RIVER_OWNER, cells: [{ x: 2, y: 1 }] },
+      ],
+      bridges: [
+        {
+          cells: [{ x: 2, y: 1 }],
+          banks: [
+            { x: 1, y: 1, islandId: 0 },
+            { x: 2, y: 2, islandId: 0 },
+            { x: 3, y: 1, islandId: 1 },
+            { x: 2, y: 0, islandId: 1 },
+          ],
+          arm: "trunk",
+        },
+      ],
+    };
+    // Owning the (2,2) side-bank (not a "designated" entry point) still
+    // lets p1 jump to EITHER empty bank on the other island.
+    expect(isValidRouteClaim(board, "p1", { x: 3, y: 1 })).toBe(true);
+    expect(isValidRouteClaim(board, "p1", { x: 2, y: 0 })).toBe(true);
+    const keys = new Set(enumerateValidRouteCells(board, "p1").map(cellKey));
+    expect(keys.has(cellKey({ x: 3, y: 1 }))).toBe(true);
+    expect(keys.has(cellKey({ x: 2, y: 0 }))).toBe(true);
+    // Never claimable: the river cell itself (can't "exit into the water").
+    expect(isValidRouteClaim(board, "p1", { x: 2, y: 1 })).toBe(false);
+  });
 });
 
 describe("makeRouteNeighborsFn", () => {
-  const bridges = [{ cells: [{ x: 2, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" }];
+  const bridges = [
+    {
+      cells: [{ x: 2, y: 0 }],
+      banks: [{ x: 1, y: 0, islandId: 0 }, { x: 3, y: 0, islandId: 1 }],
+      arm: "trunk",
+    },
+  ];
 
   it("adds a symmetric wormhole edge between the two banks", () => {
     const neighborsFn = makeRouteNeighborsFn(bridges);
@@ -308,8 +357,8 @@ describe("makeRouteNeighborsFn", () => {
 
 describe("relocateBridge / shouldRelocateBridges", () => {
   it("relocates to the other candidate in its arm when exactly 2 exist", () => {
-    const candA = { cells: [{ x: 2, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" };
-    const candB = { cells: [{ x: 2, y: 5 }], bankA: { x: 1, y: 5 }, bankB: { x: 3, y: 5 }, arm: "trunk" };
+    const candA = { cells: [{ x: 2, y: 0 }], banks: [{ x: 1, y: 0, islandId: 0 }, { x: 3, y: 0, islandId: 1 }], arm: "trunk" };
+    const candB = { cells: [{ x: 2, y: 5 }], banks: [{ x: 1, y: 5, islandId: 0 }, { x: 3, y: 5, islandId: 1 }], arm: "trunk" };
     const candidatesByArm = { trunk: [candA, candB], branchA: [], branchB: [] };
     for (let i = 0; i < 10; i++) {
       expect(relocateBridge(candA, candidatesByArm)).toEqual(candB);
@@ -317,8 +366,12 @@ describe("relocateBridge / shouldRelocateBridges", () => {
   });
 
   it("treats a 2-cell (diagonal elbow) bridge span as distinct from a 1-cell one when relocating", () => {
-    const candA = { cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 1 }, arm: "trunk" };
-    const candB = { cells: [{ x: 2, y: 5 }], bankA: { x: 1, y: 5 }, bankB: { x: 3, y: 5 }, arm: "trunk" };
+    const candA = {
+      cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }],
+      banks: [{ x: 1, y: 0, islandId: 0 }, { x: 3, y: 1, islandId: 1 }],
+      arm: "trunk",
+    };
+    const candB = { cells: [{ x: 2, y: 5 }], banks: [{ x: 1, y: 5, islandId: 0 }, { x: 3, y: 5, islandId: 1 }], arm: "trunk" };
     const candidatesByArm = { trunk: [candA, candB], branchA: [], branchB: [] };
     for (let i = 0; i < 10; i++) {
       expect(relocateBridge(candA, candidatesByArm)).toEqual(candB);
@@ -343,7 +396,13 @@ describe("reviveEligiblePlayers", () => {
     const boardWithBridge = {
       ...boardNoBridge,
       pieces: [seed("p1", 0, 0), { id: "river", playerId: RIVER_OWNER, cells: [{ x: 1, y: 0 }] }],
-      bridges: [{ cells: [{ x: 1, y: 0 }], bankA: { x: 0, y: 0 }, bankB: { x: 2, y: 0 }, arm: "trunk" }],
+      bridges: [
+        {
+          cells: [{ x: 1, y: 0 }],
+          banks: [{ x: 0, y: 0, islandId: 0 }, { x: 2, y: 0, islandId: 1 }],
+          arm: "trunk",
+        },
+      ],
     };
     const { eliminatedPlayerIds, revived } = reviveEligiblePlayers(["p1"], boardWithBridge);
     expect(revived).toEqual(["p1"]);

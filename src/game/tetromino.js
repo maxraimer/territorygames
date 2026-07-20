@@ -169,15 +169,12 @@ function cellKey(x, y) {
 }
 
 /**
- * Greedily tiles a set of cells with as many complete tetrominoes (any of
- * the 19 rotation states) as fit, without needing them adjacent to any
- * territory — the whole region is already exclusively reachable by one
- * player, so there's nothing left to validate against. Repeatedly places
- * the first shape it finds that fits entirely within what's left, until
- * nothing more fits; any leftover cells (the region's shape doesn't always
- * tile losslessly) stay unclaimed. Returns an array of 4-cell placements.
+ * Plain greedy pass: repeatedly places the first shape found (scanning
+ * cells in reading order, then shapes/rotations in a fixed order) that
+ * fits entirely within what's left. Used as a cheap floor result — see
+ * packTetrominoesGreedy below for why this alone isn't the whole story.
  */
-export function packTetrominoesGreedy(cells) {
+function simpleGreedyPack(cells) {
   const remaining = new Set(cells.map((c) => cellKey(c.x, c.y)));
   const placements = [];
 
@@ -208,6 +205,77 @@ export function packTetrominoesGreedy(cells) {
     }
   }
   return placements;
+}
+
+// Recursive-search node budget for packTetrominoesGreedy — keeps
+// pathologically large enclosed regions fast; see that function's comment.
+const PACK_SEARCH_BUDGET = 150000;
+
+/**
+ * Tiles a set of cells with as many complete tetrominoes (any of the 19
+ * rotation states) as fit, without needing them adjacent to any territory —
+ * the whole region is already exclusively reachable by one player, so
+ * there's nothing left to validate against. Returns an array of 4-cell
+ * placements; any leftover cells (the region's shape doesn't always tile
+ * losslessly) stay unclaimed.
+ *
+ * A pure greedy pass (simpleGreedyPack above) can walk itself into a dead
+ * end — e.g. placing an O piece where only an L+J combination tiles the
+ * whole region losslessly, leaving a gap the player could clearly see was
+ * fillable. So this backtracks instead: at each step it resolves the fate
+ * of the first (reading-order) still-uncovered cell — trying every
+ * placement that could cover it, plus leaving it permanently uncovered —
+ * and keeps whichever choice leads to the most total cells covered.
+ * Bounded by a node-visit budget so pathologically large regions still
+ * return quickly; simpleGreedyPack's result is used as a floor, so a
+ * budget cutoff can never do worse than the old plain-greedy behavior,
+ * only match or beat it.
+ */
+export function packTetrominoesGreedy(cells) {
+  const greedyPlacements = simpleGreedyPack(cells);
+  let best = { placements: greedyPlacements, coveredCount: greedyPlacements.length * 4 };
+  if (best.coveredCount === cells.length) return best.placements; // already perfect, nothing to improve
+
+  const remaining = new Set(cells.map((c) => cellKey(c.x, c.y)));
+  let budget = PACK_SEARCH_BUDGET;
+
+  function firstRemainingCell() {
+    let found = null;
+    for (const key of remaining) {
+      const [x, y] = key.split(",").map(Number);
+      if (!found || y < found.y || (y === found.y && x < found.x)) found = { x, y };
+    }
+    return found;
+  }
+
+  function search(placements, coveredCount) {
+    if (budget-- <= 0) return;
+    if (coveredCount > best.coveredCount) best = { placements: placements.slice(), coveredCount };
+    if (remaining.size === 0) return;
+
+    const anchor = firstRemainingCell();
+    for (const shape of ALL_TETROMINO_SHAPES) {
+      for (const ref of shape) {
+        const dx = anchor.x - ref.x;
+        const dy = anchor.y - ref.y;
+        const translated = shape.map((c) => ({ x: c.x + dx, y: c.y + dy }));
+        if (!translated.every((c) => remaining.has(cellKey(c.x, c.y)))) continue;
+        for (const c of translated) remaining.delete(cellKey(c.x, c.y));
+        placements.push(translated);
+        search(placements, coveredCount + 4);
+        placements.pop();
+        for (const c of translated) remaining.add(cellKey(c.x, c.y));
+        if (budget <= 0) return;
+      }
+    }
+
+    remaining.delete(cellKey(anchor.x, anchor.y));
+    search(placements, coveredCount);
+    remaining.add(cellKey(anchor.x, anchor.y));
+  }
+
+  search([], 0);
+  return best.placements;
 }
 
 /** Whether the player has any legal placement at all, for any piece type in any rotation. */
