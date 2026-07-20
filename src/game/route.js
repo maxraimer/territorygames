@@ -372,35 +372,73 @@ function generateMountainClusters(cols, rows, riverBlocked, corners) {
 }
 
 // ---------------------------------------------------------------------------
-// Bridges — one per river arm, valid on any river cell that has at least 2
-// land neighbors on 2 different islands (a genuine bank-to-bank crossing).
-// Not restricted to cells with *exactly* 2 land neighbors: the diagonal
-// "elbow" cells the river walk drops can leave a crossing with 3 land
-// neighbors (e.g. at a corner where the river briefly widens to 2 cells),
-// and that's just as valid a bridge site as a plain 1-cell-wide stretch.
+// Bridges — one per river arm. A bridge spans either 1 river cell (valid
+// wherever a single cell already has land neighbors on 2 different islands)
+// or 2 orthogonally-adjacent river cells (valid at a diagonal "elbow" step,
+// where the river is 2 cells wide and neither cell alone touches both
+// banks — the crossing only exists by hopping over the pair together).
 // ---------------------------------------------------------------------------
+
+function landNeighborsOn(cell, islandOf) {
+  return squareNeighbors(cell.x, cell.y).filter((n) => islandOf.has(cellKey(n.x, n.y)));
+}
+
+/** The first 2 cells within `list` that sit on different islands, or null. */
+function firstCrossIslandPairWithin(list, islandOf) {
+  for (let i = 0; i < list.length; i++) {
+    for (let j = i + 1; j < list.length; j++) {
+      if (islandOf.get(cellKey(list[i].x, list[i].y)) !== islandOf.get(cellKey(list[j].x, list[j].y))) {
+        return [list[i], list[j]];
+      }
+    }
+  }
+  return null;
+}
+
+/** The first cell from `listA` and cell from `listB` that sit on different islands, or null. */
+function firstCrossIslandPairAcross(listA, listB, islandOf) {
+  for (const a of listA) {
+    for (const b of listB) {
+      if (islandOf.get(cellKey(a.x, a.y)) !== islandOf.get(cellKey(b.x, b.y))) return [a, b];
+    }
+  }
+  return null;
+}
 
 export function computeBridgeCandidates(river, islandOf) {
   const arms = { trunk: river.trunk, branchA: river.branchA, branchB: river.branchB };
   const result = {};
   for (const [arm, cells] of Object.entries(arms)) {
     const candidates = [];
+    const cellSet = new Set(cells.map((c) => cellKey(c.x, c.y)));
+
     for (const cell of cells) {
-      const landNeighbors = squareNeighbors(cell.x, cell.y).filter((n) => islandOf.has(cellKey(n.x, n.y)));
-      let bridgeBanks = null;
-      for (let i = 0; i < landNeighbors.length && !bridgeBanks; i++) {
-        for (let j = i + 1; j < landNeighbors.length && !bridgeBanks; j++) {
-          const idA = islandOf.get(cellKey(landNeighbors[i].x, landNeighbors[i].y));
-          const idB = islandOf.get(cellKey(landNeighbors[j].x, landNeighbors[j].y));
-          if (idA !== idB) bridgeBanks = [landNeighbors[i], landNeighbors[j]];
-        }
-      }
-      if (!bridgeBanks) continue;
-      candidates.push({ cell, bankA: bridgeBanks[0], bankB: bridgeBanks[1], arm });
+      const banks = firstCrossIslandPairWithin(landNeighborsOn(cell, islandOf), islandOf);
+      if (banks) candidates.push({ cells: [cell], bankA: banks[0], bankB: banks[1], arm });
     }
+
+    for (const cellA of cells) {
+      for (const cellB of squareNeighbors(cellA.x, cellA.y)) {
+        if (!cellSet.has(cellKey(cellB.x, cellB.y))) continue;
+        // Only consider each unordered pair once.
+        if (cellB.x < cellA.x || (cellB.x === cellA.x && cellB.y < cellA.y)) continue;
+        const landA = landNeighborsOn(cellA, islandOf).filter((c) => !(c.x === cellB.x && c.y === cellB.y));
+        const landB = landNeighborsOn(cellB, islandOf).filter((c) => !(c.x === cellA.x && c.y === cellA.y));
+        const banks = firstCrossIslandPairAcross(landA, landB, islandOf);
+        if (banks) candidates.push({ cells: [cellA, cellB], bankA: banks[0], bankB: banks[1], arm });
+      }
+    }
+
     result[arm] = candidates;
   }
   return result;
+}
+
+function bridgeCandidateKey(candidate) {
+  return candidate.cells
+    .map((c) => cellKey(c.x, c.y))
+    .sort()
+    .join("|");
 }
 
 function pickInitialBridges(candidatesByArm) {
@@ -410,10 +448,11 @@ function pickInitialBridges(candidatesByArm) {
   });
 }
 
-/** A new position for `bridge` within its own arm, distinct from its current cell when possible. */
+/** A new position for `bridge` within its own arm, distinct from its current span when possible. */
 export function relocateBridge(bridge, candidatesByArm) {
   const candidates = candidatesByArm[bridge.arm];
-  const others = candidates.filter((c) => !(c.cell.x === bridge.cell.x && c.cell.y === bridge.cell.y));
+  const currentKey = bridgeCandidateKey(bridge);
+  const others = candidates.filter((c) => bridgeCandidateKey(c) !== currentKey);
   const pool = others.length > 0 ? others : candidates;
   return pool[Math.floor(Math.random() * pool.length)];
 }
@@ -593,7 +632,7 @@ export function makeRouteNeighborsFn(bridges) {
 
 /** Splits board terrain into render-ready cell lists (river cells currently under a bridge render as bridges instead). */
 export function terrainLayersForRender(board) {
-  const bridgeCells = (board.bridges ?? []).map((b) => b.cell);
+  const bridgeCells = (board.bridges ?? []).flatMap((b) => b.cells);
   const bridgeKeys = new Set(bridgeCells.map((c) => cellKey(c.x, c.y)));
   const riverPiece = board.pieces.find((p) => p.playerId === RIVER_OWNER);
   const mountainCells = board.pieces.filter((p) => p.playerId === MOUNTAIN_OWNER).flatMap((p) => p.cells);

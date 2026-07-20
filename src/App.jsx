@@ -141,6 +141,7 @@ function makeGameState(gameType, config) {
       rollStreakByPlayer: Object.fromEntries(players.map((p) => [p.id, { streakValue: null, streakLength: 0 }])),
       pendingBonusTurn: false,
       turnsSinceBridgeMove: 0,
+      autoFillEnclosed: Boolean(autoFillEnclosed),
     };
   }
   return {

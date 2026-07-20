@@ -1,7 +1,16 @@
+import { FaBridge, FaWater, FaMountain } from "react-icons/fa6";
 import { getCellSize } from "../game/constants";
 import { roundedPolyominoPath } from "../game/outline";
 import { contrastTextColor } from "../game/color";
 import { dominoContactInfo } from "../game/domino";
+
+// Icon colors are a more saturated shade of each terrain type's cell fill,
+// so the icon reads clearly against its own background instead of blending in.
+const TERRAIN_ICON_COLORS = {
+  river: "#38bdf8",
+  mountain: "#78350f",
+  bridge: "#92400e",
+};
 
 function colorForPlayer(players, playerId) {
   return players.find((p) => p.id === playerId)?.color ?? "#888888";
@@ -50,6 +59,12 @@ function DominoHalves({ cells, cellSize, textColor }) {
 
 function cellCenter(cell, cellSize) {
   return { cx: (cell.x + 0.5) * cellSize, cy: (cell.y + 0.5) * cellSize };
+}
+
+/** Position + size for a terrain icon (react-icons/fa6), centered within its cell. */
+function terrainIconRect(cell, cellSize) {
+  const size = cellSize * 0.55;
+  return { x: cell.x * cellSize + (cellSize - size) / 2, y: cell.y * cellSize + (cellSize - size) / 2, size };
 }
 
 // Routeritory's river/mountain cells: ordinary pieces owned by a sentinel
@@ -112,6 +127,15 @@ export default function Board({
           ))}
           {terrain.bridges.map((c, i) => (
             <rect key={`bridge${i}`} x={c.x * cellSize} y={c.y * cellSize} width={cellSize} height={cellSize} fill="#d6b88a" />
+          ))}
+          {terrain.river.map((c, i) => (
+            <FaWater key={`river-icon${i}`} {...terrainIconRect(c, cellSize)} color={TERRAIN_ICON_COLORS.river} />
+          ))}
+          {terrain.mountain.map((c, i) => (
+            <FaMountain key={`mountain-icon${i}`} {...terrainIconRect(c, cellSize)} color={TERRAIN_ICON_COLORS.mountain} />
+          ))}
+          {terrain.bridges.map((c, i) => (
+            <FaBridge key={`bridge-icon${i}`} {...terrainIconRect(c, cellSize)} color={TERRAIN_ICON_COLORS.bridge} />
           ))}
         </g>
       )}

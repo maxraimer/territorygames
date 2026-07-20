@@ -75,6 +75,32 @@ describe("computeBridgeCandidates", () => {
     expect(computeBridgeCandidates(river, islandOf).trunk).toHaveLength(0);
   });
 
+  it("finds a 2-cell (diagonal elbow) bridge span when neither cell alone touches 2 different islands", () => {
+    // (2,0)'s land neighbors are all island 0; (2,1)'s land neighbors are all
+    // island 1 — neither cell alone is a valid 1-cell crossing, but the pair
+    // together spans both islands (the diagonal "elbow" case: the river is
+    // 2 cells wide here, so a single-cell bridge can't reach across it).
+    const islandOf = new Map([
+      [cellKey({ x: 1, y: 0 }), 0],
+      [cellKey({ x: 3, y: 0 }), 0],
+      [cellKey({ x: 1, y: 1 }), 1],
+      [cellKey({ x: 3, y: 1 }), 1],
+      [cellKey({ x: 2, y: 2 }), 1],
+    ]);
+    const river = { trunk: [{ x: 2, y: 0 }, { x: 2, y: 1 }], branchA: [], branchB: [] };
+    const result = computeBridgeCandidates(river, islandOf);
+    const twoCellCandidates = result.trunk.filter((c) => c.cells.length === 2);
+    expect(twoCellCandidates).toHaveLength(1);
+    const [candidate] = twoCellCandidates;
+    const spanKeys = new Set(candidate.cells.map(cellKey));
+    expect(spanKeys).toEqual(new Set([cellKey({ x: 2, y: 0 }), cellKey({ x: 2, y: 1 })]));
+    const bankIslands = new Set([
+      islandOf.get(cellKey(candidate.bankA)),
+      islandOf.get(cellKey(candidate.bankB)),
+    ]);
+    expect(bankIslands).toEqual(new Set([0, 1]));
+  });
+
   it("still finds a valid crossing on a river cell with 3+ land neighbors (a wider stretch, not just 1-cell-wide)", () => {
     // (2,1) has 3 land neighbors: (1,1) and (2,0) on island 0, (3,1) on island 1.
     const islandOf = new Map([
@@ -211,7 +237,7 @@ describe("classifyIslands / seedRoutePlayers", () => {
 });
 
 describe("route claim validity", () => {
-  function boardWithBridge({ bridges = [{ cell: { x: 2, y: 0 }, bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" }], extraPieces = [] } = {}) {
+  function boardWithBridge({ bridges = [{ cells: [{ x: 2, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" }], extraPieces = [] } = {}) {
     return {
       cols: 5,
       rows: 1,
@@ -261,7 +287,7 @@ describe("route claim validity", () => {
 });
 
 describe("makeRouteNeighborsFn", () => {
-  const bridges = [{ cell: { x: 2, y: 0 }, bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" }];
+  const bridges = [{ cells: [{ x: 2, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" }];
 
   it("adds a symmetric wormhole edge between the two banks", () => {
     const neighborsFn = makeRouteNeighborsFn(bridges);
@@ -282,8 +308,17 @@ describe("makeRouteNeighborsFn", () => {
 
 describe("relocateBridge / shouldRelocateBridges", () => {
   it("relocates to the other candidate in its arm when exactly 2 exist", () => {
-    const candA = { cell: { x: 2, y: 0 }, bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" };
-    const candB = { cell: { x: 2, y: 5 }, bankA: { x: 1, y: 5 }, bankB: { x: 3, y: 5 }, arm: "trunk" };
+    const candA = { cells: [{ x: 2, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 0 }, arm: "trunk" };
+    const candB = { cells: [{ x: 2, y: 5 }], bankA: { x: 1, y: 5 }, bankB: { x: 3, y: 5 }, arm: "trunk" };
+    const candidatesByArm = { trunk: [candA, candB], branchA: [], branchB: [] };
+    for (let i = 0; i < 10; i++) {
+      expect(relocateBridge(candA, candidatesByArm)).toEqual(candB);
+    }
+  });
+
+  it("treats a 2-cell (diagonal elbow) bridge span as distinct from a 1-cell one when relocating", () => {
+    const candA = { cells: [{ x: 2, y: 0 }, { x: 3, y: 0 }], bankA: { x: 1, y: 0 }, bankB: { x: 3, y: 1 }, arm: "trunk" };
+    const candB = { cells: [{ x: 2, y: 5 }], bankA: { x: 1, y: 5 }, bankB: { x: 3, y: 5 }, arm: "trunk" };
     const candidatesByArm = { trunk: [candA, candB], branchA: [], branchB: [] };
     for (let i = 0; i < 10; i++) {
       expect(relocateBridge(candA, candidatesByArm)).toEqual(candB);
@@ -308,7 +343,7 @@ describe("reviveEligiblePlayers", () => {
     const boardWithBridge = {
       ...boardNoBridge,
       pieces: [seed("p1", 0, 0), { id: "river", playerId: RIVER_OWNER, cells: [{ x: 1, y: 0 }] }],
-      bridges: [{ cell: { x: 1, y: 0 }, bankA: { x: 0, y: 0 }, bankB: { x: 2, y: 0 }, arm: "trunk" }],
+      bridges: [{ cells: [{ x: 1, y: 0 }], bankA: { x: 0, y: 0 }, bankB: { x: 2, y: 0 }, arm: "trunk" }],
     };
     const { eliminatedPlayerIds, revived } = reviveEligiblePlayers(["p1"], boardWithBridge);
     expect(revived).toEqual(["p1"]);
