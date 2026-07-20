@@ -43,6 +43,10 @@
       "hex": {
         "name": "Hexoritory",
         "tagline": "Un plateau hexagonal, six directions d'attaque — maîtrisez les hexagones et encerclez vos adversaires."
+      },
+      "route": {
+        "name": "Routeritory",
+        "tagline": "Lancez le dé et tracez un chemin à travers montagnes et rivière — les ponts se déplacent sans cesse, alors traversez pendant qu'il en est temps."
       }
     }
   },
@@ -106,20 +110,23 @@
       "dice": "Lancer les dés (Espace)",
       "tetromino": "Piocher une pièce (Espace)",
       "domino": "Piocher un domino (Espace)",
-      "hex": "Lancer les dés (Espace)"
+      "hex": "Lancer les dés (Espace)",
+      "route": "Lancer le dé (Espace)"
     },
     "rollingLabel": {
       "dice": "Lancer des dés…",
       "tetromino": "Pioche de la pièce…",
       "domino": "Pioche du domino…",
-      "hex": "Lancer des dés…"
+      "hex": "Lancer des dés…",
+      "route": "Lancer du dé…"
     },
     "placingLabel": {
       "dice": "Survolez le plateau et cliquez pour placer le rectangle.",
       "tetromino": "Survolez le plateau et cliquez pour placer la pièce.",
       "domino": "Survolez le plateau et cliquez pour placer le domino.",
       "hexStored": "Survolez le plateau et cliquez pour placer la pièce depuis la réserve.",
-      "hexRoll": "Survolez le plateau et cliquez pour placer la pièce (il en reste {{count}})."
+      "hexRoll": "Survolez le plateau et cliquez pour placer la pièce (il en reste {{count}}).",
+      "route": "Survolez le plateau et cliquez pour capturer une case."
     },
     "skippedLabel": "Aucune position valide pour ce résultat. Tour passé.",
     "remainingLabel": "il en reste {{count}}",
@@ -157,6 +164,11 @@
       "hexPlacedFromStorage": "{{name}} : a placé {{shape}} depuis la réserve en ({{x}}, {{y}})",
       "hexSkipRemainder": " (reste ×{{count}} — pas de place, ignoré)",
       "hexStored": "{{name}} : a stocké {{shape}}",
+      "routeRoll": "{{name}} : dé {{roll}}",
+      "routeRollSkipped": "{{name}} : dé {{roll}} — aucun coup valide, tour passé",
+      "routePlaced": "{{name}} : a capturé ({{x}}, {{y}})",
+      "routeBridgeCrossed": "{{name}} : a traversé le pont et capturé ({{x}}, {{y}})",
+      "routeStreakBonus": "— série de résultats identiques ! Un tour de plus",
       "eliminated": "{{name}} : est éliminé — plus aucun coup possible",
       "dicePlaced": "{{name}} : a placé {{w}}×{{h}} en ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}} : a placé la pièce {{type}} en ({{x}}, {{y}})",
@@ -233,6 +245,22 @@
         {
           "title": "Capture automatique du territoire encerclé",
           "body": "Si vous encerclez une zone du plateau avec vos hexagones de sorte que vos adversaires n'y ont plus accès, elle est aussitôt remplie au maximum de formes de votre couleur."
+        }
+      ]
+    },
+    "route": {
+      "title": "Routeritory — règles",
+      "objective": "La même bataille pour le territoire, mais une rivière traverse le plateau et le divise en trois îles : deux grandes où démarrent les joueurs, et une petite neutre. Des montagnes sont disséminées çà et là.",
+      "turn": "À votre tour, lancez un dé (1–6) — c'est le nombre de cases distinctes à capturer ce tour-ci, une par une.",
+      "placement": "Une case ne peut être capturée que si elle touche directement votre territoire déjà capturé (y compris les cases capturées plus tôt ce même tour). La rivière et les montagnes sont infranchissables. Il y a 3 ponts sur la rivière (un par bras) — si votre territoire touche un pont, vous pouvez aussitôt capturer la case libre sur la rive opposée.",
+      "toggles": [
+        {
+          "title": "Ponts",
+          "body": "Tous les quelques tours, les 3 ponts se déplacent aléatoirement au sein de leur propre bras de la rivière, si bien que le point de passage ne reste pas toujours au même endroit."
+        },
+        {
+          "title": "Série de résultats identiques",
+          "body": "Si le dé affiche le même nombre trois fois de suite, ce joueur obtient un tour supplémentaire. Mais si le quatrième lancer d'affilée correspond aussi, aucun tour bonus n'est accordé et la série recommence à zéro."
         }
       ]
     }

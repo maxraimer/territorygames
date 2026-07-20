@@ -27,8 +27,8 @@ export default function RulesModal({ gameType, dialogRef }) {
           )}
 
           <div className="flex flex-col gap-2 border-t border-base-300 pt-3 text-base-content/70">
-            <p>{t("rules.common.rotationToggle")}</p>
-            <p>{t("rules.common.smartAssistToggle")}</p>
+            {gameType !== "route" && <p>{t("rules.common.rotationToggle")}</p>}
+            {gameType !== "route" && <p>{t("rules.common.smartAssistToggle")}</p>}
             <p>{t("rules.common.autoWinToggle")}</p>
             <p>{t("rules.common.eliminationNote")}</p>
           </div>

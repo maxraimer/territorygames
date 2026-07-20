@@ -302,15 +302,17 @@ export function isOutcomeDecided(board, players, neighborsFn = squareNeighbors) 
 
 /**
  * True once a player holds strictly more than an equal T/P share of the
- * board (T = total cells, P = player count). For 2 players this is a
- * rigorous majority — nobody else can possibly catch up. For 3+ players
- * it's a much cheaper heuristic than `isOutcomeDecided` (no flood fill)
- * that's usually right in practice, but isn't a strict proof since the
- * remaining share could still concentrate in a single trailing player.
+ * board (T = claimableTotal, defaulting to every cell, P = player count).
+ * For 2 players this is a rigorous majority — nobody else can possibly
+ * catch up. For 3+ players it's a much cheaper heuristic than
+ * `isOutcomeDecided` (no flood fill) that's usually right in practice, but
+ * isn't a strict proof since the remaining share could still concentrate in
+ * a single trailing player. Games with permanently-unclaimable terrain
+ * (e.g. Routeritory's river/mountains) should pass the real claimable cell
+ * count so majority isn't computed against cells nobody can ever own.
  */
-export function hasMajorityShare(board, players) {
+export function hasMajorityShare(board, players, claimableTotal = board.cols * board.rows) {
   if (players.length < 2) return false;
-  const total = board.cols * board.rows;
-  const threshold = total / players.length;
+  const threshold = claimableTotal / players.length;
   return players.some((p) => playerArea(board, p.id) > threshold);
 }

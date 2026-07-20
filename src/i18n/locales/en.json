@@ -43,6 +43,10 @@
       "hex": {
         "name": "Hexoritory",
         "tagline": "A hexagonal board, six directions of attack — master the hexes and surround your rivals."
+      },
+      "route": {
+        "name": "Routeritory",
+        "tagline": "Roll the die and carve a path across mountains and a river — bridges keep moving, so cross while you can."
       }
     }
   },
@@ -106,20 +110,23 @@
       "dice": "Roll dice (Space)",
       "tetromino": "Draw piece (Space)",
       "domino": "Draw domino (Space)",
-      "hex": "Roll dice (Space)"
+      "hex": "Roll dice (Space)",
+      "route": "Roll die (Space)"
     },
     "rollingLabel": {
       "dice": "Rolling dice…",
       "tetromino": "Drawing piece…",
       "domino": "Drawing domino…",
-      "hex": "Rolling dice…"
+      "hex": "Rolling dice…",
+      "route": "Rolling die…"
     },
     "placingLabel": {
       "dice": "Hover over the board and click to place the rectangle.",
       "tetromino": "Hover over the board and click to place the piece.",
       "domino": "Hover over the board and click to place the domino.",
       "hexStored": "Hover over the board and click to place the shape from storage.",
-      "hexRoll": "Hover over the board and click to place the shape ({{count}} remaining)."
+      "hexRoll": "Hover over the board and click to place the shape ({{count}} remaining).",
+      "route": "Hover over the board and click to claim a cell."
     },
     "skippedLabel": "No valid positions for this roll. Turn skipped.",
     "remainingLabel": "{{count}} remaining",
@@ -157,6 +164,11 @@
       "hexPlacedFromStorage": "{{name}}: placed {{shape}} from storage at ({{x}}, {{y}})",
       "hexSkipRemainder": " (remaining ×{{count}} — no room, skipped)",
       "hexStored": "{{name}}: stored {{shape}}",
+      "routeRoll": "{{name}}: die {{roll}}",
+      "routeRollSkipped": "{{name}}: die {{roll}} — no valid moves, turn skipped",
+      "routePlaced": "{{name}}: claimed ({{x}}, {{y}})",
+      "routeBridgeCrossed": "{{name}}: crossed the bridge and claimed ({{x}}, {{y}})",
+      "routeStreakBonus": "— matching streak! Another turn",
       "eliminated": "{{name}}: eliminated — no more possible moves",
       "dicePlaced": "{{name}}: placed {{w}}×{{h}} at ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}}: placed piece {{type}} at ({{x}}, {{y}})",
@@ -233,6 +245,22 @@
         {
           "title": "Auto-claim enclosed territory",
           "body": "If your hexes enclose an area of the board that your opponents can no longer reach, it's immediately filled as much as possible with shapes in your color."
+        }
+      ]
+    },
+    "route": {
+      "title": "Routeritory — Rules",
+      "objective": "The same battle for territory, but a river runs through the board, splitting it into three islands — two large ones where players start, and one small neutral one. Mountains are scattered here and there.",
+      "turn": "On your turn, roll a die (1–6) — that's how many separate cells you must claim this turn, one at a time.",
+      "placement": "A cell can only be claimed if it directly touches your already-claimed territory (including cells claimed earlier this same turn). The river and mountains are impassable. There are 3 bridges across the river (one per arm) — if your territory touches a bridge, you can immediately claim the free cell on the opposite bank.",
+      "toggles": [
+        {
+          "title": "Bridges",
+          "body": "Every few rounds, all 3 bridges randomly relocate within their own arm of the river, so the crossing point doesn't stay put."
+        },
+        {
+          "title": "Matching-roll streak",
+          "body": "If the die shows the same number three times in a row, that player gets an extra turn. But if the fourth roll in a row also matches, no further bonus is granted, and the streak starts counting fresh."
         }
       ]
     }

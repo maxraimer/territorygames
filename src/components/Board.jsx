@@ -52,6 +52,14 @@ function cellCenter(cell, cellSize) {
   return { cx: (cell.x + 0.5) * cellSize, cy: (cell.y + 0.5) * cellSize };
 }
 
+// Routeritory's river/mountain cells: ordinary pieces owned by a sentinel
+// "__"-prefixed playerId (see game/route.js) so rules.js treats them as
+// occupied-but-unowned for free. They render exclusively through the
+// `terrain` prop below, not through the per-player pieces loop.
+function isTerrainPiece(piece) {
+  return piece.playerId.startsWith("__");
+}
+
 export default function Board({
   board,
   players,
@@ -62,6 +70,7 @@ export default function Board({
   onLeaveBoard,
   onPlaceClick,
   interactive = true,
+  terrain, // { river: Cell[], mountain: Cell[], bridges: Cell[] } | undefined
 }) {
   const cellSize = getCellSize(board.rows);
   const width = board.cols * cellSize;
@@ -93,7 +102,21 @@ export default function Board({
     >
       <rect x={0} y={0} width={width} height={height} className="fill-base-200" />
 
-      {board.pieces.map((piece) => {
+      {terrain && (
+        <g className="pointer-events-none">
+          {terrain.river.map((c, i) => (
+            <rect key={`river${i}`} x={c.x * cellSize} y={c.y * cellSize} width={cellSize} height={cellSize} fill="#1e40af" />
+          ))}
+          {terrain.mountain.map((c, i) => (
+            <rect key={`mountain${i}`} x={c.x * cellSize} y={c.y * cellSize} width={cellSize} height={cellSize} fill="#78716c" />
+          ))}
+          {terrain.bridges.map((c, i) => (
+            <rect key={`bridge${i}`} x={c.x * cellSize} y={c.y * cellSize} width={cellSize} height={cellSize} fill="#d6b88a" />
+          ))}
+        </g>
+      )}
+
+      {board.pieces.filter((piece) => !isTerrainPiece(piece)).map((piece) => {
         const fill = colorForPlayer(players, piece.playerId);
         return (
           <g key={piece.id} className="animate-place-pop" style={{ transformBox: "fill-box", transformOrigin: "center" }}>

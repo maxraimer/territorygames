@@ -44,6 +44,12 @@ export default function GameConfigFields({
 }) {
   const { t } = useTranslation();
   const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
+  // Route claims are always single cells (no shape to rotate), and roll
+  // "playability" doesn't depend on the rolled number the way it does for
+  // every other game's shape/size — there's nothing for either toggle to
+  // meaningfully nudge, so both are hidden rather than shown as no-ops.
+  const supportsRotation = gameType !== "route";
+  const supportsSmartAssist = gameType !== "route";
 
   return (
     <>
@@ -86,12 +92,14 @@ export default function GameConfigFields({
           checked={autoWin}
           onChange={onAutoWinChange}
         />
-        <Toggle
-          label={t("setup.toggles.allowRotation.label")}
-          hint={t(`setup.copy.${gameType}.rotationHint`)}
-          checked={allowRotation}
-          onChange={onAllowRotationChange}
-        />
+        {supportsRotation && (
+          <Toggle
+            label={t("setup.toggles.allowRotation.label")}
+            hint={t(`setup.copy.${gameType}.rotationHint`)}
+            checked={allowRotation}
+            onChange={onAllowRotationChange}
+          />
+        )}
         {gameType === "dice" && onDoublesExtraTurnChange && (
           <Toggle
             label={t("setup.toggles.doublesExtraTurn.label")}
@@ -100,12 +108,14 @@ export default function GameConfigFields({
             onChange={onDoublesExtraTurnChange}
           />
         )}
-        <Toggle
-          label={t(`setup.copy.${gameType}.smartLabel`)}
-          hint={t(`setup.copy.${gameType}.smartHint`)}
-          checked={smartAssist}
-          onChange={onSmartAssistChange}
-        />
+        {supportsSmartAssist && (
+          <Toggle
+            label={t(`setup.copy.${gameType}.smartLabel`)}
+            hint={t(`setup.copy.${gameType}.smartHint`)}
+            checked={smartAssist}
+            onChange={onSmartAssistChange}
+          />
+        )}
         {supportsAutoFillEnclosed && (
           <Toggle
             label={t("setup.toggles.autoFillEnclosed.label")}

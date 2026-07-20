@@ -43,6 +43,10 @@
       "hex": {
         "name": "Hexoritory",
         "tagline": "Ein sechseckiges Spielfeld, sechs Angriffsrichtungen — meistere die Hexagone und kreise deine Gegner ein."
+      },
+      "route": {
+        "name": "Routeritory",
+        "tagline": "Würfle und bahne dir einen Weg durch Berge und einen Fluss — Brücken wandern ständig, also überquere, solange du kannst."
       }
     }
   },
@@ -106,20 +110,23 @@
       "dice": "Würfel werfen (Leertaste)",
       "tetromino": "Figur ziehen (Leertaste)",
       "domino": "Stein ziehen (Leertaste)",
-      "hex": "Würfel werfen (Leertaste)"
+      "hex": "Würfel werfen (Leertaste)",
+      "route": "Würfel werfen (Leertaste)"
     },
     "rollingLabel": {
       "dice": "Würfel werden geworfen…",
       "tetromino": "Figur wird gezogen…",
       "domino": "Stein wird gezogen…",
-      "hex": "Würfel werden geworfen…"
+      "hex": "Würfel werden geworfen…",
+      "route": "Würfel wird geworfen…"
     },
     "placingLabel": {
       "dice": "Zeige auf das Feld und klicke, um das Rechteck zu platzieren.",
       "tetromino": "Zeige auf das Feld und klicke, um die Figur zu platzieren.",
       "domino": "Zeige auf das Feld und klicke, um den Stein zu platzieren.",
       "hexStored": "Zeige auf das Feld und klicke, um die Figur aus dem Speicher zu platzieren.",
-      "hexRoll": "Zeige auf das Feld und klicke, um die Figur zu platzieren (noch {{count}})."
+      "hexRoll": "Zeige auf das Feld und klicke, um die Figur zu platzieren (noch {{count}}).",
+      "route": "Zeige auf das Feld und klicke, um ein Feld zu erobern."
     },
     "skippedLabel": "Keine gültigen Positionen für diesen Wurf. Zug ausgesetzt.",
     "remainingLabel": "noch {{count}}",
@@ -157,6 +164,11 @@
       "hexPlacedFromStorage": "{{name}}: hat {{shape}} aus dem Speicher bei ({{x}}, {{y}}) platziert",
       "hexSkipRemainder": " (Rest ×{{count}} — kein Platz, übersprungen)",
       "hexStored": "{{name}}: hat {{shape}} eingelagert",
+      "routeRoll": "{{name}}: Würfel {{roll}}",
+      "routeRollSkipped": "{{name}}: Würfel {{roll}} — keine gültigen Züge, Zug ausgesetzt",
+      "routePlaced": "{{name}}: hat ({{x}}, {{y}}) erobert",
+      "routeBridgeCrossed": "{{name}}: hat die Brücke überquert und ({{x}}, {{y}}) erobert",
+      "routeStreakBonus": "— Serie gleicher Würfe! Noch ein Zug",
       "eliminated": "{{name}}: scheidet aus — keine möglichen Züge mehr",
       "dicePlaced": "{{name}}: hat {{w}}×{{h}} bei ({{x}}, {{y}}) platziert",
       "tetrominoPlaced": "{{name}}: hat Figur {{type}} bei ({{x}}, {{y}}) platziert",
@@ -233,6 +245,22 @@
         {
           "title": "Automatische Übernahme umschlossener Gebiete",
           "body": "Hast du mit Hexagonen ein Gebiet so umschlossen, dass die Gegner keinen Zugriff mehr darauf haben, wird es sofort maximal mit Figuren deiner Farbe aufgefüllt."
+        }
+      ]
+    },
+    "route": {
+      "title": "Routeritory — Regeln",
+      "objective": "Derselbe Kampf um Territorium, aber ein Fluss durchquert das Spielfeld und teilt es in drei Inseln — zwei große, auf denen die Spieler starten, und eine kleine neutrale. Berge sind hier und da verstreut.",
+      "turn": "Wirf in deinem Zug einen Würfel (1–6) — das ist die Anzahl einzelner Felder, die du in diesem Zug erobern musst, eines nach dem anderen.",
+      "placement": "Ein Feld kann nur erobert werden, wenn es direkt an dein bereits erobertes Gebiet angrenzt (einschließlich der in diesem Zug zuvor eroberten Felder). Fluss und Berge sind unpassierbar. Es gibt 3 Brücken über den Fluss (eine pro Flussarm) — grenzt dein Gebiet an eine Brücke, kannst du sofort das freie Feld am gegenüberliegenden Ufer erobern.",
+      "toggles": [
+        {
+          "title": "Brücken",
+          "body": "Alle paar Runden verschieben sich alle 3 Brücken zufällig innerhalb ihres eigenen Flussarms, sodass die Übergangsstelle nicht immer dieselbe bleibt."
+        },
+        {
+          "title": "Serie gleicher Würfe",
+          "body": "Zeigt der Würfel dreimal in Folge dieselbe Zahl, erhält dieser Spieler einen zusätzlichen Zug. Stimmt aber auch der vierte Wurf in Folge überein, wird kein weiterer Bonus gewährt, und die Serie beginnt neu zu zählen."
         }
       ]
     }

@@ -43,6 +43,10 @@
       "hex": {
         "name": "Hexoritory",
         "tagline": "Sześciokątna plansza, sześć kierunków ataku — opanuj heksagony i weź przeciwników w okrążenie."
+      },
+      "route": {
+        "name": "Routeritory",
+        "tagline": "Rzuć kostką i wytycz szlak przez góry i rzekę — mosty wciąż się przemieszczają, więc przepraw się, póki możesz."
       }
     }
   },
@@ -106,20 +110,23 @@
       "dice": "Rzuć kośćmi (Spacja)",
       "tetromino": "Weź figurę (Spacja)",
       "domino": "Weź kostkę (Spacja)",
-      "hex": "Rzuć kośćmi (Spacja)"
+      "hex": "Rzuć kośćmi (Spacja)",
+      "route": "Rzuć kostką (Spacja)"
     },
     "rollingLabel": {
       "dice": "Rzucamy kośćmi…",
       "tetromino": "Losujemy figurę…",
       "domino": "Losujemy kostkę…",
-      "hex": "Rzucamy kośćmi…"
+      "hex": "Rzucamy kośćmi…",
+      "route": "Rzucamy kostką…"
     },
     "placingLabel": {
       "dice": "Najedź na planszę i kliknij, aby ustawić prostokąt.",
       "tetromino": "Najedź na planszę i kliknij, aby ustawić figurę.",
       "domino": "Najedź na planszę i kliknij, aby ustawić kostkę.",
       "hexStored": "Najedź na planszę i kliknij, aby ustawić figurę ze schowka.",
-      "hexRoll": "Najedź na planszę i kliknij, aby ustawić figurę (pozostało {{count}})."
+      "hexRoll": "Najedź na planszę i kliknij, aby ustawić figurę (pozostało {{count}}).",
+      "route": "Najedź na planszę i kliknij, aby zająć pole."
     },
     "skippedLabel": "Brak dostępnych pozycji dla tego rzutu. Ruch pominięty.",
     "remainingLabel": "pozostało {{count}}",
@@ -157,6 +164,11 @@
       "hexPlacedFromStorage": "{{name}}: ustawił {{shape}} ze schowka w ({{x}}, {{y}})",
       "hexSkipRemainder": " (pozostało ×{{count}} — brak miejsca, pominięto)",
       "hexStored": "{{name}}: schował {{shape}}",
+      "routeRoll": "{{name}}: kostka {{roll}}",
+      "routeRollSkipped": "{{name}}: kostka {{roll}} — brak dostępnych ruchów, ruch pominięty",
+      "routePlaced": "{{name}}: zajął ({{x}}, {{y}})",
+      "routeBridgeCrossed": "{{name}}: przeszedł przez most i zajął ({{x}}, {{y}})",
+      "routeStreakBonus": "— seria takich samych rzutów! Jeszcze jeden ruch",
       "eliminated": "{{name}}: odpada — nie ma już możliwych ruchów",
       "dicePlaced": "{{name}}: ustawił {{w}}×{{h}} w ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}}: ustawił figurę {{type}} w ({{x}}, {{y}})",
@@ -233,6 +245,22 @@
         {
           "title": "Automatyczne zajmowanie otoczonego terytorium",
           "body": "Jeśli otoczysz heksagonami obszar planszy tak, że przeciwnicy nie mają już do niego dostępu — zostaje on natychmiast maksymalnie wypełniony figurami w twoim kolorze."
+        }
+      ]
+    },
+    "route": {
+      "title": "Routeritory — zasady",
+      "objective": "Ta sama walka o terytorium, ale przez planszę płynie rzeka dzieląca ją na trzy wyspy — dwie duże, na których zaczynają gracze, i jedną małą neutralną. Tu i ówdzie pojawiają się góry.",
+      "turn": "W swojej turze rzuć kostką (1–6) — to liczba osobnych pól, które musisz zająć w tym ruchu, jedno po drugim.",
+      "placement": "Pole można zająć tylko wtedy, gdy bezpośrednio przylega do twojego już zajętego terytorium (włącznie z polami zajętymi wcześniej w tym samym ruchu). Rzeka i góry są nie do przebycia. Przez rzekę prowadzą 3 mosty (po jednym na każdym jej ramieniu) — jeśli twoje terytorium przylega do mostu, możesz od razu zająć wolne pole na przeciwległym brzegu.",
+      "toggles": [
+        {
+          "title": "Mosty",
+          "body": "Co kilka rund wszystkie 3 mosty losowo przemieszczają się w obrębie swojego ramienia rzeki, więc miejsce przeprawy nie zawsze jest takie samo."
+        },
+        {
+          "title": "Seria takich samych rzutów",
+          "body": "Jeśli kostka pokaże tę samą liczbę trzy razy z rzędu — gracz otrzymuje dodatkowy ruch. Ale jeśli czwarty rzut z rzędu też się zgadza, dodatkowy ruch już nie przysługuje, a seria liczy się od nowa."
         }
       ]
     }

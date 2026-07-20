@@ -416,4 +416,17 @@ describe("hasMajorityShare", () => {
     expect(playerArea(board2, "p1")).toBe(5);
     expect(hasMajorityShare(board2, players)).toBe(true);
   });
+
+  it("computes the threshold against an explicit claimableTotal instead of cols*rows", () => {
+    // 4x4 board but only 10 cells are actually claimable (e.g. terrain takes
+    // the rest) -> threshold 5 for 2 players. p1 has 6, over the real
+    // threshold, even though 6 wouldn't clear the full-board threshold of 8.
+    const board = makeBoard(4, 4, [
+      { id: "a", playerId: "p1", x: 0, y: 0, w: 3, h: 2 },
+    ]);
+    const players = [{ id: "p1" }, { id: "p2" }];
+    expect(playerArea(board, "p1")).toBe(6);
+    expect(hasMajorityShare(board, players)).toBe(false); // default 16-cell denominator
+    expect(hasMajorityShare(board, players, 10)).toBe(true); // explicit claimable-land denominator
+  });
 });

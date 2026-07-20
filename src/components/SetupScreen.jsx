@@ -35,8 +35,8 @@ export default function SetupScreen({ gameType, firstPlayerName, onStart, onBack
     if (firstPlayerName) initial[0] = { ...initial[0], name: firstPlayerName };
     return initial;
   });
-  const [cols, setCols] = useState(DEFAULT_COLS);
-  const [rows, setRows] = useState(DEFAULT_ROWS);
+  const [cols, setCols] = useState(() => Math.max(DEFAULT_COLS, gridMinForPlayerCount(DEFAULT_PLAYER_COUNT, gameType)));
+  const [rows, setRows] = useState(() => Math.max(DEFAULT_ROWS, gridMinForPlayerCount(DEFAULT_PLAYER_COUNT, gameType)));
   const [autoWin, setAutoWin] = useState(DEFAULT_AUTO_WIN);
   const [allowRotation, setAllowRotation] = useState(DEFAULT_ALLOW_ROTATION);
   const [doublesExtraTurn, setDoublesExtraTurn] = useState(DEFAULT_DOUBLES_EXTRA_TURN);
@@ -50,7 +50,7 @@ export default function SetupScreen({ gameType, firstPlayerName, onStart, onBack
   const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
 
   const colorClash = new Set(players.map((p) => p.color)).size !== players.length;
-  const gridMin = gridMinForPlayerCount(players.length);
+  const gridMin = gridMinForPlayerCount(players.length, gameType);
 
   function setPlayerCount(count) {
     setPlayers((prev) => {
@@ -62,7 +62,7 @@ export default function SetupScreen({ gameType, firstPlayerName, onStart, onBack
       }
       return next;
     });
-    const newMin = gridMinForPlayerCount(count);
+    const newMin = gridMinForPlayerCount(count, gameType);
     setCols((c) => Math.max(c, newMin));
     setRows((r) => Math.max(r, newMin));
   }

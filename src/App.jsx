@@ -75,8 +75,20 @@ import {
   chooseTetrominoBotMove,
   chooseDominoBotMove,
   chooseHexBotMove,
+  chooseRouteBotMove,
   shouldBankDominoOnSkip,
 } from "./game/bots";
+import {
+  createInitialRouteBoard,
+  isValidRouteClaim,
+  hasAnyPossibleRouteMove,
+  isBridgeJumpClaim,
+  makeRouteNeighborsFn,
+  relocateBridge,
+  shouldRelocateBridges,
+  terrainLayersForRender,
+  nextRollStreak,
+} from "./game/route";
 
 const ROLL_ANIMATION_MS = 650;
 const BOT_MOVE_DELAY_MS = 600;
@@ -111,6 +123,18 @@ function makeGameState(gameType, config) {
   }
   if (gameType === "domino") {
     return { ...base, domino: null, storageByPlayer: Object.fromEntries(players.map((p) => [p.id, []])) };
+  }
+  if (gameType === "route") {
+    return {
+      ...base,
+      allowRotation: false, // single-cell claims never rotate
+      board: createInitialRouteBoard(cols, rows, players),
+      routeRoll: null,
+      piecesRemaining: 0,
+      rollStreakByPlayer: Object.fromEntries(players.map((p) => [p.id, { streakValue: null, streakLength: 0 }])),
+      pendingBonusTurn: false,
+      turnsSinceBridgeMove: 0,
+    };
   }
   return {
     ...base,
@@ -249,8 +273,8 @@ function rollWeightedHexShape(board, playerId, badRollStreak, smartAssist, allow
 }
 
 /** Reason an early (non-exhausted) end is warranted, or null if play should continue. */
-function checkAutoWin(board, players, neighborsFn) {
-  if (hasMajorityShare(board, players)) return "majority";
+function checkAutoWin(board, players, neighborsFn, claimableTotal) {
+  if (hasMajorityShare(board, players, claimableTotal)) return "majority";
   if (isOutcomeDecided(board, players, neighborsFn)) return "decided";
   return null;
 }
@@ -355,6 +379,7 @@ export default function App() {
   const rotationIndex = game?.rotationIndex ?? 0;
   const turnPhase = game?.turnPhase ?? "idle";
   const log = game?.log ?? [];
+  const routeRoll = game?.routeRoll ?? null;
 
   const dims = dice ? (swapped ? { w: dice[1], h: dice[0] } : { w: dice[0], h: dice[1] }) : null;
 
@@ -378,6 +403,9 @@ export default function App() {
   } else if (game?.gameType === "hex" && hexActiveShapeIndex != null) {
     shapeCells = hexShapeCells(hexActiveShapeIndex, rotationIndex);
     shapeKey = `${hexActiveShapeIndex},${rotationIndex},${activeSource}`;
+  } else if (game?.gameType === "route") {
+    shapeCells = [{ x: 0, y: 0 }];
+    shapeKey = "route";
   }
 
   const previewPlacement = useMemo(() => {
@@ -398,7 +426,9 @@ export default function App() {
         ? validDominoPlacement(board, currentPlayer.id, cells)
         : game.gameType === "hex"
           ? validHexPlacement(board, currentPlayer.id, cells)
-          : validPlacement(board, currentPlayer.id, cells);
+          : game.gameType === "route"
+            ? isValidRouteClaim(board, currentPlayer.id, cells[0])
+            : validPlacement(board, currentPlayer.id, cells);
     return { cells, valid };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- shapeCells/game.gameType are derived from shapeKey above
   }, [board, turnPhase, hoverCell, shapeKey, currentPlayer?.id]);
@@ -450,9 +480,27 @@ export default function App() {
     setGame((prev) => {
       const eliminated = prev.eliminatedPlayerIds ?? [];
       const currentEliminated = eliminated.includes(prev.players[prev.currentPlayerIndex].id);
-      const keepSamePlayer = prev.doublesExtraTurn && prev.lastRollWasDouble && !currentEliminated;
+      const keepSamePlayer =
+        (prev.doublesExtraTurn && prev.lastRollWasDouble && !currentEliminated) ||
+        (prev.gameType === "route" && prev.pendingBonusTurn && !currentEliminated);
+
+      let nextBoard = prev.board;
+      let turnsSinceBridgeMove = prev.turnsSinceBridgeMove;
+      if (prev.gameType === "route") {
+        turnsSinceBridgeMove = (prev.turnsSinceBridgeMove ?? 0) + 1;
+        const activePlayerCount = prev.players.length - eliminated.length;
+        if (shouldRelocateBridges(turnsSinceBridgeMove, activePlayerCount)) {
+          const relocated = prev.board.bridges.map((bridge) => relocateBridge(bridge, prev.board.bridgeCandidatesByArm));
+          nextBoard = { ...prev.board, bridges: relocated };
+          turnsSinceBridgeMove = 0;
+        }
+      }
+
       return {
         ...prev,
+        board: nextBoard,
+        turnsSinceBridgeMove,
+        pendingBonusTurn: false,
         currentPlayerIndex: keepSamePlayer
           ? prev.currentPlayerIndex
           : nextActivePlayerIndex(prev.players, prev.currentPlayerIndex, eliminated),
@@ -462,6 +510,7 @@ export default function App() {
         domino: null,
         hexShapeIndex: null,
         hexCount: null,
+        routeRoll: null,
         piecesRemaining: 0,
         activeSource: "roll",
         actedThisTurn: false,
@@ -481,6 +530,7 @@ export default function App() {
     playersSnapshot,
     hasMoveFn,
     neighborsFn,
+    claimableTotal,
     ...fields
   }) {
     setGame((prev) => ({
@@ -498,7 +548,7 @@ export default function App() {
       return;
     }
     if (game.autoWin) {
-      const autoWinReason = checkAutoWin(boardSnapshot, playersSnapshot, neighborsFn);
+      const autoWinReason = checkAutoWin(boardSnapshot, playersSnapshot, neighborsFn, claimableTotal);
       if (autoWinReason) {
         setGame((prev) => ({ ...prev, endedAt: Date.now(), endedReason: autoWinReason }));
         setScreen("gameover");
@@ -600,8 +650,7 @@ export default function App() {
           hasMoveFn: hasAnyPossibleDominoMove,
         });
       }, ROLL_ANIMATION_MS);
-    } else {
-      // hex
+    } else if (game.gameType === "hex") {
       const { shapeIndex, count, nextBadRollStreak } = rollWeightedHexShape(
         boardSnapshot,
         rollingPlayer.id,
@@ -634,6 +683,35 @@ export default function App() {
           playersSnapshot,
           hasMoveFn: hasAnyPossibleHexMove,
           neighborsFn: hexNeighbors,
+        });
+      }, ROLL_ANIMATION_MS);
+    } else {
+      // route
+      const roll = 1 + Math.floor(Math.random() * 6);
+      const streak = nextRollStreak(game.rollStreakByPlayer[rollingPlayer.id], roll);
+
+      setGame((prev) => ({ ...prev, turnPhase: "rolling" }));
+      clearTimeout(rollTimeoutRef.current);
+      rollTimeoutRef.current = setTimeout(() => {
+        const anyValid = hasAnyPossibleRouteMove(boardSnapshot, rollingPlayer.id);
+        const entry = anyValid
+          ? i18n.t("playing.log.routeRoll", { name: rollingPlayer.name, roll })
+          : i18n.t("playing.log.routeRollSkipped", { name: rollingPlayer.name, roll });
+        const bonusEntry = streak.bonus ? i18n.t("playing.log.routeStreakBonus", { name: rollingPlayer.name }) : null;
+
+        finishTurn({
+          routeRoll: roll,
+          piecesRemaining: anyValid ? roll : 0,
+          pendingBonusTurn: streak.bonus,
+          rollStreakByPlayer: { ...game.rollStreakByPlayer, [rollingPlayer.id]: streak },
+          anyValid,
+          entry: bonusEntry ? `${entry} ${bonusEntry}` : entry,
+          lastRollWasDouble: false,
+          boardSnapshot,
+          playersSnapshot,
+          hasMoveFn: hasAnyPossibleRouteMove,
+          neighborsFn: makeRouteNeighborsFn(boardSnapshot.bridges),
+          claimableTotal: boardSnapshot.claimableTotal,
         });
       }, ROLL_ANIMATION_MS);
     }
@@ -921,6 +999,10 @@ export default function App() {
 
   function handlePlaceClick() {
     if (turnPhase !== "placing" || !previewPlacement || !previewPlacement.valid || !currentPlayer || !board || !game) return;
+    if (game.gameType === "route") {
+      commitRoutePlacement(previewPlacement.cells[0]);
+      return;
+    }
     commitSquarePlacement(previewPlacement.cells);
   }
 
@@ -1004,6 +1086,66 @@ export default function App() {
     advanceTurn();
   }
 
+  /**
+   * Claims a single cell. A bridge-crossing claim still costs the same 1
+   * roll-point as any ordinary claim (see game/route.js) — the only thing
+   * "free" about it is that the bridge cell itself is never separately
+   * claimed as a stepping stone, so `piecesRemaining` always decrements by
+   * exactly 1 here regardless of which kind of claim it was.
+   */
+  function commitRoutePlacement(cell) {
+    const jumpBridge = isBridgeJumpClaim(board, currentPlayer.id, cell);
+    const piece = {
+      id: `${currentPlayer.id}-${board.pieces.length}`,
+      playerId: currentPlayer.id,
+      cells: [cell],
+    };
+    const placedBoard = { ...board, pieces: [...board.pieces, piece] };
+    const logEntry = jumpBridge
+      ? i18n.t("playing.log.routeBridgeCrossed", { name: currentPlayer.name, x: cell.x, y: cell.y })
+      : i18n.t("playing.log.routePlaced", { name: currentPlayer.name, x: cell.x, y: cell.y });
+
+    const nextPiecesRemaining = game.piecesRemaining - 1;
+
+    const { eliminatedPlayerIds, newlyEliminated } = detectNewEliminations(
+      placedBoard,
+      players,
+      hasAnyPossibleRouteMove,
+      game.eliminatedPlayerIds ?? []
+    );
+    const eliminationEntries = newlyEliminated.map((p) => i18n.t("playing.log.eliminated", { name: p.name }));
+
+    setGame((prev) => ({
+      ...prev,
+      board: placedBoard,
+      eliminatedPlayerIds,
+      piecesRemaining: nextPiecesRemaining,
+      turnPhase: "placing",
+      log: [...eliminationEntries.slice().reverse(), logEntry, ...prev.log].slice(0, 40),
+    }));
+    setHoverCell(null);
+
+    if (isGameOver(placedBoard, players, hasAnyPossibleRouteMove)) {
+      setGame((prev) => ({ ...prev, endedAt: Date.now(), endedReason: "exhausted" }));
+      setScreen("gameover");
+      return;
+    }
+    if (game.autoWin) {
+      const autoWinReason = checkAutoWin(
+        placedBoard,
+        players,
+        makeRouteNeighborsFn(board.bridges),
+        board.claimableTotal
+      );
+      if (autoWinReason) {
+        setGame((prev) => ({ ...prev, endedAt: Date.now(), endedReason: autoWinReason }));
+        setScreen("gameover");
+        return;
+      }
+    }
+    if (nextPiecesRemaining === 0) advanceTurn();
+  }
+
   // Drives bot turns end-to-end: roll -> (after a short delay) decide + place -> advance.
   // Depends on the whole `game` object rather than hand-picked fields, same trade-off
   // `previewPlacement`'s memo above makes (see its eslint-disable comment) — this is also
@@ -1044,12 +1186,15 @@ export default function App() {
             currentPlayer.difficulty,
             opponents
           );
-        } else {
+        } else if (game.gameType === "hex") {
           const activeShapeIndex = game.activeSource === "roll" ? game.hexShapeIndex : game.storageByPlayer[currentPlayer.id];
           cells = chooseHexBotMove(board, currentPlayer.id, activeShapeIndex, game.allowRotation, currentPlayer.difficulty, opponents);
+        } else if (game.gameType === "route") {
+          cells = chooseRouteBotMove(board, currentPlayer.id, currentPlayer.difficulty, opponents);
         }
         if (cells) {
           if (game.gameType === "hex") commitHexPlacement(cells);
+          else if (game.gameType === "route") commitRoutePlacement(cells[0]);
           else commitSquarePlacement(cells);
         } else {
           advanceTurn();
@@ -1223,7 +1368,7 @@ export default function App() {
                   <Dice value={dominoDisplay?.[0]?.value ?? 1} rolling={turnPhase === "rolling"} />
                   <Dice value={dominoDisplay?.[1]?.value ?? 1} rolling={turnPhase === "rolling"} />
                 </div>
-              ) : (
+              ) : game.gameType === "hex" ? (
                 <div className="flex items-center gap-3">
                   <HexPiecePreview
                     shapeIndex={hexActiveShapeIndex}
@@ -1237,6 +1382,15 @@ export default function App() {
                       <div className="text-xs text-base-content/50">
                         {t("playing.remainingLabel", { count: piecesRemaining })}
                       </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Dice value={routeRoll ?? 1} rolling={turnPhase === "rolling"} />
+                  {routeRoll != null && (
+                    <div className="text-xs text-base-content/50">
+                      {t("playing.remainingLabel", { count: piecesRemaining })}
                     </div>
                   )}
                 </div>
@@ -1413,6 +1567,7 @@ export default function App() {
                 onLeaveBoard={() => setHoverCell(null)}
                 onPlaceClick={handlePlaceClick}
                 interactive={currentPlayer?.type !== "bot"}
+                terrain={game.gameType === "route" ? terrainLayersForRender(board) : undefined}
               />
             )}
           </div>

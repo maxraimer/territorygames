@@ -29,8 +29,8 @@ export default function BotSetupScreen({ gameType, firstPlayerName, onStart, onB
   const [botCount, setBotCount] = useState(DEFAULT_BOT_COUNT);
   const [difficulty, setDifficulty] = useState("medium");
   const [humanColor, setHumanColor] = useState(COLOR_PALETTE[0]);
-  const [cols, setCols] = useState(DEFAULT_COLS);
-  const [rows, setRows] = useState(DEFAULT_ROWS);
+  const [cols, setCols] = useState(() => Math.max(DEFAULT_COLS, gridMinForPlayerCount(1 + DEFAULT_BOT_COUNT, gameType)));
+  const [rows, setRows] = useState(() => Math.max(DEFAULT_ROWS, gridMinForPlayerCount(1 + DEFAULT_BOT_COUNT, gameType)));
   const [autoWin, setAutoWin] = useState(DEFAULT_AUTO_WIN);
   const [allowRotation, setAllowRotation] = useState(DEFAULT_ALLOW_ROTATION);
   const [doublesExtraTurn, setDoublesExtraTurn] = useState(DEFAULT_DOUBLES_EXTRA_TURN);
@@ -44,11 +44,11 @@ export default function BotSetupScreen({ gameType, firstPlayerName, onStart, onB
   const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex";
 
   const totalPlayers = 1 + botCount;
-  const gridMin = gridMinForPlayerCount(totalPlayers);
+  const gridMin = gridMinForPlayerCount(totalPlayers, gameType);
 
   function handleBotCountChange(count) {
     setBotCount(count);
-    const newMin = gridMinForPlayerCount(count + 1);
+    const newMin = gridMinForPlayerCount(count + 1, gameType);
     setCols((c) => Math.max(c, newMin));
     setRows((r) => Math.max(r, newMin));
   }

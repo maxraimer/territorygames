@@ -8,6 +8,13 @@ export const GRID_MAX = 32;
 export const DEFAULT_COLS = 12;
 export const DEFAULT_ROWS = 10;
 
+// Routeritory's river/mountain generation needs real room to work with
+// regardless of player count, so it floors well above the other games'
+// player-count-scaled minimums.
+export const ROUTE_GRID_MIN = 20;
+export const DEFAULT_ROUTE_COLS = 20;
+export const DEFAULT_ROUTE_ROWS = 20;
+
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 4;
 export const DEFAULT_PLAYER_COUNT = 2;
@@ -16,7 +23,8 @@ export const MIN_BOTS = 1;
 export const MAX_BOTS = MAX_PLAYERS - 1;
 export const DEFAULT_BOT_COUNT = 1;
 
-export function gridMinForPlayerCount(count) {
+export function gridMinForPlayerCount(count, gameType) {
+  if (gameType === "route") return ROUTE_GRID_MIN;
   return GRID_MIN_BY_PLAYER_COUNT[count] ?? GRID_MIN_BY_PLAYER_COUNT[MIN_PLAYERS];
 }
 
@@ -83,13 +91,15 @@ export const DEFAULT_AUTO_FILL_ENCLOSED = false;
 
 // name/tagline for each game now live in i18n (home.games.<id>), since they're
 // user-facing copy — this array only carries the stable id ordering.
-export const GAME_TYPES = [{ id: "dice" }, { id: "tetromino" }, { id: "domino" }, { id: "hex" }];
+export const GAME_TYPES = [{ id: "dice" }, { id: "tetromino" }, { id: "domino" }, { id: "hex" }, { id: "route" }];
 
 export const GAME_LOGOS = {
   dice: `${import.meta.env.BASE_URL}logo_diceritory.png`,
   tetromino: `${import.meta.env.BASE_URL}logo_tetritory.png`,
   domino: `${import.meta.env.BASE_URL}logo_dominotory.png`,
   hex: `${import.meta.env.BASE_URL}logo_hexoritory.png`,
+  // Placeholder SVG until a matching PNG (like the other 4 games') is ready.
+  route: `${import.meta.env.BASE_URL}logo_routeritory.svg`,
 };
 
 // The two-part split used to color just the first chunk of each game's
@@ -99,6 +109,7 @@ export const GAME_TITLE_PARTS = {
   tetromino: ["Tetri", "tory"],
   domino: ["Domino", "tory"],
   hex: ["Hexo", "ritory"],
+  route: ["Route", "ritory"],
 };
 
 // Dominotory: each player may hold up to this many drawn dominoes in

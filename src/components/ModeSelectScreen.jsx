@@ -3,16 +3,21 @@ import { FiUsers, FiCpu, FiGlobe } from "react-icons/fi";
 import { GAME_LOGOS, GAME_TITLE_PARTS } from "../game/constants";
 import HeaderControls from "./HeaderControls";
 
-const MODES = [
-  { id: "hotseat", icon: FiUsers, disabled: false },
-  { id: "bots", icon: FiCpu, disabled: false },
-  { id: "online", icon: FiGlobe, disabled: true },
+const BASE_MODES = [
+  { id: "hotseat", icon: FiUsers },
+  { id: "bots", icon: FiCpu },
+  { id: "online", icon: FiGlobe },
 ];
 
 export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
   const { t } = useTranslation();
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const logo = GAME_LOGOS[gameType] ?? GAME_LOGOS.dice;
+  const modes = BASE_MODES.map((mode) => ({
+    ...mode,
+    disabled: mode.id === "online",
+    disabledReason: "mode.online.comingSoon",
+  }));
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-base-200 p-6">
@@ -35,13 +40,13 @@ export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {MODES.map(({ id, icon: Icon, disabled }) => (
+          {modes.map(({ id, icon: Icon, disabled, disabledReason }) => (
             <button
               key={id}
               type="button"
               disabled={disabled}
               onClick={() => onSelect(id)}
-              title={disabled ? t("mode.online.comingSoon") : undefined}
+              title={disabled ? t(disabledReason) : undefined}
               className={
                 "card bg-base-100 text-left shadow-xl transition " +
                 (disabled
@@ -53,7 +58,7 @@ export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
                 <Icon className="h-8 w-8 text-primary" />
                 <h2 className="card-title">{t(`mode.${id}.title`)}</h2>
                 <p className="text-sm text-base-content/60">{t(`mode.${id}.description`)}</p>
-                {disabled && <span className="badge badge-ghost badge-sm">{t("mode.online.comingSoon")}</span>}
+                {disabled && <span className="badge badge-ghost badge-sm">{t(disabledReason)}</span>}
               </div>
             </button>
           ))}

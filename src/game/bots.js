@@ -2,6 +2,7 @@ import { enumerateValidPlacements, reachableEmptyCellCount, buildOwnSet, rectCel
 import { pieceRotations, pieceCells } from "./tetromino";
 import { dominoCells, dominoOrientationCount, enumerateValidDominoPlacements } from "./domino";
 import { hexShapeCells, hexRotationCount, enumerateValidHexPlacements, hexNeighbors } from "./hex";
+import { enumerateValidRouteCells, makeRouteNeighborsFn } from "./route";
 
 // Bounds per-move cost independent of board size/candidate count (boards go up to 32x32,
 // and medium/hard score every candidate with a flood fill) — a random subsample is "good
@@ -110,6 +111,11 @@ export function chooseHexBotMove(board, playerId, shapeIndex, allowRotation, dif
     candidates.push(...enumerateValidHexPlacements(board, playerId, hexShapeCells(shapeIndex, r)));
   }
   return pickPlacement(board, playerId, candidates, opponents, difficulty, hexNeighbors);
+}
+
+export function chooseRouteBotMove(board, playerId, difficulty, opponents) {
+  const candidates = enumerateValidRouteCells(board, playerId).map((cell) => [cell]);
+  return pickPlacement(board, playerId, candidates, opponents, difficulty, makeRouteNeighborsFn(board.bridges));
 }
 
 // Only `hard` bots bank, and only when the turn is forfeit either way (a placeable roll is

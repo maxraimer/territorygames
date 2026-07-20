@@ -43,6 +43,10 @@
       "hex": {
         "name": "Hexoritory",
         "tagline": "Tablero hexagonal, seis direcciones de ataque: domina los hexágonos y rodea a tus rivales."
+      },
+      "route": {
+        "name": "Routeritory",
+        "tagline": "Lanza el dado y traza un camino entre montañas y un río — los puentes se mueven, así que cruza mientras puedas."
       }
     }
   },
@@ -106,20 +110,23 @@
       "dice": "Lanzar dados (Espacio)",
       "tetromino": "Sacar figura (Espacio)",
       "domino": "Sacar ficha (Espacio)",
-      "hex": "Lanzar dados (Espacio)"
+      "hex": "Lanzar dados (Espacio)",
+      "route": "Lanzar dado (Espacio)"
     },
     "rollingLabel": {
       "dice": "Lanzando dados…",
       "tetromino": "Sacando figura…",
       "domino": "Sacando ficha…",
-      "hex": "Lanzando dados…"
+      "hex": "Lanzando dados…",
+      "route": "Lanzando dado…"
     },
     "placingLabel": {
       "dice": "Pasa el cursor sobre el tablero y haz clic para colocar el rectángulo.",
       "tetromino": "Pasa el cursor sobre el tablero y haz clic para colocar la figura.",
       "domino": "Pasa el cursor sobre el tablero y haz clic para colocar la ficha.",
       "hexStored": "Pasa el cursor sobre el tablero y haz clic para colocar la figura guardada.",
-      "hexRoll": "Pasa el cursor sobre el tablero y haz clic para colocar la figura (quedan {{count}})."
+      "hexRoll": "Pasa el cursor sobre el tablero y haz clic para colocar la figura (quedan {{count}}).",
+      "route": "Pasa el cursor sobre el tablero y haz clic para capturar una casilla."
     },
     "skippedLabel": "No hay posiciones válidas para esta tirada. Turno omitido.",
     "remainingLabel": "quedan {{count}}",
@@ -157,6 +164,11 @@
       "hexPlacedFromStorage": "{{name}}: colocó {{shape}} del almacén en ({{x}}, {{y}})",
       "hexSkipRemainder": " (resto ×{{count}} — sin espacio, omitido)",
       "hexStored": "{{name}}: guardó {{shape}}",
+      "routeRoll": "{{name}}: dado {{roll}}",
+      "routeRollSkipped": "{{name}}: dado {{roll}} — sin movimientos válidos, turno omitido",
+      "routePlaced": "{{name}}: capturó ({{x}}, {{y}})",
+      "routeBridgeCrossed": "{{name}}: cruzó el puente y capturó ({{x}}, {{y}})",
+      "routeStreakBonus": "— ¡racha de coincidencias! Otro turno",
       "eliminated": "{{name}}: queda eliminado — ya no tiene movimientos posibles",
       "dicePlaced": "{{name}}: colocó {{w}}×{{h}} en ({{x}}, {{y}})",
       "tetrominoPlaced": "{{name}}: colocó la figura {{type}} en ({{x}}, {{y}})",
@@ -233,6 +245,22 @@
         {
           "title": "Captura automática del territorio rodeado",
           "body": "Si rodeas con hexágonos una zona del tablero de forma que tus rivales ya no puedan acceder a ella, esta se rellena de inmediato al máximo con figuras de tu color."
+        }
+      ]
+    },
+    "route": {
+      "title": "Routeritory — reglas",
+      "objective": "La misma batalla por el territorio, pero un río atraviesa el tablero dividiéndolo en tres islas: dos grandes donde empiezan los jugadores y una pequeña neutral. Hay montañas repartidas aquí y allá.",
+      "turn": "En tu turno, lanza un dado (1–6): esa es la cantidad de casillas individuales que debes capturar este turno, una por una.",
+      "placement": "Una casilla solo se puede capturar si toca directamente tu territorio ya capturado (incluidas las casillas capturadas antes en este mismo turno). El río y las montañas son infranqueables. Hay 3 puentes sobre el río (uno por cada rama) — si tu territorio toca un puente, puedes capturar de inmediato la casilla libre de la orilla opuesta.",
+      "toggles": [
+        {
+          "title": "Puentes",
+          "body": "Cada varios turnos, los 3 puentes se desplazan aleatoriamente dentro de su propia rama del río, así que el cruce no siempre está en el mismo lugar."
+        },
+        {
+          "title": "Racha de tiradas iguales",
+          "body": "Si el dado muestra el mismo número tres veces seguidas, ese jugador obtiene un turno extra. Pero si la cuarta tirada seguida también coincide, no se concede otro turno extra y la racha vuelve a contarse desde cero."
         }
       ]
     }

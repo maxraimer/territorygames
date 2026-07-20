@@ -5,6 +5,7 @@ import Board from "./Board";
 import HexBoard from "./HexBoard";
 import { formatDuration } from "../game/time";
 import { playerArea } from "../game/rules";
+import { terrainLayersForRender } from "../game/route";
 
 export default function GameOverScreen({ board, players, gameType, startedAt, endedAt, moveCount, reason, onRestart }) {
   const { t } = useTranslation();
@@ -65,7 +66,13 @@ export default function GameOverScreen({ board, players, gameType, startedAt, en
         {gameType === "hex" ? (
           <HexBoard board={board} players={players} previewPlacement={null} interactive={false} />
         ) : (
-          <Board board={board} players={players} previewPlacement={null} interactive={false} />
+          <Board
+            board={board}
+            players={players}
+            previewPlacement={null}
+            interactive={false}
+            terrain={gameType === "route" ? terrainLayersForRender(board) : undefined}
+          />
         )}
       </div>
 
