@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
 // Below this viewport width the board keeps its plain row-count-threshold
-// size (getCellSize/getHexSize) — a dedicated mobile board layout is a
-// separate, later effort, so phones intentionally don't get this treatment.
-const MOBILE_BREAKPOINT = 768;
+// size (getCellSize/getHexSize) instead of being fitted — must match the
+// `lg` breakpoint App.jsx uses to switch the playing screen between a
+// stacked (sidebar above board) and side-by-side layout. Below it the
+// sidebar sits above the board, so the board's on-screen `top` (and thus
+// the "available height" this hook fits against) is pushed far down by
+// the sidebar's own height rather than reflecting real screen space —
+// fitting against it there shrinks the board more as the sidebar grows,
+// not less. A dedicated mobile board layout is a separate, later effort,
+// so phones intentionally don't get this treatment either.
+const MOBILE_BREAKPOINT = 1024;
 // Rough starting guess for the chrome below/around the board (the board
 // wrapper's own padding+border, the page's own bottom padding, ...) — not
 // exact on purpose, since hardcoding those precisely is brittle if the
