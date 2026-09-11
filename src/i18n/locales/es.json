@@ -175,6 +175,7 @@
       "routeRollSkipped": "{{name}}: dado {{roll}} — sin movimientos válidos, turno omitido",
       "routePlaced": "{{name}}: capturó ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}}: cruzó el puente y capturó ({{x}}, {{y}})",
+      "routeSkipRemainder": " (resto ×{{count}} — no hay más movimientos, omitido)",
       "routeStreakBonus": "— ¡racha de coincidencias! Otro turno",
       "routeRevived": "{{name}}: un puente se movió y le abrió un movimiento de nuevo — vuelve a la partida",
       "eliminated": "{{name}}: queda eliminado — ya no tiene movimientos posibles",

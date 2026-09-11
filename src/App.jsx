@@ -1190,7 +1190,13 @@ export default function App() {
       ? i18n.t("playing.log.routeBridgeCrossed", { name: currentPlayer.name, x: cell.x, y: cell.y })
       : i18n.t("playing.log.routePlaced", { name: currentPlayer.name, x: cell.x, y: cell.y });
 
-    const nextPiecesRemaining = game.piecesRemaining - 1;
+    let nextPiecesRemaining = game.piecesRemaining - 1;
+
+    let skipNote = "";
+    if (nextPiecesRemaining > 0 && !hasAnyPossibleRouteMove(placedBoard, currentPlayer.id)) {
+      skipNote = i18n.t("playing.log.routeSkipRemainder", { count: nextPiecesRemaining });
+      nextPiecesRemaining = 0;
+    }
 
     const { board: newBoard, entries: autoFillEntries } = game.autoFillEnclosed
       ? applyAutoFillEnclosedRoute(placedBoard, players)
@@ -1213,7 +1219,7 @@ export default function App() {
       log: [
         ...eliminationEntries.slice().reverse(),
         ...autoFillEntries.slice().reverse(),
-        logEntry,
+        logEntry + skipNote,
         ...prev.log,
       ].slice(0, 40),
     }));
@@ -1530,17 +1536,6 @@ export default function App() {
           </div>
 
           {game.gameType === "route" && <TerrainLegend />}
-
-          <div className="card bg-base-100 shadow-sm">
-            <div className="card-body gap-2 p-4">
-              <h2 className="card-title text-sm">{t("playing.historyTitle")}</h2>
-              <ul className="flex max-h-64 flex-col gap-1.5 overflow-y-auto text-xs text-base-content/70">
-                {log.map((entry, i) => (
-                  <li key={i}>{entry}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col gap-3">
@@ -1668,6 +1663,17 @@ export default function App() {
                 cellSize={fittedCellSize}
               />
             )}
+          </div>
+
+          <div className="card bg-base-100 shadow-sm">
+            <div className="card-body gap-2 p-4">
+              <h2 className="card-title text-sm">{t("playing.historyTitle")}</h2>
+              <ul className="flex h-64 flex-col gap-1.5 overflow-y-auto text-xs text-base-content/70">
+                {log.map((entry, i) => (
+                  <li key={i}>{entry}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </main>
       </div>

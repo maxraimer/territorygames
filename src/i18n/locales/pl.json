@@ -175,6 +175,7 @@
       "routeRollSkipped": "{{name}}: kostka {{roll}} — brak dostępnych ruchów, ruch pominięty",
       "routePlaced": "{{name}}: zajął ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}}: przeszedł przez most i zajął ({{x}}, {{y}})",
+      "routeSkipRemainder": " (pozostało ×{{count}} — brak dalszych ruchów, pominięto)",
       "routeStreakBonus": "— seria takich samych rzutów! Jeszcze jeden ruch",
       "routeRevived": "{{name}}: most się przesunął i gracz znów ma ruch — wraca do gry",
       "eliminated": "{{name}}: odpada — nie ma już możliwych ruchów",

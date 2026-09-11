@@ -175,6 +175,7 @@
       "routeRollSkipped": "{{name}}: die {{roll}} — no valid moves, turn skipped",
       "routePlaced": "{{name}}: claimed ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}}: crossed the bridge and claimed ({{x}}, {{y}})",
+      "routeSkipRemainder": " (remaining ×{{count}} — no more moves, skipped)",
       "routeStreakBonus": "— matching streak! Another turn",
       "routeRevived": "{{name}}: a bridge moved and opened up a move again — back in the game",
       "eliminated": "{{name}}: eliminated — no more possible moves",
