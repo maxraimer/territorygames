@@ -6,10 +6,18 @@ import { enumerateValidRouteCells, makeRouteNeighborsFn } from "./route";
 
 // Bounds per-move cost independent of board size/candidate count (boards go up to 32x32,
 // and medium/hard score every candidate with a flood fill) — a random subsample is "good
-// enough" for bot play without needing to evaluate every last placement.
+// enough" for bot play without needing to evaluate every last placement. `hard` gets a much
+// wider search than `medium`: it's the difficulty meant to genuinely try to win, so it's
+// worth the extra flood-fills to actually find its best move instead of settling for the
+// best of a small random sample.
 const MAX_CANDIDATES_TO_EVALUATE = 60;
+const HARD_MAX_CANDIDATES_TO_EVALUATE = 200;
 const HARD_OPPONENT_WEIGHT = 1;
-const HARD_BLOCK_BONUS = 0.5;
+// Weighted equal to a cell of the bot's own reachable space: hard bots should treat
+// actively crowding an opponent's border as being just as valuable as growing their own
+// territory, not a minor tiebreak, so they play to suppress opponents rather than just to
+// expand.
+const HARD_BLOCK_BONUS = 1;
 
 function cellKey(x, y) {
   return `${x},${y}`;
@@ -66,7 +74,8 @@ export function scorePlacement(board, playerId, cells, opponents, difficulty, ne
 
 function pickPlacement(board, playerId, candidates, opponents, difficulty, neighborsFn = squareNeighbors) {
   if (!candidates || candidates.length === 0) return null;
-  const pool = sample(candidates, MAX_CANDIDATES_TO_EVALUATE);
+  const maxCandidates = difficulty === "hard" ? HARD_MAX_CANDIDATES_TO_EVALUATE : MAX_CANDIDATES_TO_EVALUATE;
+  const pool = sample(candidates, maxCandidates);
 
   if (difficulty === "easy") {
     return pool[Math.floor(Math.random() * pool.length)];

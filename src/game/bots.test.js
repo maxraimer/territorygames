@@ -50,7 +50,7 @@ describe("scorePlacement", () => {
     // A: ownReachable=2 (x1,x2), bestOpponentReachable=2 (x1,x2 still open from x3), blocking=0
     expect(scorePlacement(board, "p1", farFromOpponent, opponents, "hard")).toBeCloseTo(2 - 2);
     // B: ownReachable=2 (x0,x1), bestOpponentReachable=0 (p2 now boxed in by p1 at x2), blocking=1 (adjacent to p2's x3)
-    expect(scorePlacement(board, "p1", nextToOpponent, opponents, "hard")).toBeCloseTo(2 + 0.5);
+    expect(scorePlacement(board, "p1", nextToOpponent, opponents, "hard")).toBeCloseTo(2 + 1);
 
     // medium doesn't see the difference (both candidates leave 2 reachable own cells)...
     expect(scorePlacement(board, "p1", farFromOpponent, opponents, "medium")).toBe(
@@ -99,6 +99,28 @@ describe("chooseDiceBotMove", () => {
   it("returns null when nothing is placeable", () => {
     const board = makeBoard(1, 1, [seed("p1", 0, 0)]);
     expect(chooseDiceBotMove(board, "p1", [2, 2], true, "hard", [])).toBeNull();
+  });
+
+  it("hard always finds the one open pocket among 100 candidates, most of which are dead ends", () => {
+    // 1-wide, 193-cell strip, no p1 territory yet (any empty cell is a valid
+    // first move): y=0,2,...,178 are walls, y=1,3,...,179 are 90 isolated
+    // 1-cell dead ends (both neighbors walled, reachable=0); y=180-182 are a
+    // buffer wall; y=183-192 are a 10-cell open pocket (all mutually
+    // reachable, reachable=9 each) — the only candidates that beat 0. With
+    // 100 total candidates, hard's widened search (it no longer shares
+    // medium's 60-candidate sampling cap) must evaluate every one of them,
+    // so it should always land in the pocket, never on a dead end.
+    const wallYs = [];
+    for (let y = 0; y <= 178; y += 2) wallYs.push(y);
+    wallYs.push(180, 181, 182);
+    const board = { cols: 1, rows: 193, pieces: [{ id: "walls", playerId: "p2", cells: wallYs.map((y) => ({ x: 0, y })) }] };
+
+    for (let i = 0; i < 15; i++) {
+      const move = chooseDiceBotMove(board, "p1", [1, 1], true, "hard", []);
+      expect(move).not.toBeNull();
+      expect(move[0].y).toBeGreaterThanOrEqual(183);
+      expect(move[0].y).toBeLessThanOrEqual(192);
+    }
   });
 });
 
