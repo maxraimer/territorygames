@@ -1190,7 +1190,13 @@ export default function App() {
       ? i18n.t("playing.log.routeBridgeCrossed", { name: currentPlayer.name, x: cell.x, y: cell.y })
       : i18n.t("playing.log.routePlaced", { name: currentPlayer.name, x: cell.x, y: cell.y });
 
-    const nextPiecesRemaining = game.piecesRemaining - 1;
+    let nextPiecesRemaining = game.piecesRemaining - 1;
+
+    let skipNote = "";
+    if (nextPiecesRemaining > 0 && !hasAnyPossibleRouteMove(placedBoard, currentPlayer.id)) {
+      skipNote = i18n.t("playing.log.routeSkipRemainder", { count: nextPiecesRemaining });
+      nextPiecesRemaining = 0;
+    }
 
     const { board: newBoard, entries: autoFillEntries } = game.autoFillEnclosed
       ? applyAutoFillEnclosedRoute(placedBoard, players)
@@ -1213,7 +1219,7 @@ export default function App() {
       log: [
         ...eliminationEntries.slice().reverse(),
         ...autoFillEntries.slice().reverse(),
-        logEntry,
+        logEntry + skipNote,
         ...prev.log,
       ].slice(0, 40),
     }));

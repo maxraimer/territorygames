@@ -175,6 +175,7 @@
       "routeRollSkipped": "{{name}}: Würfel {{roll}} — keine gültigen Züge, Zug ausgesetzt",
       "routePlaced": "{{name}}: hat ({{x}}, {{y}}) erobert",
       "routeBridgeCrossed": "{{name}}: hat die Brücke überquert und ({{x}}, {{y}}) erobert",
+      "routeSkipRemainder": " (Rest ×{{count}} — keine Züge mehr, übersprungen)",
       "routeStreakBonus": "— Serie gleicher Würfe! Noch ein Zug",
       "routeRevived": "{{name}}: eine Brücke hat sich verschoben und ihm wieder einen Zug ermöglicht — zurück im Spiel",
       "eliminated": "{{name}}: scheidet aus — keine möglichen Züge mehr",

@@ -175,6 +175,7 @@
       "routeRollSkipped": "{{name}} : dé {{roll}} — aucun coup valide, tour passé",
       "routePlaced": "{{name}} : a capturé ({{x}}, {{y}})",
       "routeBridgeCrossed": "{{name}} : a traversé le pont et capturé ({{x}}, {{y}})",
+      "routeSkipRemainder": " (reste ×{{count}} — plus de coups possibles, ignoré)",
       "routeStreakBonus": "— série de résultats identiques ! Un tour de plus",
       "routeRevived": "{{name}} : un pont a bougé et lui a rouvert un coup — de retour dans la partie",
       "eliminated": "{{name}} : est éliminé — plus aucun coup possible",
