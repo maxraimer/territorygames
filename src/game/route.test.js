@@ -327,6 +327,36 @@ describe("route claim validity", () => {
     // Never claimable: the river cell itself (can't "exit into the water").
     expect(isValidRouteClaim(board, "p1", { x: 2, y: 1 })).toBe(false);
   });
+
+  it("also jumps between two banks tagged with the SAME island id — the terrain-only split doesn't guarantee an actual walkable path between them", () => {
+    // Same bridge as above: p1 owns (1,1), an island-0 bank. (2,2) is also
+    // tagged island 0, but a player standing at the bridge sees it as just
+    // another empty neighbor of the same crossing — the jump must work
+    // regardless of the (invisible, terrain-only) island classification.
+    const board = {
+      cols: 5,
+      rows: 3,
+      pieces: [
+        seed("p1", 1, 1),
+        { id: "river", playerId: RIVER_OWNER, cells: [{ x: 2, y: 1 }] },
+      ],
+      bridges: [
+        {
+          cells: [{ x: 2, y: 1 }],
+          banks: [
+            { x: 1, y: 1, islandId: 0 },
+            { x: 2, y: 2, islandId: 0 },
+            { x: 3, y: 1, islandId: 1 },
+            { x: 2, y: 0, islandId: 1 },
+          ],
+          arm: "trunk",
+        },
+      ],
+    };
+    expect(isValidRouteClaim(board, "p1", { x: 2, y: 2 })).toBe(true);
+    const keys = new Set(enumerateValidRouteCells(board, "p1").map(cellKey));
+    expect(keys.has(cellKey({ x: 2, y: 2 }))).toBe(true);
+  });
 });
 
 describe("makeRouteNeighborsFn", () => {
@@ -342,6 +372,23 @@ describe("makeRouteNeighborsFn", () => {
     const neighborsFn = makeRouteNeighborsFn(bridges);
     expect(neighborsFn(1, 0).some((n) => n.x === 3 && n.y === 0)).toBe(true);
     expect(neighborsFn(3, 0).some((n) => n.x === 1 && n.y === 0)).toBe(true);
+  });
+
+  it("wormholes between two banks tagged with the SAME island id too", () => {
+    const sameIslandBridges = [
+      {
+        cells: [{ x: 2, y: 1 }],
+        banks: [
+          { x: 1, y: 1, islandId: 0 },
+          { x: 2, y: 2, islandId: 0 },
+          { x: 3, y: 1, islandId: 1 },
+        ],
+        arm: "trunk",
+      },
+    ];
+    const neighborsFn = makeRouteNeighborsFn(sameIslandBridges);
+    expect(neighborsFn(1, 1).some((n) => n.x === 2 && n.y === 2)).toBe(true);
+    expect(neighborsFn(2, 2).some((n) => n.x === 1 && n.y === 1)).toBe(true);
   });
 
   it("lets reachableEmptyCellCount cross the river only when routed through the bridge", () => {

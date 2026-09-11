@@ -574,23 +574,26 @@ export function createInitialRouteBoard(cols, rows, players) {
 
 // ---------------------------------------------------------------------------
 // Claim validity — ordinary adjacency (via rules.js) plus the bridge-jump
-// rule: owning any bank of a currently-positioned bridge makes any empty
-// bank on a different island claimable, without the bridge cell itself ever
-// being claimed. Every side of the bridge works both to enter and to exit —
-// there's no single fixed "far bank", just "some island other than the one
-// you're jumping from".
+// rule: owning any bank of a currently-positioned bridge makes every other
+// empty bank of that same bridge claimable, without the bridge cell itself
+// ever being claimed. This is deliberately NOT restricted to banks on a
+// different island than the one you're jumping from: two banks tagged with
+// the same island id are only guaranteed connected by the river-only split
+// computed at terrain generation, not by the actual walkable path once
+// other players' claims are sitting in between — requiring "different
+// island" made some same-island jumps silently refuse to work despite
+// looking, to a player standing at the bridge, exactly like every other
+// crossing. Every side of the bridge works both to enter and to exit —
+// there's no fixed "far bank", just "any other bank of this bridge".
 // ---------------------------------------------------------------------------
 
 /** Empty banks of `bridge` reachable this turn, given `own`/`occupied` cell sets. */
 function jumpTargetsFromBridge(bridge, own, occupied) {
-  const targets = [];
-  for (const target of bridge.banks) {
-    const key = cellKey(target.x, target.y);
-    if (occupied.has(key)) continue;
-    const ownsOtherSide = bridge.banks.some((b) => b.islandId !== target.islandId && own.has(cellKey(b.x, b.y)));
-    if (ownsOtherSide) targets.push({ x: target.x, y: target.y });
-  }
-  return targets;
+  const ownsAnyBank = bridge.banks.some((b) => own.has(cellKey(b.x, b.y)));
+  if (!ownsAnyBank) return [];
+  return bridge.banks
+    .filter((target) => !occupied.has(cellKey(target.x, target.y)))
+    .map((target) => ({ x: target.x, y: target.y }));
 }
 
 /** The bridge `cell` would cross, or null if this isn't a valid bridge-jump claim. */
@@ -651,11 +654,15 @@ export function reviveEligiblePlayers(eliminatedPlayerIds, board) {
 }
 
 /**
- * squareNeighbors plus a one-hop wormhole at each currently-positioned
- * bridge's banks — lets reachableEmptyCellCount/isOutcomeDecided correctly
- * "see across" the river at a bridge without ever stepping onto the
- * (permanently occupied) bridge cell itself. Must be rebuilt whenever
- * bridges relocate, since it closes over their current positions.
+ * squareNeighbors plus a one-hop wormhole between every pair of a
+ * currently-positioned bridge's banks — lets reachableEmptyCellCount/
+ * isOutcomeDecided correctly "see across" the river at a bridge without ever
+ * stepping onto the (permanently occupied) bridge cell itself. Deliberately
+ * not restricted to cross-island bank pairs, matching jumpTargetsFromBridge
+ * above: two banks the terrain-only island split happens to tag alike
+ * aren't necessarily connected by an actual walkable path once other
+ * players' claims sit in between. Must be rebuilt whenever bridges
+ * relocate, since it closes over their current positions.
  */
 export function makeRouteNeighborsFn(bridges) {
   return function routeNeighbors(x, y) {
@@ -665,7 +672,7 @@ export function makeRouteNeighborsFn(bridges) {
       const self = bridge.banks.find((b) => b.x === x && b.y === y);
       if (!self) continue;
       for (const other of bridge.banks) {
-        if (other.islandId !== self.islandId) extra.push({ x: other.x, y: other.y });
+        if (other.x !== x || other.y !== y) extra.push({ x: other.x, y: other.y });
       }
     }
     return extra.length ? [...base, ...extra] : base;
