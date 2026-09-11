@@ -1391,6 +1391,23 @@ export default function App() {
 
   const canActivateRolledHex = game.gameType === "hex" && activeSource === "stored" && piecesRemaining > 0;
 
+  // Whether this game type ever shows a rotate / secondary-action button at
+  // all (fixed for the whole game by gameType + allowRotation) — kept
+  // separate from the per-turn can* flags above so the button slots below
+  // can be reserved (and merely toggled invisible turn to turn) instead of
+  // mounting/unmounting and shifting the board.
+  const rotationEverPossible = game.allowRotation && game.gameType !== "route";
+  const secondaryActionEverPossible = game.gameType === "domino" || game.gameType === "hex";
+  const secondaryAction = canStoreDomino
+    ? { label: t("playing.storeButton"), onClick: handleStore }
+    : canStoreHex
+      ? { label: t("playing.storeButton"), onClick: handleStoreHex }
+      : canActivateStoredHex
+        ? { label: t("playing.placeFromStorageButton"), onClick: handleToggleStoredHex }
+        : canActivateRolledHex
+          ? { label: t("playing.backToRollButton"), onClick: handleToggleStoredHex }
+          : null;
+
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const rollLabel = t(`playing.rollLabel.${game.gameType}`);
   const rollingLabel = t(`playing.rollingLabel.${game.gameType}`);
@@ -1496,33 +1513,26 @@ export default function App() {
                 </div>
               )}
 
-              {canRotate && (
-                <button className="btn btn-outline btn-sm" onClick={handleRotate}>
+              {/* Slots (not conditional mounts) so this card's height stays constant across
+                  turns within a game — a button popping in/out from turn to turn is exactly
+                  what made the board shift up and down as you played. */}
+              {rotationEverPossible && (
+                <button
+                  className={"btn btn-outline btn-sm " + (canRotate ? "" : "invisible")}
+                  onClick={handleRotate}
+                  disabled={!canRotate}
+                >
                   {t("playing.rotateButton")}
                 </button>
               )}
 
-              {canStoreDomino && (
-                <button className="btn btn-outline btn-sm" onClick={handleStore}>
-                  {t("playing.storeButton")}
-                </button>
-              )}
-
-              {canStoreHex && (
-                <button className="btn btn-outline btn-sm" onClick={handleStoreHex}>
-                  {t("playing.storeButton")}
-                </button>
-              )}
-
-              {canActivateStoredHex && (
-                <button className="btn btn-outline btn-sm" onClick={handleToggleStoredHex}>
-                  {t("playing.placeFromStorageButton")}
-                </button>
-              )}
-
-              {canActivateRolledHex && (
-                <button className="btn btn-outline btn-sm" onClick={handleToggleStoredHex}>
-                  {t("playing.backToRollButton")}
+              {secondaryActionEverPossible && (
+                <button
+                  className={"btn btn-outline btn-sm " + (secondaryAction ? "" : "invisible")}
+                  onClick={secondaryAction?.onClick}
+                  disabled={!secondaryAction}
+                >
+                  {secondaryAction?.label ?? " "}
                 </button>
               )}
 
