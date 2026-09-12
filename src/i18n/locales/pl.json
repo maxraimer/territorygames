@@ -104,6 +104,7 @@
   },
   "playing": {
     "exit": "Wyjdź",
+    "waitingForHost": "Czekamy, aż gospodarz rozpocznie grę…",
     "timerTitle": "Czas gry",
     "movesTitle": "Liczba ruchów",
     "moveLabel": "Ruch {{count}}",

@@ -104,6 +104,7 @@
   },
   "playing": {
     "exit": "Выйти",
+    "waitingForHost": "Ждём, пока хост запустит игру…",
     "timerTitle": "Время игры",
     "movesTitle": "Количество ходов",
     "moveLabel": "Ход {{count}}",

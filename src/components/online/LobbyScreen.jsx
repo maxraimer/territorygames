@@ -26,8 +26,12 @@ export default function LobbyScreen({ gameType, code, playerId, onLeave, onGameS
       doublesExtraTurn: lobby.config.doublesExtraTurn,
       smartAssist: lobby.config.smartAssist,
       autoFillEnclosed: lobby.config.autoFillEnclosed,
+      // Lets App.jsx tell "my turn" from "someone else's turn" and pick
+      // which client seeds the shared match (see gameSyncApi.js) — the
+      // lobby's own code doubles as the game-sync session id.
+      online: { code: lobby.code, myPlayerId: playerId, isHost },
     });
-  }, [lobby, onGameStart]);
+  }, [lobby, onGameStart, playerId, isHost]);
 
   function handleCopy() {
     navigator.clipboard.writeText(code);

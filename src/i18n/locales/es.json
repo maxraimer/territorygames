@@ -104,6 +104,7 @@
   },
   "playing": {
     "exit": "Salir",
+    "waitingForHost": "Esperando a que el anfitrión inicie la partida…",
     "timerTitle": "Tiempo de partida",
     "movesTitle": "Número de turnos",
     "moveLabel": "Turno {{count}}",

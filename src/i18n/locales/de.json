@@ -104,6 +104,7 @@
   },
   "playing": {
     "exit": "Verlassen",
+    "waitingForHost": "Warte, bis der Host das Spiel startet…",
     "timerTitle": "Spielzeit",
     "movesTitle": "Anzahl der Züge",
     "moveLabel": "Zug {{count}}",
