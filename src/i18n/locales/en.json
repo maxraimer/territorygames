@@ -304,7 +304,7 @@
       "choice": {
         "subtitle": "Create a new lobby or join one with a code",
         "create": "Create lobby",
-        "createHint": "Set up the game and invite others with a code",
+        "createHint": "Create a lobby and invite others with a code — set it up together",
         "join": "Join lobby",
         "joinHint": "Enter the code you were sent"
       },
@@ -338,7 +338,12 @@
         "starting": "Starting…",
         "minPlayersHint": "At least 2 players are needed to start",
         "waitingHint": "Waiting for the lobby host to start the game…",
-        "leaveButton": "Leave lobby"
+        "leaveButton": "Leave lobby",
+        "settingsTitle": "Game settings",
+        "hostSettingsHint": "You're the lobby host. Everyone can see these settings.",
+        "guestSettingsHint": "The lobby host controls these settings.",
+        "yourColorLabel": "Your color",
+        "maxPlayersLabel": "Maximum players"
       }
     }
   }

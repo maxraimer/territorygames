@@ -10,6 +10,8 @@ export {
   getLobby,
   leaveLobby,
   startLobby,
+  updateLobbyConfig,
+  updatePlayerColor,
   subscribeToLobby,
 } from "./adapters/firebaseLobbyAdapter";
 

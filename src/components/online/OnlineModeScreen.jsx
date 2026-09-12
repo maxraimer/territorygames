@@ -25,12 +25,7 @@ export default function OnlineModeScreen({ gameType, firstPlayerName, onBack, on
 
   if (view === "create") {
     return (
-      <CreateLobbyScreen
-        gameType={gameType}
-        firstPlayerName={firstPlayerName}
-        onCreated={handleJoined}
-        onBack={() => setView("choice")}
-      />
+      <CreateLobbyScreen gameType={gameType} firstPlayerName={firstPlayerName} onCreated={handleJoined} />
     );
   }
 

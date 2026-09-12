@@ -304,7 +304,7 @@
       "choice": {
         "subtitle": "Crea una sala nueva o únete con un código",
         "create": "Crear sala",
-        "createHint": "Configura la partida e invita a otros con un código",
+        "createHint": "Crea una sala e invita a otros con un código — configuradla juntos",
         "join": "Unirse a una sala",
         "joinHint": "Introduce el código que te enviaron"
       },
@@ -338,7 +338,12 @@
         "starting": "Empezando…",
         "minPlayersHint": "Se necesitan al menos 2 jugadores para empezar",
         "waitingHint": "Esperando a que el anfitrión de la sala empiece la partida…",
-        "leaveButton": "Salir de la sala"
+        "leaveButton": "Salir de la sala",
+        "settingsTitle": "Ajustes de la partida",
+        "hostSettingsHint": "Eres el anfitrión de la sala. Todos pueden ver estos ajustes.",
+        "guestSettingsHint": "El anfitrión de la sala controla estos ajustes.",
+        "yourColorLabel": "Tu color",
+        "maxPlayersLabel": "Máximo de jugadores"
       }
     }
   }

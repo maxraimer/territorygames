@@ -1,9 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { GRID_MAX } from "../game/constants";
 
-export function Toggle({ label, hint, checked, onChange }) {
+export function Toggle({ label, hint, checked, onChange, disabled = false }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4">
+    <label
+      className={
+        "flex items-start justify-between gap-4 " + (disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer")
+      }
+    >
       <span>
         <span className="block text-sm font-medium">{label}</span>
         {hint && <span className="block text-xs text-base-content/50">{hint}</span>}
@@ -12,6 +16,7 @@ export function Toggle({ label, hint, checked, onChange }) {
         type="checkbox"
         className="toggle toggle-primary mt-0.5 shrink-0"
         checked={checked}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
       />
     </label>
@@ -41,6 +46,7 @@ export default function GameConfigFields({
   onSmartAssistChange,
   autoFillEnclosed,
   onAutoFillEnclosedChange,
+  readOnly = false,
 }) {
   const { t } = useTranslation();
   const supportsAutoFillEnclosed = gameType === "tetromino" || gameType === "hex" || gameType === "route";
@@ -64,6 +70,7 @@ export default function GameConfigFields({
             min={gridMin}
             max={GRID_MAX}
             value={cols}
+            disabled={readOnly}
             onChange={(e) => onColsChange(Number(e.target.value))}
             className="range range-primary range-sm"
           />
@@ -78,6 +85,7 @@ export default function GameConfigFields({
             min={gridMin}
             max={GRID_MAX}
             value={rows}
+            disabled={readOnly}
             onChange={(e) => onRowsChange(Number(e.target.value))}
             className="range range-primary range-sm"
           />
@@ -91,6 +99,7 @@ export default function GameConfigFields({
           hint={t("setup.toggles.autoWin.hint")}
           checked={autoWin}
           onChange={onAutoWinChange}
+          disabled={readOnly}
         />
         {supportsRotation && (
           <Toggle
@@ -98,6 +107,7 @@ export default function GameConfigFields({
             hint={t(`setup.copy.${gameType}.rotationHint`)}
             checked={allowRotation}
             onChange={onAllowRotationChange}
+            disabled={readOnly}
           />
         )}
         {gameType === "dice" && onDoublesExtraTurnChange && (
@@ -106,6 +116,7 @@ export default function GameConfigFields({
             hint={t("setup.toggles.doublesExtraTurn.hint")}
             checked={doublesExtraTurn}
             onChange={onDoublesExtraTurnChange}
+            disabled={readOnly}
           />
         )}
         {supportsSmartAssist && (
@@ -114,6 +125,7 @@ export default function GameConfigFields({
             hint={t(`setup.copy.${gameType}.smartHint`)}
             checked={smartAssist}
             onChange={onSmartAssistChange}
+            disabled={readOnly}
           />
         )}
         {supportsAutoFillEnclosed && (
@@ -126,6 +138,7 @@ export default function GameConfigFields({
             )}
             checked={autoFillEnclosed}
             onChange={onAutoFillEnclosedChange}
+            disabled={readOnly}
           />
         )}
       </div>

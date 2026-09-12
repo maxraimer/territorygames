@@ -304,7 +304,7 @@
       "choice": {
         "subtitle": "Créez un nouveau salon ou rejoignez-en un avec un code",
         "create": "Créer un salon",
-        "createHint": "Configurez la partie et invitez d'autres joueurs avec un code",
+        "createHint": "Créez un salon et invitez d'autres joueurs avec un code — configurez-le ensemble",
         "join": "Rejoindre un salon",
         "joinHint": "Entrez le code qu'on vous a envoyé"
       },
@@ -338,7 +338,12 @@
         "starting": "Lancement…",
         "minPlayersHint": "Il faut au moins 2 joueurs pour commencer",
         "waitingHint": "En attente que l'hôte lance la partie…",
-        "leaveButton": "Quitter le salon"
+        "leaveButton": "Quitter le salon",
+        "settingsTitle": "Paramètres de la partie",
+        "hostSettingsHint": "Vous êtes l'hôte du salon. Tout le monde voit ces paramètres.",
+        "guestSettingsHint": "L'hôte du salon définit ces paramètres.",
+        "yourColorLabel": "Votre couleur",
+        "maxPlayersLabel": "Nombre maximum de joueurs"
       }
     }
   }
