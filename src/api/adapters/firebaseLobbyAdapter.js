@@ -1,14 +1,24 @@
 // Firebase Realtime Database implementation of the lobby contract (see
 // ../lobbyApi.js) — the same 6 functions as mockLobbyAdapter.js, so
 // swapping back to the mock for local/offline work is changing
-// lobbyApi.js's one import line. Stores each lobby at `lobbies/{code}`;
-// join/leave/start use runTransaction so two players joining (or leaving)
-// at once can't both write a stale player list — the mock adapter doesn't
-// need this (single-threaded JS, one write always finishes before the
-// next starts) but a real multi-client backend does. This is the active
-// adapter (see lobbyApi.js) — the project config lives in
-// ../firebaseConfig.js.
-import { ref, get, set, runTransaction, onValue, off } from "firebase/database";
+// lobbyApi.js's one import line. Stores each lobby at `lobbies/{code}`.
+// This is the active adapter (see lobbyApi.js) — the project config lives
+// in ../firebaseConfig.js.
+//
+// join/leave/start are plain get-validate-set, not runTransaction: a first
+// attempt used transactions (the textbook choice for "read, decide, write"
+// against concurrent writers) but a client joining a lobby path it had
+// never touched before could have its transaction callback invoked with a
+// premature `lobby === null` before the real server value arrived, and our
+// callback's reasonable "null means doesn't exist, abort" response was
+// then honored by the SDK as final instead of retried with real data —
+// every first-time join failed with a wrong "lobby is full" error, and a
+// get()-before-transaction workaround didn't reliably fix it either. For
+// this app's actual concurrency (2-4 players joining a lobby seconds
+// apart, never the same instant), a plain read-then-write's tiny race
+// window is a far better trade than a transaction API that was
+// demonstrably misbehaving in practice.
+import { ref, get, set, onValue, off } from "firebase/database";
 import { getFirebaseDb } from "./firebaseApp";
 import { LobbyError, LOBBY_ERROR_CODES } from "../lobbyErrors";
 import { COLOR_PALETTE } from "../../game/constants";
@@ -60,37 +70,21 @@ export async function createLobby({ gameType, config, hostName }) {
 export async function joinLobby(code, { name }) {
   const db = getFirebaseDb();
   const normalizedCode = code.toUpperCase();
-  const playerId = randomId();
   const target = lobbyRef(db, normalizedCode);
 
-  // A client that has never touched this path before (any brand-new guest
-  // joining a lobby) has no local cache for it, and runTransaction's first
-  // pass can invoke the update function with `lobby === null` before the
-  // server value has actually arrived. Since our callback treats `null` as
-  // a deliberate "doesn't exist, abort" decision rather than a staleness
-  // conflict, Firebase honors that abort immediately instead of retrying
-  // with the real data — which was showing up as every first-time join
-  // failing with a wrong "lobby is full" error. One plain get() first
-  // warms the SDK's cache for this path so the transaction never sees that
-  // premature null.
-  await get(target);
+  const snap = await get(target);
+  if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
+  const lobby = snap.val();
+  if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
+  if (lobby.players.length >= lobby.config.maxPlayers) throw new LobbyError(LOBBY_ERROR_CODES.FULL);
 
-  const result = await runTransaction(target, (lobby) => {
-    if (lobby === null) return; // abort — NOT_FOUND, diagnosed below
-    if (lobby.status !== "waiting") return; // abort — ALREADY_STARTED
-    if (lobby.players.length >= lobby.config.maxPlayers) return; // abort — FULL
-    lobby.players.push({ id: playerId, name, color: colorForSlot(lobby.players.length), isHost: false });
-    return lobby;
-  });
-
-  if (!result.committed) {
-    const snap = await get(target);
-    if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
-    const lobby = snap.val();
-    if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
-    throw new LobbyError(LOBBY_ERROR_CODES.FULL);
-  }
-  return { lobby: result.snapshot.val(), playerId };
+  const playerId = randomId();
+  const nextLobby = {
+    ...lobby,
+    players: [...lobby.players, { id: playerId, name, color: colorForSlot(lobby.players.length), isHost: false }],
+  };
+  await set(target, nextLobby);
+  return { lobby: nextLobby, playerId };
 }
 
 export async function getLobby(code) {
@@ -104,15 +98,20 @@ export async function leaveLobby(code, playerId) {
   const db = getFirebaseDb();
   const normalizedCode = code.toUpperCase();
   const target = lobbyRef(db, normalizedCode);
-  await get(target); // see joinLobby's comment on warming the cache before a transaction
-  await runTransaction(target, (lobby) => {
-    if (lobby === null) return; // already gone
-    const remainingPlayers = lobby.players.filter((p) => p.id !== playerId);
-    if (remainingPlayers.length === 0) return null; // delete the lobby
-    const nextHostId = lobby.hostId === playerId ? remainingPlayers[0].id : lobby.hostId;
-    lobby.hostId = nextHostId;
-    lobby.players = remainingPlayers.map((p) => ({ ...p, isHost: p.id === nextHostId }));
-    return lobby;
+  const snap = await get(target);
+  if (!snap.exists()) return; // already gone
+  const lobby = snap.val();
+
+  const remainingPlayers = lobby.players.filter((p) => p.id !== playerId);
+  if (remainingPlayers.length === 0) {
+    await set(target, null); // delete the lobby
+    return;
+  }
+  const nextHostId = lobby.hostId === playerId ? remainingPlayers[0].id : lobby.hostId;
+  await set(target, {
+    ...lobby,
+    hostId: nextHostId,
+    players: remainingPlayers.map((p) => ({ ...p, isHost: p.id === nextHostId })),
   });
 }
 
@@ -120,24 +119,16 @@ export async function startLobby(code, playerId) {
   const db = getFirebaseDb();
   const normalizedCode = code.toUpperCase();
   const target = lobbyRef(db, normalizedCode);
-  await get(target); // see joinLobby's comment on warming the cache before a transaction
 
-  const result = await runTransaction(target, (lobby) => {
-    if (lobby === null) return; // abort — NOT_FOUND
-    if (lobby.hostId !== playerId) return; // abort — NOT_HOST
-    if (lobby.players.length < 2) return; // abort — NOT_ENOUGH_PLAYERS
-    lobby.status = "started";
-    return lobby;
-  });
+  const snap = await get(target);
+  if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
+  const lobby = snap.val();
+  if (lobby.hostId !== playerId) throw new LobbyError(LOBBY_ERROR_CODES.NOT_HOST);
+  if (lobby.players.length < 2) throw new LobbyError(LOBBY_ERROR_CODES.NOT_ENOUGH_PLAYERS);
 
-  if (!result.committed) {
-    const snap = await get(target);
-    if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
-    const lobby = snap.val();
-    if (lobby.hostId !== playerId) throw new LobbyError(LOBBY_ERROR_CODES.NOT_HOST);
-    throw new LobbyError(LOBBY_ERROR_CODES.NOT_ENOUGH_PLAYERS);
-  }
-  return result.snapshot.val();
+  const nextLobby = { ...lobby, status: "started" };
+  await set(target, nextLobby);
+  return nextLobby;
 }
 
 /** Subscribes to every future change to a lobby (not the current snapshot, matching mockLobbyAdapter — call getLobby first). Returns an unsubscribe function. */
