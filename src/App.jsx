@@ -16,6 +16,7 @@ import GameTimer from "./components/GameTimer";
 import HeaderControls from "./components/HeaderControls";
 import TerrainLegend from "./components/TerrainLegend";
 import useNickname from "./hooks/useNickname";
+import { pushGameState, getGameState, subscribeToGameState } from "./api/gameSyncApi";
 import { rollDice } from "./game/dice";
 import {
   createInitialBoard,
@@ -101,7 +102,7 @@ const ROLL_ANIMATION_MS = 650;
 const BOT_MOVE_DELAY_MS = 600;
 
 function makeGameState(gameType, config) {
-  const { cols, rows, players, autoWin, allowRotation, doublesExtraTurn, smartAssist, autoFillEnclosed } = config;
+  const { cols, rows, players, autoWin, allowRotation, doublesExtraTurn, smartAssist, autoFillEnclosed, online } = config;
   const base = {
     gameType,
     cols,
@@ -111,6 +112,9 @@ function makeGameState(gameType, config) {
     allowRotation,
     doublesExtraTurn: gameType === "dice" && doublesExtraTurn,
     smartAssist,
+    // { code, myPlayerId, isHost } for an online match, null for hot-seat/bots
+    // — see the game-sync effects further down for how this is used.
+    online: online ?? null,
     board: createInitialBoard(cols, rows, players),
     currentPlayerIndex: 0,
     turnPhase: "idle", // 'idle' | 'rolling' | 'placing' | 'skipped'
@@ -405,6 +409,20 @@ export default function App() {
   const [hoverCell, setHoverCell] = useState(null);
   const rollTimeoutRef = useRef(null);
   const botTimeoutRef = useRef(null);
+  // This client's own { code, myPlayerId, isHost } for the current online
+  // match (null for hot-seat/bots) — set once in handleStart and kept in a
+  // ref rather than game.online so an incoming remote snapshot (which
+  // carries the *sender's* online info) never clobbers it. See the
+  // game-sync effects below for how it drives push/subscribe.
+  const onlineIdentityRef = useRef(null);
+  // Monotonic counter shared with gameSyncApi's seq — lets the subscribe
+  // effect tell a genuinely newer remote snapshot from a stale one or this
+  // client's own push echoing back to itself.
+  const onlineSeqRef = useRef(0);
+  // Set right before applying an incoming remote snapshot so the push
+  // effect (which reacts to every `game` change) knows not to broadcast it
+  // straight back out.
+  const applyingRemoteOnlineUpdateRef = useRef(false);
 
   useEffect(() => () => {
     clearTimeout(rollTimeoutRef.current);
@@ -432,6 +450,12 @@ export default function App() {
   const players = game?.players ?? [];
   const currentPlayerIndex = game?.currentPlayerIndex ?? 0;
   const currentPlayer = players[currentPlayerIndex] ?? null;
+  // Hot-seat/bots pass the device around, so anyone can act for whoever's
+  // turn it is; an online match is one device per player, so only the
+  // client whose own player is up may act — everyone else is read-only
+  // until their snapshot says otherwise. True (no restriction) outside
+  // online mode, since game.online is null there.
+  const isMyTurnOnline = !game?.online || currentPlayer?.id === game.online.myPlayerId;
   const dice = game?.dice ?? null;
   const swapped = game?.swapped ?? false;
   const pieceType = game?.pieceType ?? null;
@@ -513,7 +537,19 @@ export default function App() {
   }
 
   function handleStart(config) {
-    setGame(makeGameState(gameType, config));
+    onlineIdentityRef.current = config.online ?? null;
+    onlineSeqRef.current = 0;
+    applyingRemoteOnlineUpdateRef.current = false;
+    if (config.online && !config.online.isHost) {
+      // Only the host seeds the match (board generation, terrain, initial
+      // rolls can all be randomized) — everyone else waits for that exact
+      // snapshot over gameSyncApi instead of independently generating their
+      // own, which is exactly the "every client boots its own local engine"
+      // gap online mode has had until now.
+      setGame({ gameType, online: config.online, waitingForHost: true });
+    } else {
+      setGame(makeGameState(gameType, config));
+    }
     setHoverCell(null);
     setScreen("playing");
   }
@@ -1034,6 +1070,7 @@ export default function App() {
     handleStore: handleStoreCurrent,
     handlePickStorage: handlePickStorageOrToggle,
     turnPhase,
+    isMyTurnOnline,
   };
 
   useEffect(() => {
@@ -1041,6 +1078,10 @@ export default function App() {
       const tag = document.activeElement?.tagName;
       const isFormField = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON";
       if (isFormField) return;
+      // Board clicks and the visible action buttons are already gated by
+      // `interactive`/`disabled`, but these keyboard shortcuts bypass both,
+      // so it's the one spot that needs its own explicit online-turn check.
+      if (!keyActionsRef.current.isMyTurnOnline) return;
 
       const { handleRoll, advanceTurn, handleRotate, handleStore, handlePickStorage, turnPhase } = keyActionsRef.current;
 
@@ -1246,6 +1287,54 @@ export default function App() {
     if (nextPiecesRemaining === 0) advanceTurn();
   }
 
+  // Online sync, receive half: catches up on whatever's already been pushed
+  // (covers mounting after the host's first push, or a mid-game refresh)
+  // and then stays subscribed to every later snapshot for the rest of the
+  // match. `online` is stable for the whole session (set once in
+  // handleStart), so this only needs to run once per "playing" mount, not
+  // on every `game` change.
+  useEffect(() => {
+    const online = onlineIdentityRef.current;
+    if (screen !== "playing" || !online) return undefined;
+
+    let cancelled = false;
+    function applyRemote(entry) {
+      if (!entry || entry.seq <= onlineSeqRef.current) return; // stale, or our own echo
+      onlineSeqRef.current = entry.seq;
+      applyingRemoteOnlineUpdateRef.current = true;
+      setGame({ ...entry.state, online });
+    }
+
+    getGameState(online.code).then((entry) => {
+      if (!cancelled) applyRemote(entry);
+    });
+    const unsubscribe = subscribeToGameState(online.code, applyRemote);
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- online identity is a stable ref, not state
+  }, [screen]);
+
+  // Online sync, send half: whenever this client's own game state changes
+  // (any placement, roll, or turn advance already updates `game` the exact
+  // same way hot-seat/bots do — nothing upstream needs to know it's
+  // online), broadcast the new snapshot so every other client mirrors it.
+  // Skipped for a remote-originated change (would otherwise ping-pong the
+  // same update back out) and before any real state exists yet (the
+  // non-host's placeholder while it's still waiting for the host).
+  useEffect(() => {
+    const online = onlineIdentityRef.current;
+    if (screen !== "playing" || !online || !game?.board) return;
+    if (applyingRemoteOnlineUpdateRef.current) {
+      applyingRemoteOnlineUpdateRef.current = false;
+      return;
+    }
+    onlineSeqRef.current += 1;
+    pushGameState(online.code, game, onlineSeqRef.current);
+  }, [game, screen]);
+
   // Drives bot turns end-to-end: roll -> (after a short delay) decide + place -> advance.
   // Depends on the whole `game` object rather than hand-picked fields, same trade-off
   // `previewPlacement`'s memo above makes (see its eslint-disable comment) — this is also
@@ -1342,6 +1431,14 @@ export default function App() {
     );
   }
 
+  if (screen === "playing" && game?.waitingForHost) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-base-200 p-6">
+        <p className="text-base-content/60">{t("playing.waitingForHost")}</p>
+      </div>
+    );
+  }
+
   if (screen === "setup" || !game || !board) {
     return (
       <SetupScreen gameType={gameType} firstPlayerName={nickname} onStart={handleStart} onBack={handleBackToMode} />
@@ -1426,6 +1523,23 @@ export default function App() {
         .sort((a, b) => a.y - b.y || a.x - b.x)
     : null;
 
+  // Rendered in two spots below (sidebar on wide screens, below the board on
+  // narrow ones — see their `hidden`/`lg:hidden` wrappers) rather than one
+  // fixed position, since which placement avoids pushing the board around
+  // depends on which layout mode (stacked vs. side-by-side) is active.
+  const historyCard = (
+    <div className="card bg-base-100 shadow-sm">
+      <div className="card-body gap-2 p-4">
+        <h2 className="card-title text-sm">{t("playing.historyTitle")}</h2>
+        <ul className="flex h-64 flex-col gap-1.5 overflow-y-auto text-xs text-base-content/70">
+          {log.map((entry, i) => (
+            <li key={i}>{entry}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-base-200 p-4 sm:p-6">
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1459,7 +1573,7 @@ export default function App() {
                   (turnPhase === "idle" || turnPhase === "skipped" ? "" : "invisible")
                 }
                 onClick={turnPhase === "skipped" ? advanceTurn : handleRoll}
-                disabled={turnPhase !== "idle" && turnPhase !== "skipped"}
+                disabled={(turnPhase !== "idle" && turnPhase !== "skipped") || !isMyTurnOnline}
               >
                 {turnPhase === "skipped" ? t("playing.nextButton") : rollLabel}
               </button>
@@ -1520,7 +1634,7 @@ export default function App() {
                 <button
                   className={"btn btn-outline btn-sm " + (canRotate ? "" : "invisible")}
                   onClick={handleRotate}
-                  disabled={!canRotate}
+                  disabled={!canRotate || !isMyTurnOnline}
                 >
                   {t("playing.rotateButton")}
                 </button>
@@ -1530,7 +1644,7 @@ export default function App() {
                 <button
                   className={"btn btn-outline btn-sm " + (secondaryAction ? "" : "invisible")}
                   onClick={secondaryAction?.onClick}
-                  disabled={!secondaryAction}
+                  disabled={!secondaryAction || !isMyTurnOnline}
                 >
                   {secondaryAction?.label ?? " "}
                 </button>
@@ -1546,6 +1660,8 @@ export default function App() {
           </div>
 
           {game.gameType === "route" && <TerrainLegend />}
+
+          <div className="hidden lg:block">{historyCard}</div>
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col gap-3">
@@ -1584,7 +1700,7 @@ export default function App() {
                     <div className="mt-1.5 flex gap-1">
                       {Array.from({ length: DOMINO_STORAGE_LIMIT }, (_, i) => {
                         const values = game.storageByPlayer[player.id]?.[i];
-                        const pickable = active && turnPhase === "idle" && Boolean(values);
+                        const pickable = active && turnPhase === "idle" && Boolean(values) && isMyTurnOnline;
                         return (
                           <button
                             key={i}
@@ -1616,7 +1732,8 @@ export default function App() {
                         active &&
                         stored != null &&
                         game.activeSource === "roll" &&
-                        (turnPhase === "placing" || turnPhase === "skipped");
+                        (turnPhase === "placing" || turnPhase === "skipped") &&
+                        isMyTurnOnline;
                       return (
                         <div className="mt-1.5">
                           <button
@@ -1655,7 +1772,7 @@ export default function App() {
                 onHoverCell={handleHoverCell}
                 onLeaveBoard={() => setHoverCell(null)}
                 onPlaceClick={handleHexPlaceClick}
-                interactive={currentPlayer?.type !== "bot"}
+                interactive={currentPlayer?.type !== "bot" && isMyTurnOnline}
                 hexSize={fittedCellSize}
               />
             ) : (
@@ -1668,23 +1785,14 @@ export default function App() {
                 onHoverCell={handleHoverCell}
                 onLeaveBoard={() => setHoverCell(null)}
                 onPlaceClick={handlePlaceClick}
-                interactive={currentPlayer?.type !== "bot"}
+                interactive={currentPlayer?.type !== "bot" && isMyTurnOnline}
                 terrain={game.gameType === "route" ? terrainLayersForRender(board) : undefined}
                 cellSize={fittedCellSize}
               />
             )}
           </div>
 
-          <div className="card bg-base-100 shadow-sm">
-            <div className="card-body gap-2 p-4">
-              <h2 className="card-title text-sm">{t("playing.historyTitle")}</h2>
-              <ul className="flex h-64 flex-col gap-1.5 overflow-y-auto text-xs text-base-content/70">
-                {log.map((entry, i) => (
-                  <li key={i}>{entry}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <div className="lg:hidden">{historyCard}</div>
         </main>
       </div>
     </div>

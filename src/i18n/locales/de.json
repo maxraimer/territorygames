@@ -104,6 +104,7 @@
   },
   "playing": {
     "exit": "Verlassen",
+    "waitingForHost": "Warte, bis der Host das Spiel startet…",
     "timerTitle": "Spielzeit",
     "movesTitle": "Anzahl der Züge",
     "moveLabel": "Zug {{count}}",
@@ -300,7 +301,6 @@
     "online": {
       "title": "Online",
       "description": "Erstelle eine Lobby oder tritt Freunden per Code bei.",
-      "comingSoon": "Demnächst",
       "choice": {
         "subtitle": "Erstelle eine neue Lobby oder tritt per Code bei",
         "create": "Lobby erstellen",

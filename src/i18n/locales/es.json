@@ -104,6 +104,7 @@
   },
   "playing": {
     "exit": "Salir",
+    "waitingForHost": "Esperando a que el anfitrión inicie la partida…",
     "timerTitle": "Tiempo de partida",
     "movesTitle": "Número de turnos",
     "moveLabel": "Turno {{count}}",
@@ -300,7 +301,6 @@
     "online": {
       "title": "Online",
       "description": "Crea una sala o únete a tus amigos con un código.",
-      "comingSoon": "Próximamente",
       "choice": {
         "subtitle": "Crea una sala nueva o únete con un código",
         "create": "Crear sala",
