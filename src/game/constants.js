@@ -1,6 +1,6 @@
 // Bumped by hand on each notable release; shown in the home screen footer
 // so a player can tell Claude/us which build they're on when reporting a bug.
-export const APP_VERSION = "1.1";
+export const APP_VERSION = "1.1f2";
 
 export const BASE_CELL_SIZE = 44;
 
