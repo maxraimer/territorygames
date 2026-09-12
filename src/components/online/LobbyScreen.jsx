@@ -1,19 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FiCopy, FiCheck, FiLogOut } from "react-icons/fi";
-import { GAME_LOGOS, GAME_TITLE_PARTS } from "../../game/constants";
+import { FiCopy, FiCheck, FiLogOut, FiInfo } from "react-icons/fi";
+import {
+  GAME_LOGOS,
+  GAME_TITLE_PARTS,
+  COLOR_PALETTE,
+  MIN_PLAYERS,
+  MAX_PLAYERS,
+  gridMinForPlayerCount,
+} from "../../game/constants";
 import useLobby from "../../hooks/useLobby";
 import HeaderControls from "../HeaderControls";
+import RulesModal from "../RulesModal";
+import GameConfigFields from "../GameConfigFields";
+
+const MAX_PLAYERS_OPTIONS = Array.from({ length: MAX_PLAYERS - MIN_PLAYERS + 1 }, (_, i) => MIN_PLAYERS + i);
 
 export default function LobbyScreen({ gameType, code, playerId, onLeave, onGameStart }) {
   const { t } = useTranslation();
-  const { lobby, loading, error, start, leave } = useLobby(code);
+  const { lobby, loading, error, start, leave, updateConfig, updateColor } = useLobby(code);
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
+  const rulesDialogRef = useRef(null);
 
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const logo = GAME_LOGOS[gameType] ?? GAME_LOGOS.dice;
   const isHost = lobby?.hostId === playerId;
+  const me = lobby?.players.find((p) => p.id === playerId);
 
   useEffect(() => {
     if (lobby?.status !== "started") return;
@@ -53,6 +66,25 @@ export default function LobbyScreen({ gameType, code, playerId, onLeave, onGameS
     onLeave();
   }
 
+  function handleConfigPatch(patch) {
+    if (!isHost) return;
+    updateConfig(playerId, patch).catch(() => {});
+  }
+
+  function handleMaxPlayersChange(count) {
+    if (!isHost || !lobby) return;
+    const newMin = gridMinForPlayerCount(count, gameType);
+    handleConfigPatch({
+      maxPlayers: count,
+      cols: Math.max(lobby.config.cols, newMin),
+      rows: Math.max(lobby.config.rows, newMin),
+    });
+  }
+
+  function handleColorPick(color) {
+    updateColor(playerId, color).catch(() => {});
+  }
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-base-200 p-6">
@@ -71,6 +103,8 @@ export default function LobbyScreen({ gameType, code, playerId, onLeave, onGameS
       </div>
     );
   }
+
+  const gridMin = gridMinForPlayerCount(lobby.config.maxPlayers, gameType);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-base-200 p-6">
@@ -96,6 +130,103 @@ export default function LobbyScreen({ gameType, code, playerId, onLeave, onGameS
               </button>
             </div>
           </div>
+
+          <div className="flex flex-col gap-3 rounded-lg border border-base-300 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <span className="text-sm font-medium">{t("mode.online.lobby.settingsTitle")}</span>
+                <p className="text-xs text-base-content/50">
+                  {t(isHost ? "mode.online.lobby.hostSettingsHint" : "mode.online.lobby.guestSettingsHint")}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-outline btn-xs shrink-0 gap-1"
+                onClick={() => rulesDialogRef.current?.showModal()}
+              >
+                <FiInfo className="h-3.5 w-3.5" />
+                {t("setup.rulesButton")}
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">{t("mode.online.lobby.maxPlayersLabel")}</span>
+              {isHost ? (
+                <div className="flex gap-2">
+                  {MAX_PLAYERS_OPTIONS.map((count) => (
+                    <button
+                      key={count}
+                      type="button"
+                      disabled={count < lobby.players.length}
+                      onClick={() => handleMaxPlayersChange(count)}
+                      className={
+                        "flex h-10 w-10 items-center justify-center rounded-lg border-2 text-sm font-semibold transition " +
+                        (lobby.config.maxPlayers === count
+                          ? "border-primary bg-primary text-primary-content cursor-pointer"
+                          : count < lobby.players.length
+                            ? "cursor-not-allowed border-base-300 text-base-content/30"
+                            : "cursor-pointer border-base-300 text-base-content hover:border-primary hover:bg-primary/10")
+                      }
+                    >
+                      {count}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-sm text-base-content/70">{lobby.config.maxPlayers}</span>
+              )}
+            </div>
+
+            <GameConfigFields
+              gameType={gameType}
+              cols={lobby.config.cols}
+              rows={lobby.config.rows}
+              onColsChange={(cols) => handleConfigPatch({ cols })}
+              onRowsChange={(rows) => handleConfigPatch({ rows })}
+              gridMin={gridMin}
+              playerCount={lobby.config.maxPlayers}
+              autoWin={lobby.config.autoWin}
+              onAutoWinChange={(autoWin) => handleConfigPatch({ autoWin })}
+              allowRotation={lobby.config.allowRotation}
+              onAllowRotationChange={(allowRotation) => handleConfigPatch({ allowRotation })}
+              doublesExtraTurn={lobby.config.doublesExtraTurn}
+              onDoublesExtraTurnChange={(doublesExtraTurn) => handleConfigPatch({ doublesExtraTurn })}
+              smartAssist={lobby.config.smartAssist}
+              onSmartAssistChange={(smartAssist) => handleConfigPatch({ smartAssist })}
+              autoFillEnclosed={lobby.config.autoFillEnclosed}
+              onAutoFillEnclosedChange={(autoFillEnclosed) => handleConfigPatch({ autoFillEnclosed })}
+              readOnly={!isHost}
+            />
+          </div>
+
+          {me && (
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">{t("mode.online.lobby.yourColorLabel")}</span>
+              <div className="flex flex-wrap gap-3">
+                {COLOR_PALETTE.map((color) => {
+                  const takenByOther = lobby.players.some((p) => p.id !== playerId && p.color === color);
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      disabled={takenByOther}
+                      onClick={() => handleColorPick(color)}
+                      className={
+                        "h-7 w-7 rounded-full transition ring-offset-2 ring-offset-base-100 cursor-pointer" +
+                        (me.color === color
+                          ? " ring-2 ring-base-content"
+                          : takenByOther
+                            ? " cursor-not-allowed opacity-25"
+                            : " hover:scale-110")
+                      }
+                      style={{ background: color }}
+                      aria-label={color}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium">
@@ -138,6 +269,8 @@ export default function LobbyScreen({ gameType, code, playerId, onLeave, onGameS
           </div>
         </div>
       </div>
+
+      <RulesModal gameType={gameType} dialogRef={rulesDialogRef} />
     </div>
   );
 }

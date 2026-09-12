@@ -304,7 +304,7 @@
       "choice": {
         "subtitle": "Erstelle eine neue Lobby oder tritt per Code bei",
         "create": "Lobby erstellen",
-        "createHint": "Richte das Spiel ein und lade andere per Code ein",
+        "createHint": "Erstelle eine Lobby und lade andere per Code ein — richtet sie gemeinsam ein",
         "join": "Lobby beitreten",
         "joinHint": "Gib den Code ein, den du erhalten hast"
       },
@@ -338,7 +338,12 @@
         "starting": "Wird gestartet…",
         "minPlayersHint": "Mindestens 2 Spieler nötig, um zu starten",
         "waitingHint": "Warten, bis der Lobby-Host das Spiel startet…",
-        "leaveButton": "Lobby verlassen"
+        "leaveButton": "Lobby verlassen",
+        "settingsTitle": "Spieleinstellungen",
+        "hostSettingsHint": "Du bist der Lobby-Host. Diese Einstellungen sehen alle.",
+        "guestSettingsHint": "Diese Einstellungen legt der Lobby-Host fest.",
+        "yourColorLabel": "Deine Farbe",
+        "maxPlayersLabel": "Maximale Spielerzahl"
       }
     }
   }

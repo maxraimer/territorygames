@@ -1,5 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
-import { createLobby, joinLobby, getLobby, leaveLobby, startLobby, subscribeToLobby } from "./mockLobbyAdapter";
+import {
+  createLobby,
+  joinLobby,
+  getLobby,
+  leaveLobby,
+  startLobby,
+  updateLobbyConfig,
+  updatePlayerColor,
+  subscribeToLobby,
+} from "./mockLobbyAdapter";
 import { LobbyError, LOBBY_ERROR_CODES } from "../lobbyErrors";
 
 describe("createLobby / getLobby", () => {
@@ -101,6 +110,74 @@ describe("leaveLobby", () => {
     const { lobby, playerId: hostId } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
     await leaveLobby(lobby.code, hostId);
     await expect(getLobby(lobby.code)).rejects.toMatchObject({ code: LOBBY_ERROR_CODES.NOT_FOUND });
+  });
+});
+
+describe("updateLobbyConfig", () => {
+  it("merges the patch into config when called by the host", async () => {
+    const { lobby, playerId: hostId } = await createLobby({
+      gameType: "dice",
+      config: { maxPlayers: 4, cols: 12, rows: 10 },
+      hostName: "Alice",
+    });
+    const updated = await updateLobbyConfig(lobby.code, hostId, { cols: 16, autoWin: false });
+    expect(updated.config).toMatchObject({ maxPlayers: 4, cols: 16, rows: 10, autoWin: false });
+  });
+
+  it("throws NOT_HOST when a non-host player tries to change settings", async () => {
+    const { lobby } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
+    const { playerId: guestId } = await joinLobby(lobby.code, { name: "Bob" });
+    await expect(updateLobbyConfig(lobby.code, guestId, { cols: 16 })).rejects.toMatchObject({
+      code: LOBBY_ERROR_CODES.NOT_HOST,
+    });
+  });
+
+  it("throws ALREADY_STARTED once the game has started", async () => {
+    const { lobby, playerId: hostId } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
+    await joinLobby(lobby.code, { name: "Bob" });
+    await startLobby(lobby.code, hostId);
+    await expect(updateLobbyConfig(lobby.code, hostId, { cols: 16 })).rejects.toMatchObject({
+      code: LOBBY_ERROR_CODES.ALREADY_STARTED,
+    });
+  });
+
+  it("throws NOT_FOUND for an unknown code", async () => {
+    await expect(updateLobbyConfig("ZZZZ99", "p1", { cols: 16 })).rejects.toMatchObject({
+      code: LOBBY_ERROR_CODES.NOT_FOUND,
+    });
+  });
+});
+
+describe("updatePlayerColor", () => {
+  it("changes a player's own color", async () => {
+    const { lobby, playerId: hostId } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
+    const updated = await updatePlayerColor(lobby.code, hostId, "#000000");
+    expect(updated.players.find((p) => p.id === hostId).color).toBe("#000000");
+  });
+
+  it("throws COLOR_TAKEN when another player already has that color", async () => {
+    const { lobby, playerId: hostId } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
+    const { lobby: joined, playerId: guestId } = await joinLobby(lobby.code, { name: "Bob" });
+    const hostColor = joined.players.find((p) => p.id === hostId).color;
+    await expect(updatePlayerColor(lobby.code, guestId, hostColor)).rejects.toMatchObject({
+      code: LOBBY_ERROR_CODES.COLOR_TAKEN,
+    });
+  });
+
+  it("allows picking the color the player already has", async () => {
+    const { lobby, playerId: hostId } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
+    const ownColor = lobby.players[0].color;
+    const updated = await updatePlayerColor(lobby.code, hostId, ownColor);
+    expect(updated.players.find((p) => p.id === hostId).color).toBe(ownColor);
+  });
+
+  it("throws ALREADY_STARTED once the game has started", async () => {
+    const { lobby, playerId: hostId } = await createLobby({ gameType: "dice", config: { maxPlayers: 4 }, hostName: "Alice" });
+    await joinLobby(lobby.code, { name: "Bob" });
+    await startLobby(lobby.code, hostId);
+    await expect(updatePlayerColor(lobby.code, hostId, "#000000")).rejects.toMatchObject({
+      code: LOBBY_ERROR_CODES.ALREADY_STARTED,
+    });
   });
 });
 

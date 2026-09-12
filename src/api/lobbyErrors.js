@@ -4,6 +4,7 @@ export const LOBBY_ERROR_CODES = {
   ALREADY_STARTED: "ALREADY_STARTED",
   NOT_HOST: "NOT_HOST",
   NOT_ENOUGH_PLAYERS: "NOT_ENOUGH_PLAYERS",
+  COLOR_TAKEN: "COLOR_TAKEN",
 };
 
 export class LobbyError extends Error {

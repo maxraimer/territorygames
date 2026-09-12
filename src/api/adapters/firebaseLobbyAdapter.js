@@ -131,6 +131,40 @@ export async function startLobby(code, playerId) {
   return nextLobby;
 }
 
+export async function updateLobbyConfig(code, playerId, configPatch) {
+  const db = getFirebaseDb();
+  const normalizedCode = code.toUpperCase();
+  const target = lobbyRef(db, normalizedCode);
+
+  const snap = await get(target);
+  if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
+  const lobby = snap.val();
+  if (lobby.hostId !== playerId) throw new LobbyError(LOBBY_ERROR_CODES.NOT_HOST);
+  if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
+
+  const nextLobby = { ...lobby, config: { ...lobby.config, ...configPatch } };
+  await set(target, nextLobby);
+  return nextLobby;
+}
+
+export async function updatePlayerColor(code, playerId, color) {
+  const db = getFirebaseDb();
+  const normalizedCode = code.toUpperCase();
+  const target = lobbyRef(db, normalizedCode);
+
+  const snap = await get(target);
+  if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
+  const lobby = snap.val();
+  if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
+  if (lobby.players.some((p) => p.id !== playerId && p.color === color)) {
+    throw new LobbyError(LOBBY_ERROR_CODES.COLOR_TAKEN);
+  }
+
+  const nextLobby = { ...lobby, players: lobby.players.map((p) => (p.id === playerId ? { ...p, color } : p)) };
+  await set(target, nextLobby);
+  return nextLobby;
+}
+
 /** Subscribes to every future change to a lobby (not the current snapshot, matching mockLobbyAdapter — call getLobby first). Returns an unsubscribe function. */
 export function subscribeToLobby(code, onUpdate) {
   const db = getFirebaseDb();

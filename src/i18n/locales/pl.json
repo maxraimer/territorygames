@@ -304,7 +304,7 @@
       "choice": {
         "subtitle": "Utwórz nowe lobby albo dołącz za pomocą kodu",
         "create": "Utwórz lobby",
-        "createHint": "Skonfiguruj grę i zaproś innych za pomocą kodu",
+        "createHint": "Utwórz lobby i zaproś innych za pomocą kodu — ustawicie je razem",
         "join": "Dołącz do lobby",
         "joinHint": "Wpisz kod, który do Ciebie wysłano"
       },
@@ -338,7 +338,12 @@
         "starting": "Rozpoczynamy…",
         "minPlayersHint": "Potrzeba co najmniej 2 graczy, aby rozpocząć",
         "waitingHint": "Czekamy, aż właściciel lobby rozpocznie grę…",
-        "leaveButton": "Opuść lobby"
+        "leaveButton": "Opuść lobby",
+        "settingsTitle": "Ustawienia gry",
+        "hostSettingsHint": "Jesteś właścicielem lobby. Te ustawienia widzą wszyscy.",
+        "guestSettingsHint": "Te ustawienia ustala właściciel lobby.",
+        "yourColorLabel": "Twój kolor",
+        "maxPlayersLabel": "Maksymalna liczba graczy"
       }
     }
   }

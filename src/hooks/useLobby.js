@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { getLobby, subscribeToLobby, startLobby, leaveLobby } from "../api/lobbyApi";
+import {
+  getLobby,
+  subscribeToLobby,
+  startLobby,
+  leaveLobby,
+  updateLobbyConfig,
+  updatePlayerColor,
+} from "../api/lobbyApi";
 
 /** Live view of one lobby: fetches it once, then stays in sync via subscribeToLobby. */
 export default function useLobby(code) {
@@ -48,5 +55,15 @@ export default function useLobby(code) {
 
   const leave = useCallback((playerId) => leaveLobby(code, playerId), [code]);
 
-  return { lobby, loading, error, start, leave };
+  // Left to the caller to catch: a rejected config/color update shouldn't
+  // blow away this hook's shared `error` state (that state drives the
+  // whole-screen "lobby no longer exists" fallback in LobbyScreen), just
+  // like `leave` above.
+  const updateConfig = useCallback(
+    (playerId, configPatch) => updateLobbyConfig(code, playerId, configPatch),
+    [code]
+  );
+  const updateColor = useCallback((playerId, color) => updatePlayerColor(code, playerId, color), [code]);
+
+  return { lobby, loading, error, start, leave, updateConfig, updateColor };
 }

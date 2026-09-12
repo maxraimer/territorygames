@@ -161,6 +161,34 @@ export async function startLobby(code, playerId) {
   return next;
 }
 
+export async function updateLobbyConfig(code, playerId, configPatch) {
+  await delay(50);
+  const normalizedCode = code.toUpperCase();
+  const lobby = read(normalizedCode);
+  if (!lobby) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
+  if (lobby.hostId !== playerId) throw new LobbyError(LOBBY_ERROR_CODES.NOT_HOST);
+  if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
+
+  const next = { ...lobby, config: { ...lobby.config, ...configPatch } };
+  persist(normalizedCode, next);
+  return next;
+}
+
+export async function updatePlayerColor(code, playerId, color) {
+  await delay(50);
+  const normalizedCode = code.toUpperCase();
+  const lobby = read(normalizedCode);
+  if (!lobby) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
+  if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
+  if (lobby.players.some((p) => p.id !== playerId && p.color === color)) {
+    throw new LobbyError(LOBBY_ERROR_CODES.COLOR_TAKEN);
+  }
+
+  const next = { ...lobby, players: lobby.players.map((p) => (p.id === playerId ? { ...p, color } : p)) };
+  persist(normalizedCode, next);
+  return next;
+}
+
 /** Subscribes to every future change to a lobby (not the current snapshot — call getLobby first). Returns an unsubscribe function. */
 export function subscribeToLobby(code, onUpdate) {
   const normalizedCode = code.toUpperCase();
