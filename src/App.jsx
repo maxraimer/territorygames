@@ -1335,6 +1335,21 @@ export default function App() {
     pushGameState(online.code, game, onlineSeqRef.current);
   }, [game, screen]);
 
+  // Every game-ending path above sets `game.endedAt` and calls
+  // setScreen("gameover") together, in the same handler — fine for
+  // hot-seat/bots, since there's only ever one client. But online, the
+  // player who *isn't* acting never runs that handler; their `game` only
+  // ever gets `endedAt` by receiving the winner's final snapshot through
+  // the sync effect above, which doesn't touch `screen`. Without this,
+  // that player's screen just stays on "playing" forever. Reacting to
+  // `game.endedAt` here (rather than duplicating each handler's own
+  // isGameOver/autoWin check) covers both clients uniformly, and is a
+  // harmless no-op for the acting client, which already set the same
+  // screen a moment earlier.
+  useEffect(() => {
+    if (screen === "playing" && game?.endedAt) setScreen("gameover");
+  }, [game, screen]);
+
   // Drives bot turns end-to-end: roll -> (after a short delay) decide + place -> advance.
   // Depends on the whole `game` object rather than hand-picked fields, same trade-off
   // `previewPlacement`'s memo above makes (see its eslint-disable comment) — this is also
