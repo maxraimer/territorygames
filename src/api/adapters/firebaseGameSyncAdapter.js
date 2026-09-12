@@ -1,14 +1,9 @@
 // Firebase Realtime Database implementation of the game-sync contract (see
 // ../gameSyncApi.js) — the same 3 functions as mockGameSyncAdapter.js, so
-// swapping to real cross-device sync is changing gameSyncApi.js's one
-// import line to point here instead. Stores each match's live snapshot at
-// `games/{code}`.
-//
-// NOT YET WIRED UP (gameSyncApi.js still points at the mock adapter) and
-// UNTESTED against a real Firebase project — see .env.example for the
-// config this needs. Written to the same contract mockGameSyncAdapter.js
-// already exercises via App.jsx's sync effects, which is what should be
-// re-verified (ideally with two real devices) before flipping the switch.
+// swapping back to the mock for local/offline work is changing
+// gameSyncApi.js's one import line. Stores each match's live snapshot at
+// `games/{code}`. This is the active adapter (see gameSyncApi.js) — the
+// project config lives in ../firebaseConfig.js.
 import { ref, set, get, onValue, off } from "firebase/database";
 import { getFirebaseDb } from "./firebaseApp";
 

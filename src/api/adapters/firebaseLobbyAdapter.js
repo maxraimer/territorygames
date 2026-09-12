@@ -1,18 +1,13 @@
 // Firebase Realtime Database implementation of the lobby contract (see
 // ../lobbyApi.js) — the same 6 functions as mockLobbyAdapter.js, so
-// swapping to a real backend is changing lobbyApi.js's one import line to
-// point here instead. Stores each lobby at `lobbies/{code}`; join/leave/
-// start use runTransaction so two players joining (or leaving) at once
-// can't both write a stale player list — the mock adapter doesn't need
-// this (single-threaded JS, one write always finishes before the next
-// starts) but a real multi-client backend does.
-//
-// NOT YET WIRED UP (lobbyApi.js still points at the mock adapter) and
-// UNTESTED against a real Firebase project — see .env.example for the
-// config this needs. Written to the exact contract mockLobbyAdapter.test.js
-// already exercises, which is what should be re-verified (ideally rerun
-// against a real project, or ported to an emulator) before flipping the
-// switch.
+// swapping back to the mock for local/offline work is changing
+// lobbyApi.js's one import line. Stores each lobby at `lobbies/{code}`;
+// join/leave/start use runTransaction so two players joining (or leaving)
+// at once can't both write a stale player list — the mock adapter doesn't
+// need this (single-threaded JS, one write always finishes before the
+// next starts) but a real multi-client backend does. This is the active
+// adapter (see lobbyApi.js) — the project config lives in
+// ../firebaseConfig.js.
 import { ref, get, set, runTransaction, onValue, off } from "firebase/database";
 import { getFirebaseDb } from "./firebaseApp";
 import { LobbyError, LOBBY_ERROR_CODES } from "../lobbyErrors";
