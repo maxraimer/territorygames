@@ -13,11 +13,6 @@ export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
   const { t } = useTranslation();
   const titleParts = GAME_TITLE_PARTS[gameType] ?? GAME_TITLE_PARTS.dice;
   const logo = GAME_LOGOS[gameType] ?? GAME_LOGOS.dice;
-  const modes = BASE_MODES.map((mode) => ({
-    ...mode,
-    disabled: mode.id === "online",
-    disabledReason: "mode.online.comingSoon",
-  }));
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-base-200 p-6">
@@ -40,25 +35,17 @@ export default function ModeSelectScreen({ gameType, onSelect, onBack }) {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {modes.map(({ id, icon: Icon, disabled, disabledReason }) => (
+          {BASE_MODES.map(({ id, icon: Icon }) => (
             <button
               key={id}
               type="button"
-              disabled={disabled}
               onClick={() => onSelect(id)}
-              title={disabled ? t(disabledReason) : undefined}
-              className={
-                "card bg-base-100 text-left shadow-xl transition " +
-                (disabled
-                  ? "cursor-not-allowed opacity-50"
-                  : "hover:-translate-y-0.5 hover:shadow-2xl cursor-pointer")
-              }
+              className="card bg-base-100 text-left shadow-xl transition hover:-translate-y-0.5 hover:shadow-2xl cursor-pointer"
             >
               <div className="card-body items-center gap-2 text-center">
                 <Icon className="h-8 w-8 text-primary" />
                 <h2 className="card-title">{t(`mode.${id}.title`)}</h2>
                 <p className="text-sm text-base-content/60">{t(`mode.${id}.description`)}</p>
-                {disabled && <span className="badge badge-ghost badge-sm">{t(disabledReason)}</span>}
               </div>
             </button>
           ))}
