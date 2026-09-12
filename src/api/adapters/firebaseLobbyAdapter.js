@@ -61,8 +61,21 @@ export async function joinLobby(code, { name }) {
   const db = getFirebaseDb();
   const normalizedCode = code.toUpperCase();
   const playerId = randomId();
+  const target = lobbyRef(db, normalizedCode);
 
-  const result = await runTransaction(lobbyRef(db, normalizedCode), (lobby) => {
+  // A client that has never touched this path before (any brand-new guest
+  // joining a lobby) has no local cache for it, and runTransaction's first
+  // pass can invoke the update function with `lobby === null` before the
+  // server value has actually arrived. Since our callback treats `null` as
+  // a deliberate "doesn't exist, abort" decision rather than a staleness
+  // conflict, Firebase honors that abort immediately instead of retrying
+  // with the real data — which was showing up as every first-time join
+  // failing with a wrong "lobby is full" error. One plain get() first
+  // warms the SDK's cache for this path so the transaction never sees that
+  // premature null.
+  await get(target);
+
+  const result = await runTransaction(target, (lobby) => {
     if (lobby === null) return; // abort — NOT_FOUND, diagnosed below
     if (lobby.status !== "waiting") return; // abort — ALREADY_STARTED
     if (lobby.players.length >= lobby.config.maxPlayers) return; // abort — FULL
@@ -71,7 +84,7 @@ export async function joinLobby(code, { name }) {
   });
 
   if (!result.committed) {
-    const snap = await get(lobbyRef(db, normalizedCode));
+    const snap = await get(target);
     if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
     const lobby = snap.val();
     if (lobby.status !== "waiting") throw new LobbyError(LOBBY_ERROR_CODES.ALREADY_STARTED);
@@ -90,7 +103,9 @@ export async function getLobby(code) {
 export async function leaveLobby(code, playerId) {
   const db = getFirebaseDb();
   const normalizedCode = code.toUpperCase();
-  await runTransaction(lobbyRef(db, normalizedCode), (lobby) => {
+  const target = lobbyRef(db, normalizedCode);
+  await get(target); // see joinLobby's comment on warming the cache before a transaction
+  await runTransaction(target, (lobby) => {
     if (lobby === null) return; // already gone
     const remainingPlayers = lobby.players.filter((p) => p.id !== playerId);
     if (remainingPlayers.length === 0) return null; // delete the lobby
@@ -104,8 +119,10 @@ export async function leaveLobby(code, playerId) {
 export async function startLobby(code, playerId) {
   const db = getFirebaseDb();
   const normalizedCode = code.toUpperCase();
+  const target = lobbyRef(db, normalizedCode);
+  await get(target); // see joinLobby's comment on warming the cache before a transaction
 
-  const result = await runTransaction(lobbyRef(db, normalizedCode), (lobby) => {
+  const result = await runTransaction(target, (lobby) => {
     if (lobby === null) return; // abort — NOT_FOUND
     if (lobby.hostId !== playerId) return; // abort — NOT_HOST
     if (lobby.players.length < 2) return; // abort — NOT_ENOUGH_PLAYERS
@@ -114,7 +131,7 @@ export async function startLobby(code, playerId) {
   });
 
   if (!result.committed) {
-    const snap = await get(lobbyRef(db, normalizedCode));
+    const snap = await get(target);
     if (!snap.exists()) throw new LobbyError(LOBBY_ERROR_CODES.NOT_FOUND);
     const lobby = snap.val();
     if (lobby.hostId !== playerId) throw new LobbyError(LOBBY_ERROR_CODES.NOT_HOST);
