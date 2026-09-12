@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { GAME_TYPES, GAME_LOGOS } from "../game/constants";
+import { GAME_TYPES, GAME_LOGOS, APP_VERSION } from "../game/constants";
 import HeaderControls from "./HeaderControls";
 
 export default function HomeScreen({ nickname, onNicknameChange, onSelect }) {
@@ -57,6 +57,8 @@ export default function HomeScreen({ nickname, onNicknameChange, onSelect }) {
           ))}
         </div>
       </div>
+
+      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-base-content/40">v{APP_VERSION}</span>
     </div>
   );
 }
