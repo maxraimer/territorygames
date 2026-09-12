@@ -1426,6 +1426,23 @@ export default function App() {
         .sort((a, b) => a.y - b.y || a.x - b.x)
     : null;
 
+  // Rendered in two spots below (sidebar on wide screens, below the board on
+  // narrow ones — see their `hidden`/`lg:hidden` wrappers) rather than one
+  // fixed position, since which placement avoids pushing the board around
+  // depends on which layout mode (stacked vs. side-by-side) is active.
+  const historyCard = (
+    <div className="card bg-base-100 shadow-sm">
+      <div className="card-body gap-2 p-4">
+        <h2 className="card-title text-sm">{t("playing.historyTitle")}</h2>
+        <ul className="flex h-64 flex-col gap-1.5 overflow-y-auto text-xs text-base-content/70">
+          {log.map((entry, i) => (
+            <li key={i}>{entry}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-base-200 p-4 sm:p-6">
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -1546,6 +1563,8 @@ export default function App() {
           </div>
 
           {game.gameType === "route" && <TerrainLegend />}
+
+          <div className="hidden lg:block">{historyCard}</div>
         </aside>
 
         <main className="flex min-w-0 flex-1 flex-col gap-3">
@@ -1675,16 +1694,7 @@ export default function App() {
             )}
           </div>
 
-          <div className="card bg-base-100 shadow-sm">
-            <div className="card-body gap-2 p-4">
-              <h2 className="card-title text-sm">{t("playing.historyTitle")}</h2>
-              <ul className="flex h-64 flex-col gap-1.5 overflow-y-auto text-xs text-base-content/70">
-                {log.map((entry, i) => (
-                  <li key={i}>{entry}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <div className="lg:hidden">{historyCard}</div>
         </main>
       </div>
     </div>
